@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import Table from "../components/Table";
 import toast from "react-hot-toast";
 
 export default function QuestionnaireDetail() {
+    const navigate = useNavigate();
     const { id } = useParams();
     const [questionnaire, setQuestionnaire] = useState(null);
     const [results, setResults] = useState([]);
@@ -34,6 +35,7 @@ export default function QuestionnaireDetail() {
     return (
         <div className="space-y-6">
             <div className="bg-white p-4 rounded shadow">
+                <button className="mb-4 text-blue-600 underline" onClick={() => navigate(-1)}>← Back</button>
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">
                     {questionnaire.title}
                 </h2>

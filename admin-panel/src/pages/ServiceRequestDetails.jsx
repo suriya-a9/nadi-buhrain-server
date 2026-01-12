@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import api from "../services/api";
+import { IoPrintOutline } from "react-icons/io5";
 import { formatDateTime } from "../utils/dateUtils";
 import { formatDuration } from "../utils/timeUtils";
 import Table from "../components/Table";
+import { generateSingleServiceRequestPDF } from "../utils/pdf/generateSingleServiceRequestPDF";
 // function formatDateTime(dateStr) {
 //     if (!dateStr) return "-";
 //     const d = new Date(dateStr);
@@ -141,7 +143,22 @@ export default function ServiceRequestDetails() {
 
     return (
         <div className="p-6 bg-white rounded shadow mt-8">
-            <button className="mb-4 text-blue-600 underline" onClick={() => navigate(-1)}>← Back</button>
+            <div className="flex justify-between">
+                <button className="mb-4 text-blue-600 underline" onClick={() => navigate(-1)}>← Back</button>
+                {!loading && request && (
+                    <button
+                        className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2"
+                        onClick={() =>
+                            generateSingleServiceRequestPDF({
+                                request: { ...request, technicianAssignments },
+                                logoUrl: "/assets/mail-logo.jpg"
+                            })
+                        }
+                    >
+                        Print <IoPrintOutline size={20} />
+                    </button>
+                )}
+            </div>
             <h2 className="text-[25px] font-bold mb-6 text-textGreen">Service Request Details</h2>
             <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                 {/* <div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { generateServiceRequestsPDF } from "../utils/pdf/serviceRequestsPdf";
+import { IoPrintOutline } from "react-icons/io5";
 import Table from "../components/Table";
 import api from "../services/api";
 import Pagination from "../components/Pagination";
@@ -240,58 +240,21 @@ export default function ServiceRequestList() {
         }
     }, [detailsOpen, selected]);
 
-    const handleDownloadPDF = () => {
-        const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text("Service Requests List", 14, 16);
-
-        const columns = [
-            { header: "S/No", dataKey: "sno" },
-            { header: "Request ID", dataKey: "serviceRequestID" },
-            { header: "Requested By", dataKey: "requestedBy" },
-            { header: "Service Name", dataKey: "serviceName" },
-            { header: "Issue Name", dataKey: "issueName" },
-            { header: "Is Urgent?", dataKey: "urgent" },
-            { header: "Status", dataKey: "status" },
-            { header: "Scheduled Date", dataKey: "scheduledDate" },
-            { header: "Feedback", dataKey: "feedback" },
-        ];
-
-        const rows = filteredData.map((r, idx) => {
-            const { status, time } = getLastUpdatedStatusWithTime(r.statusTimestamps);
-            return {
-                sno: idx + 1,
-                serviceRequestID: r.serviceRequestID,
-                requestedBy: r.userId?.basicInfo?.fullName || "-",
-                serviceName: r.serviceId?.name || "-",
-                issueName: r.issuesId?.issue || "-",
-                urgent: r.immediateAssistance ? "Yes" : "No",
-                status: `${status}${time && time !== "-" ? ` (${formatDateTime(time)})` : ""}`,
-                scheduledDate: formatDateTime(r.scheduleService),
-                feedback: r.feedback || "-",
-            };
-        });
-
-        doc.autoTable({
-            columns,
-            body: rows,
-            startY: 22,
-            styles: { fontSize: 8, cellWidth: 'wrap' },
-            headStyles: { fillColor: [41, 128, 185] },
-            margin: { left: 10, right: 10 },
-        });
-
-        doc.save("service-requests-list.pdf");
-    };
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">Service Requests List</h2>
                 <button
-                    className="px-4 py-2 bg-green-600 text-white rounded"
-                    onClick={handleDownloadPDF}
+                    className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2"
+                    onClick={() =>
+                        generateServiceRequestsPDF({
+                            data: filteredData,
+                            logoUrl: "/assets/mail-logo.jpg",
+                            subtitle: `Total Records: ${filteredData.length}`
+                        })
+                    }
                 >
-                    Download PDF
+                    Print <IoPrintOutline size={20} />
                 </button>
             </div>
             <div className="mb-4 flex gap-2">
