@@ -116,7 +116,15 @@ exports.servicesList = async (req, res, next) => {
                     ...service.toObject(),
                     address: address || null,
                     assignmentStatus: assignment?.status,
-                    assignmentReason: assignment?.reason || null
+                    assignmentReason: assignment?.reason || null,
+                    technicianUserService: techUserService
+                        ? {
+                            ...techUserService.toObject(),
+                            assignments: techUserService.assignments.filter(
+                                a => a.technicianId.toString() === technicianId
+                            )
+                        }
+                        : null
                 };
             })
             .filter(service => {
@@ -125,7 +133,7 @@ exports.servicesList = async (req, res, next) => {
                     return service.assignmentStatus === 'in-progress' || service.assignmentStatus === 'on-hold';
                 }
                 return service.assignmentStatus === status;
-            })
+            });
 
         res.status(200).json({
             count: servicesWithAddress.length,
