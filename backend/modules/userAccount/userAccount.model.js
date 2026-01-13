@@ -19,12 +19,10 @@ const userAccountSchema = new mongoose.Schema({
             type: String,
         },
         mobileNumber: {
-            type: Number,
-            unique: true
+            type: Number
         },
         email: {
-            type: String,
-            unique: true
+            type: String
         },
         gender: {
             type: String,
@@ -100,7 +98,9 @@ const userAccountSchema = new mongoose.Schema({
         type: Date,
         default: null
     }
-}, { timestamps: true })
+}, { timestamps: true });
+userAccountSchema.index({ "basicInfo.mobileNumber": 1 }, { unique: true, sparse: true });
+userAccountSchema.index({ "basicInfo.email": 1 }, { unique: true, sparse: true });
 
 const UserAccount = mongoose.model("UserAccount", userAccountSchema);
 module.exports = UserAccount;
