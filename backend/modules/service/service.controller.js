@@ -2,12 +2,13 @@ const Service = require('./service.model');
 const UserLog = require("../userLogs/userLogs.model");
 
 exports.createService = async (req, res, next) => {
-    const { name } = req.body;
+    const { name, points } = req.body;
     try {
         const serviceImage = req.files?.serviceImage?.[0]?.filename;
         const serviceLogo = req.files?.serviceLogo?.[0]?.filename;
         const serviceCreate = await Service.create({
             name,
+            points,
             serviceImage,
             serviceLogo
         });

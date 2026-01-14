@@ -15,6 +15,7 @@ export default function Services() {
     const [form, setForm] = useState({
         id: "",
         name: "",
+        points: "",
         serviceImage: null,
         serviceLogo: null,
     });
@@ -45,6 +46,7 @@ export default function Services() {
 
         const fd = new FormData();
         fd.append("name", form.name);
+        fd.append("points", form.points);
         if (form.serviceImage) fd.append("serviceImage", form.serviceImage);
         if (form.serviceLogo) fd.append("serviceLogo", form.serviceLogo);
 
@@ -54,7 +56,7 @@ export default function Services() {
             toast.success(res.data.message);
             loadServices();
             setOpenCanvas(false);
-            setForm({ id: "", name: "", serviceImage: null, serviceLogo: null });
+            setForm({ id: "", name: "", points: "", serviceImage: null, serviceLogo: null });
         } catch (err) {
             toast.error(err.response?.data?.message);
         }
@@ -64,6 +66,7 @@ export default function Services() {
         setForm({
             id: s._id,
             name: s.name,
+            points: s.points,
             serviceImage: null,
             serviceLogo: null,
         });
@@ -122,6 +125,7 @@ export default function Services() {
                             (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
                     },
                     { title: "Name", key: "name" },
+                    { title: "Points", key: "points" },
                     {
                         title: "Image",
                         key: "serviceImage",
@@ -194,6 +198,16 @@ export default function Services() {
                             value={form.name}
                             onChange={handleChange}
                             placeholder="Enter Service Name"
+                            required
+                            className="border p-2 rounded w-full"
+                        />
+                        <label className="block mb-1 font-medium">Service Points</label>
+                        <input
+                            type="text"
+                            name="points"
+                            value={form.points}
+                            onChange={handleChange}
+                            placeholder="Enter Service Points"
                             required
                             className="border p-2 rounded w-full"
                         />

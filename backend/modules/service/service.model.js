@@ -8,7 +8,10 @@ const serviceSchema = new mongoose.Schema({
     serviceImage: {
         type: String,
     },
-    serviceLogo:{
+    serviceLogo: {
+        type: String
+    },
+    points: {
         type: String
     }
 }, { timestamps: true });

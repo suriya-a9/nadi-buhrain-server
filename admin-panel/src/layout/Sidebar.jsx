@@ -5,13 +5,14 @@ import { BsThreeDotsVertical, BsPersonVideo3, BsReverseLayoutSidebarInsetReverse
 import { FaRegFileImage, FaUsers } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
-import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline } from "react-icons/md";
+import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip } from "react-icons/md";
 import { PiBuildingApartment } from "react-icons/pi";
 import { BiCartAdd } from "react-icons/bi";
 import { CgUnavailable } from "react-icons/cg";
 import { FaWarehouse, FaClipboardUser } from "react-icons/fa6";
 import { SlBadge } from "react-icons/sl";
 import { GiRoad } from "react-icons/gi";
+import { FiInfo } from "react-icons/fi";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const { permissions } = useAuth();
@@ -164,10 +165,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;Terms and Condition
                             </NavLink>
                             <NavLink to="/about" className={linkClasses}>
-                                <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;About
+                                <FiInfo size={20} /> &nbsp;&nbsp;&nbsp;About
                             </NavLink>
                             <NavLink to="/privacy-policy" className={linkClasses}>
-                                <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;Privacy Policy
+                                <MdOutlinePrivacyTip size={20} /> &nbsp;&nbsp;&nbsp;Privacy Policy
                             </NavLink>
                         </>
                     )}

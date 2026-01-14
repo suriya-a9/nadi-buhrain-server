@@ -5,6 +5,7 @@ const UserAccount = require("../../userAccount/userAccount.model");
 const Notification = require('../../../modules/adminPanel/notification/notification.model');
 const TechnicianUserService = require('../../adminPanel/userService/technicianUserService.model');
 const UserLog = require("../../userLogs/userLogs.model");
+const Service = require("../../service/service.model");
 
 exports.createRequest = async (req, res, next) => {
     const { serviceId, issuesId, feedback, scheduleService, immediateAssistance, otherIssue } = req.body;
@@ -21,7 +22,6 @@ exports.createRequest = async (req, res, next) => {
                 message: 'Your account is not verified yet. Kindly wait till your account get verified'
             })
         }
-        const fileNames = req.files ? req.files.map(file => file.filename) : [];
         if (!mongoose.Types.ObjectId.isValid(serviceId)) {
             return res.status(400).json({ message: "Invalid serviceId" });
         }
@@ -31,6 +31,19 @@ exports.createRequest = async (req, res, next) => {
         if (issuesId && !mongoose.Types.ObjectId.isValid(issuesId)) {
             return res.status(400).json({ message: "Invalid issuesId" });
         }
+
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+        const servicePoints = parseInt(service.points || "0", 10);
+        const userPoints = parseInt(user.points || "0", 10);
+
+        if (userPoints < servicePoints) {
+            return res.status(400).json({ message: "Insufficient points to request this service" });
+        }
+
+        const fileNames = req.files ? req.files.map(file => file.filename) : [];
 
         const requestCreate = await UserService.create({
             userId: userId,
@@ -51,6 +64,10 @@ exports.createRequest = async (req, res, next) => {
                 completed: null
             }
         });
+
+        user.points = userPoints - servicePoints;
+        await user.save();
+
         const notification = await Notification.create({
             type: 'service_request',
             message: `New service request submitted by ${user.basicInfo.fullName}`,
@@ -76,6 +93,7 @@ exports.createRequest = async (req, res, next) => {
         next(err)
     }
 }
+
 // exports.userServiceList = async (req, res, next) => {
 //     try {
 //         const userId = req.user.id;
