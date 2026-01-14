@@ -170,6 +170,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <NavLink to="/privacy-policy" className={linkClasses}>
                                 <MdOutlinePrivacyTip size={20} /> &nbsp;&nbsp;&nbsp;Privacy Policy
                             </NavLink>
+                            <NavLink to="/help-support" className={linkClasses}>
+                                <MdOutlinePrivacyTip size={20} /> &nbsp;&nbsp;&nbsp;Help and Support
+                            </NavLink>
                         </>
                     )}
                     {permissions.includes("user-logs") && (

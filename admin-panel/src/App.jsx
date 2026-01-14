@@ -42,6 +42,7 @@ import Questionnaire from "./pages/Questionnaire";
 import QuestionnaireDetail from "./pages/QuestionnaireDetail";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import HelpAndSupport from "./pages/HelpAndSupport";
 
 export default function App() {
   return (
@@ -429,6 +430,18 @@ export default function App() {
                   <PermissionRoute permission="Settings">
                     <DashboardLayout>
                       <PrivacyPolicy />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/help-support"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <HelpAndSupport />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

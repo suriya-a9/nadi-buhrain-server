@@ -44,6 +44,7 @@ const userDashboardRouter = require("./modules/user/dashboard/dashboard.routes")
 const questionnaireRouter = require("./modules/adminPanel/Questionnaire/questionnaire.routes");
 const aboutRouter = require("./modules/adminPanel/about/about.routes");
 const privacyPolicyRouter = require("./modules/adminPanel/privacyPolicy/privacyPolicy.routes");
+const helpAndSupport = require("./modules/adminPanel/helpAndSupport/helpAndSupport.routes.js");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -106,6 +107,7 @@ app.use("/api/userDashboard", userDashboardRouter);
 app.use("/api/questionnaire", questionnaireRouter);
 app.use("/api/about", aboutRouter);
 app.use("/api/privacy", privacyPolicyRouter);
+app.use("/api/help", helpAndSupport);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
