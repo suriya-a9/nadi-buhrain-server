@@ -40,6 +40,8 @@ import UserResetPassword from "./pages/UserResetPassword";
 import TechnicianResetPassword from "./pages/TechnicianResetPassword";
 import Questionnaire from "./pages/Questionnaire";
 import QuestionnaireDetail from "./pages/QuestionnaireDetail";
+import About from "./pages/About";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 export default function App() {
   return (
@@ -403,6 +405,30 @@ export default function App() {
                   <PermissionRoute permission="Settings">
                     <DashboardLayout>
                       <TermsAndCondition />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <About />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/privacy-policy"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <PrivacyPolicy />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

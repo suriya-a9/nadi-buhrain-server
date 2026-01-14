@@ -25,7 +25,7 @@ const technicianAssignmentSchema = new mongoose.Schema({
         }
     ],
     paymentRaised: { type: Boolean, default: false }
-}, { _id: false });
+}, { timestamps: true });
 
 const technicianUserService = new mongoose.Schema({
     userServiceId: {

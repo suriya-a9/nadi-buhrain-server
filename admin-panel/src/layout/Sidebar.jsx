@@ -163,6 +163,12 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <NavLink to="/terms-condition" className={linkClasses}>
                                 <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;Terms and Condition
                             </NavLink>
+                            <NavLink to="/about" className={linkClasses}>
+                                <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;About
+                            </NavLink>
+                            <NavLink to="/privacy-policy" className={linkClasses}>
+                                <LuFileTerminal size={20} /> &nbsp;&nbsp;&nbsp;Privacy Policy
+                            </NavLink>
                         </>
                     )}
                     {permissions.includes("user-logs") && (

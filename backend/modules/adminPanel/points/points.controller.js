@@ -84,7 +84,7 @@ exports.requestPointsToFamily = async (req, res, next) => {
         const userNotification = await UserNotification.create({
             type: 'Points Request',
             message: `New request from ${sender.basicInfo.fullName}`,
-            userId: user._id,
+            userId: receiver._id,
             time: new Date()
         });
         await Request.create({

@@ -25,6 +25,24 @@ exports.addIntro = async (req, res, next) => {
     }
 };
 
+// exports.getIntro = async (req, res, next) => {
+//     try {
+//         const intro = await Intro.findOne({ status: true });
+
+//         if (!intro) {
+//             return res.status(404).json({ message: "Intro not found" });
+//         }
+
+//         const { status, ...introObj } = intro.toObject();
+
+//         res.status(200).json({
+//             data: introObj
+//         });
+//     } catch (err) {
+//         next(err);
+//     }
+// };
+
 exports.getIntro = async (req, res, next) => {
     try {
         const intro = await Intro.findOne({ status: true });
@@ -76,7 +94,7 @@ exports.updateIntro = async (req, res, next) => {
 exports.deleteIntro = async (req, res, next) => {
     const { id } = req.body;
     try {
-        await Intro.findByIdAndDelete(id)
+        await Intro.findByIdAndDelete(id);
         await UserLog.create({
             userId: req.user.id,
             log: "Intro content Deleted",
@@ -94,7 +112,7 @@ exports.deleteIntro = async (req, res, next) => {
 
 exports.listIntro = async (req, res, next) => {
     try {
-        const intro = await Intro.find()
+        const intro = await Intro.find();
 
         if (!intro) {
             return res.status(404).json({ message: "Intro not found" });
@@ -113,13 +131,13 @@ exports.setIntroStatus = async (req, res, next) => {
     try {
         const intro = await Intro.findByIdAndUpdate(id, { status }, { new: true });
         if (!intro) {
-            return res.status(404).json({ message: "Intro not found" })
+            return res.status(404).json({ message: "Intro not found" });
         }
         res.status(200).json({
             message: "Intro status updated",
             data: intro
         });
     } catch (err) {
-        next(err)
+        next(err);
     }
 };

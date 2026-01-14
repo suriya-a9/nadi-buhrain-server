@@ -1,4 +1,4 @@
-const { addAbout, listAbout, updateAbout, deleteAbout } = require("./about.controller");
+const { addAbout, listAbout, updateAbout, deleteAbout, listToUser, toggleAboutStatus } = require("./about.controller");
 const auth = require("../../../middleware/authMiddleware");
 const upload = require('../../../middleware/fileUpload');
 const express = require("express");
@@ -9,11 +9,15 @@ router.post("/add", auth, upload.fields([
     { name: 'media', maxCount: 1 },
 ]), addAbout);
 
-router.get("/", listAbout);
+router.get("/list", listAbout);
+
+router.get("/", listToUser);
 
 router.post("/update", auth, upload.fields([
     { name: 'media', maxCount: 1 },
 ]), updateAbout);
+
+router.post("/status", auth, toggleAboutStatus);
 
 router.post("/delete", auth, deleteAbout);
 

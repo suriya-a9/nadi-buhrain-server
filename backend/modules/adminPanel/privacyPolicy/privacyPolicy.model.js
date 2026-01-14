@@ -5,13 +5,20 @@ const privacyPolicySchema = new mongoose.Schema({
         type: String
     },
     content: {
-        type: String
+        type: [String]
     },
     link: {
         type: String
     },
     media: {
         type: String
+    },
+    subs: {
+        type: [String]
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true });
 

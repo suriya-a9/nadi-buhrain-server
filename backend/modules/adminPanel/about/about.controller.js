@@ -2,7 +2,7 @@ const About = require("./about.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addAbout = async (req, res, next) => {
-    const { title, content, link } = req.body;
+    const { title, content, link, version, isActive = false } = req.body;
     try {
         const userId = req.user.id
         if (!userId) {
@@ -16,7 +16,9 @@ exports.addAbout = async (req, res, next) => {
             title,
             content,
             link,
-            media
+            version,
+            media,
+            isActive
         })
         await UserLog.create({
             userId: userId,
@@ -37,6 +39,19 @@ exports.addAbout = async (req, res, next) => {
 exports.listAbout = async (req, res, next) => {
     try {
         const aboutData = await About.find();
+        res.status(200).json({
+            success: true,
+            message: "Success",
+            data: aboutData
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.listToUser = async (req, res, next) => {
+    try {
+        const aboutData = await About.find({ isActive: true });
         res.status(200).json({
             success: true,
             message: "Success",
@@ -80,6 +95,42 @@ exports.updateAbout = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.toggleAboutStatus = async (req, res, next) => {
+    const { id, isActive } = req.body;
+
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(403).json({
+                success: false,
+                message: "user id needed"
+            });
+        }
+
+        const aboutData = await About.findByIdAndUpdate(
+            id,
+            { isActive },
+            { new: true }
+        );
+
+        await UserLog.create({
+            userId,
+            log: `${isActive ? "Enabled" : "Disabled"} ${aboutData.title} about content`,
+            status: isActive ? "Enabled" : "Disabled",
+            logo: "/assets/about-page.webp",
+            time: new Date()
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `About content ${isActive ? "enabled" : "disabled"} successfully`
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
 
 exports.deleteAbout = async (req, res, next) => {
     const { id } = req.body;

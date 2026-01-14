@@ -21,27 +21,12 @@ export default function Header({ toggleSidebar }) {
 
     useEffect(() => {
         loadNotifications();
-
         if (!socketRef.current) {
-            socketRef.current = io(import.meta.env.VITE_API_URL, {
-                path: "/socket.io",
-                withCredentials: true,
-                transports: ["polling", "websocket"],
-            });
-
-            socketRef.current.on("connect", () => {
-                console.log("Socket connected:", socketRef.current.id);
-            });
-
-            socketRef.current.on("notification", (data) => {
+            socketRef.current = io(import.meta.env.VITE_API_URL);
+            socketRef.current.on('notification', (data) => {
                 setNotifications((prev) => [data, ...prev]);
             });
-
-            socketRef.current.on("connect_error", (err) => {
-                console.error("Socket error:", err.message);
-            });
         }
-
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
