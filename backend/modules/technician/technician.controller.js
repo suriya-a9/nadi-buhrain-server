@@ -182,13 +182,13 @@ exports.startWork = async (req, res, next) => {
         if (!userServiceId) {
             return res.status(400).json({ message: "userServiceId is required" });
         }
-
+        const now = new Date();
         await UserService.findByIdAndUpdate(
             userServiceId,
             {
                 serviceStatus: "inProgress",
-                "statusTimestamps.inProgress": new Date(),
-                workStartedAt: new Date()
+                "statusTimestamps.inProgress": now,
+                workStartedAt: now
             },
             { new: true }
         );
@@ -198,7 +198,8 @@ exports.startWork = async (req, res, next) => {
             {
                 $set: {
                     "assignments.$.status": "in-progress",
-                    "assignments.$.workStartedAt": new Date()
+                    "assignments.$.statusChangedAt": now,
+                    "assignments.$.workStartedAt": now
                 }
             },
             { new: true }
@@ -233,20 +234,20 @@ exports.onHoldService = async (req, res, next) => {
             return res.status(400).json({ message: 'service id required' });
         }
 
+        const now = new Date();
         const userService = await UserService.findById(userServiceId);
         if (userService && userService.workStartedAt) {
-            const now = new Date();
             const elapsed = Math.floor((now - userService.workStartedAt) / 1000);
             userService.workDuration = (userService.workDuration || 0) + elapsed;
             userService.workStartedAt = null;
             await userService.save();
         }
-
         const techUserService = await TechnicianUserService.findOneAndUpdate(
             { userServiceId, "assignments.technicianId": technicianId },
             {
                 $set: {
-                    "assignments.$.status": "on-hold"
+                    "assignments.$.status": "on-hold",
+                    "assignments.$.statusChangedAt": now
                 }
             },
             { new: true }
@@ -282,6 +283,7 @@ exports.updateServiceStatus = async (req, res, next) => {
             return res.status(400).json({ message: "userServiceId is required" });
         }
 
+        const now = new Date();
         const techUserService = await TechnicianUserService.findOne({ userServiceId });
         if (!techUserService) {
             return res.status(404).json({ message: "Technician assignment not found" });
@@ -294,7 +296,6 @@ exports.updateServiceStatus = async (req, res, next) => {
 
         let newWorkDuration = assignment.workDuration || 0;
         if (assignment.workStartedAt) {
-            const now = new Date();
             const elapsed = Math.floor((now - assignment.workStartedAt) / 1000);
             newWorkDuration += elapsed;
         }
@@ -302,6 +303,7 @@ exports.updateServiceStatus = async (req, res, next) => {
         const updateFields = {
             "assignments.$[elem].notes": notes || "",
             "assignments.$[elem].status": "completed",
+            "assignments.$[elem].statusChangedAt": now,
             "assignments.$[elem].workDuration": newWorkDuration,
             "assignments.$[elem].workStartedAt": null
         };

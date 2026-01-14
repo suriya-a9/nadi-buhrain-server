@@ -10,6 +10,10 @@ const technicianAssignmentSchema = new mongoose.Schema({
         enum: ['pending', 'accepted', 'in-progress', 'on-hold', 'rejected', 'completed'],
         default: 'pending'
     },
+    statusChangedAt: {
+        type: Date,
+        default: Date.now
+    },
     reason: String,
     notes: String,
     media: [String],
@@ -26,6 +30,13 @@ const technicianAssignmentSchema = new mongoose.Schema({
     ],
     paymentRaised: { type: Boolean, default: false }
 }, { timestamps: true });
+
+technicianAssignmentSchema.pre('save', function (next) {
+    if (this.isModified('status')) {
+        this.statusChangedAt = new Date();
+    }
+    next();
+});
 
 const technicianUserService = new mongoose.Schema({
     userServiceId: {

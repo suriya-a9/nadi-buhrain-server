@@ -106,9 +106,11 @@ exports.assignTechnician = async (req, res, next) => {
         if (!serviceId || !Array.isArray(technicianIds) || technicianIds.length === 0) {
             return res.status(400).json({ message: "serviceId and technicianIds are required" });
         }
+        const now = new Date();
         const assignments = technicianIds.map(technicianId => ({
             technicianId,
             status: 'pending',
+            statusChangedAt: now,
             notes: "",
             media: [],
             usedParts: []
@@ -145,63 +147,107 @@ exports.assignTechnician = async (req, res, next) => {
 exports.technicianRespond = async (req, res, next) => {
     const { assignmentId, action, reason } = req.body;
     const technicianId = req.user.id;
+
     try {
+        const now = new Date();
+
         if (action === 'accept') {
+
             const assignment = await TechnicianUserService.findOneAndUpdate(
-                { userServiceId: assignmentId, "assignments.technicianId": technicianId },
-                { $set: { "assignments.$.status": "accepted" } },
+                {
+                    userServiceId: assignmentId,
+                    "assignments.technicianId": technicianId
+                },
+                {
+                    $set: {
+                        "assignments.$.status": "accepted",
+                        "assignments.$.statusChangedAt": now // ✅ TIMESTAMP
+                    }
+                },
                 { new: true }
             );
+
             if (!assignment) {
                 return res.status(404).json({ message: "Assignment not found" });
             }
-            const allAccepted = assignment.assignments.every(a => a.status === "accepted" || a.status === "rejected");
+
+            const allAccepted = assignment.assignments.every(
+                a => a.status === "accepted" || a.status === "rejected"
+            );
+
             if (allAccepted) {
                 await UserService.findByIdAndUpdate(
                     assignmentId,
                     {
                         $set: {
                             serviceStatus: "technicianAssigned",
-                            [`statusTimestamps.technicianAssigned`]: new Date()
+                            [`statusTimestamps.technicianAssigned`]: now
                         }
                     }
                 );
             }
+
             await UserLog.create({
-                userId: req.user.id,
+                userId: technicianId,
                 log: 'Accepted a request',
                 status: "Accepted",
                 logo: "/assets/service request.webp",
-                time: new Date()
+                time: now
             });
-            return res.status(200).json({ message: "Service accepted", data: assignment });
+
+            return res.status(200).json({
+                message: "Service accepted",
+                data: assignment
+            });
+
         } else if (action === 'reject') {
+
             if (!reason) {
-                return res.status(400).json({ message: "Reason required for rejection" });
+                return res.status(400).json({
+                    message: "Reason required for rejection"
+                });
             }
+
             const assignment = await TechnicianUserService.findOneAndUpdate(
-                { userServiceId: assignmentId },
-                { $pull: { assignments: { technicianId: technicianId } } },
+                {
+                    userServiceId: assignmentId,
+                    "assignments.technicianId": technicianId
+                },
+                {
+                    $set: {
+                        "assignments.$.status": "rejected",
+                        "assignments.$.reason": reason,
+                        "assignments.$.statusChangedAt": now 
+                    }
+                },
                 { new: true }
             );
+
             if (!assignment) {
                 return res.status(404).json({ message: "Assignment not found" });
             }
+
             await UserLog.create({
-                userId: req.user.id,
+                userId: technicianId,
                 log: 'Rejected a request',
                 status: "Rejected",
                 logo: "/assets/service request.webp",
-                time: new Date()
+                time: now
             });
-            return res.status(200).json({ message: "Service rejected and assignment removed", data: assignment });
+
+            return res.status(200).json({
+                message: "Service rejected",
+                data: assignment
+            });
+
         } else {
             return res.status(400).json({ message: "Invalid action" });
         }
+
     } catch (err) {
         next(err);
     }
-}
+};
 
 exports.acceptedServiceRequests = async (req, res, next) => {
     try {
