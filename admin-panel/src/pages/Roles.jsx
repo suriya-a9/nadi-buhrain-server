@@ -10,6 +10,7 @@ export default function Roles() {
     const [rolesList, setRolesList] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         name: ""
     });
@@ -21,8 +22,10 @@ export default function Roles() {
     }, [rolesList]);
     const token = localStorage.getItem("token");
     const loadRoles = async () => {
+        setLoading(true);
         const res = await api.get("/role/");
         setRolesList(res.data.data);
+        setLoading(false);
     };
     useEffect(() => {
         loadRoles();
@@ -97,45 +100,53 @@ export default function Roles() {
                     Add Role
                 </button>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Name", key: "name" },
-                    {
-                        title: "Timestamp",
-                        key: "updatedAt",
-                        render: (_, row) => formatDateTime(row.updatedAt)
-                    },
-                ]}
-                data={PaginatedRoles}
-                actions={(row) => (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => openEdit(row)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => deleteRole(row._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Name", key: "name" },
+                            {
+                                title: "Timestamp",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
+                        ]}
+                        data={PaginatedRoles}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEdit(row)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => deleteRole(row._id)}
+                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
             <Offcanvas
                 open={openCanvas}

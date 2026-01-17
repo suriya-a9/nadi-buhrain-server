@@ -11,6 +11,7 @@ export default function Issues() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         issue: ""
     });
@@ -25,8 +26,10 @@ export default function Issues() {
 
     const loadIssues = async () => {
         try {
+            setLoading(true);
             const res = await api.get("/issue/");
             setIssuesList(res.data.data);
+            setLoading(false);
         } catch (err) {
             toast.error(err.response?.data?.message);
         }
@@ -111,45 +114,53 @@ export default function Issues() {
                     </button>
                 </div>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Issue", key: "issue" },
-                    {
-                        title: "Timestamp",
-                        key: "updatedAt",
-                        render: (_, row) => formatDateTime(row.updatedAt)
-                    },
-                ]}
-                data={paginatedIssues}
-                actions={(row) => (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => openEdit(row)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => deleteIssue(row._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Issue", key: "issue" },
+                            {
+                                title: "Timestamp",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
+                        ]}
+                        data={paginatedIssues}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEdit(row)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => deleteIssue(row._id)}
+                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
             <Offcanvas
                 open={openCanvas}

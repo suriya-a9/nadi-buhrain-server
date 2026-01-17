@@ -249,53 +249,59 @@ export default function User() {
                     </button>
                 </div>
             </div>
-
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Full Name", key: "basicInfo.fullName" },
-                    { title: "Mobile", key: "basicInfo.mobileNumber" },
-                    { title: "Email", key: "basicInfo.email" },
-                    { title: "Account Type", key: "accountTypeId.name" },
-                    { title: "Status", key: "accountVerification" },
-                ]}
-                data={paginatedUsers}
-                actions={(row) => (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => viewDetails(row._id)}
-                            className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
-                        >
-                            View
-                        </button>
-                        <button
-                            onClick={() => toggleUserStatus(row)}
-                            className={`px-2 py-1 rounded text-sm ${row.accountStatus ? "bg-red-500" : "bg-green-500"} text-white`}
-                        >
-                            {row.accountStatus ? "Disable" : "Enable"}
-                        </button>
-                        <button
-                            onClick={() => deleteUser(row._id)}
-                            className="px-2 py-1 bg-red-600 text-white rounded text-sm"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Full Name", key: "basicInfo.fullName" },
+                            { title: "Mobile", key: "basicInfo.mobileNumber" },
+                            { title: "Email", key: "basicInfo.email" },
+                            { title: "Account Type", key: "accountTypeId.name" },
+                            { title: "Status", key: "accountVerification" },
+                        ]}
+                        data={paginatedUsers}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => viewDetails(row._id)}
+                                    className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                                >
+                                    View
+                                </button>
+                                <button
+                                    onClick={() => toggleUserStatus(row)}
+                                    className={`px-2 py-1 rounded text-sm ${row.accountStatus ? "bg-red-500" : "bg-green-500"} text-white`}
+                                >
+                                    {row.accountStatus ? "Disable" : "Enable"}
+                                </button>
+                                <button
+                                    onClick={() => deleteUser(row._id)}
+                                    className="px-2 py-1 bg-red-600 text-white rounded text-sm"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
-            {loading && <div className="text-sm text-gray-500 mt-2">Loading...</div>}
 
             {detailsOpen && selectedUser && (() => {
                 const isUser = selectedUser.type === 'user';

@@ -8,6 +8,7 @@ export default function Logs() {
     const [logs, setLogs] = useState([]);
     const [search, setSearch] = useState("");
     const [searchDate, setSearchDate] = useState("");
+    const [loading, setLoading] = useState(true);
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const API_BASE = (import.meta.env.VITE_API_URL).replace(/\/$/, "");
@@ -17,21 +18,29 @@ export default function Logs() {
     const token = localStorage.getItem("token");
     const { role } = useAuth();
     const loadLogs = async () => {
-        let res;
-        if (role === "Super Admin") {
-            res = await api.get(
-                "/user-log/all",
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-        } else {
-            res = await api.post(
-                "/user-log",
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+        setLoading(true);
+        try {
+            let res;
+            if (role === "Super Admin") {
+                res = await api.get(
+                    "/user-log/all",
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            } else {
+                res = await api.post(
+                    "/user-log",
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
+            setLogs(res.data.data);
+        } catch (err) {
+            console.error(err);
+            setLogs([]);
+        } finally {
+            setLoading(false);
         }
-        setLogs(res.data.data);
     };
     useEffect(() => {
         loadLogs();
@@ -75,56 +84,62 @@ export default function Logs() {
                     />
                 </div>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    {
-                        title: "Logo",
-                        key: "logo",
-                        render: (logo) =>
-                            logo ? (
-                                <img
-                                    src={`${API_BASE}${logo}`}
-                                    alt="Log Logo"
-                                    style={{ width: 32, height: 32, objectFit: "contain" }}
-                                />
-                            ) : (
-                                "-"
-                            ),
-                    },
-                    { title: "Name", key: "userName" },
-                    { title: "Logs", key: "log" },
-                    {
-                        title: "Time",
-                        key: "time",
-                        render: (time) =>
-                            time
-                                ? new Date(time).toLocaleString("en-IN", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                })
-                                : "-",
-                    },
-                    { title: "Status", key: "status" }
-                ]}
-                data={paginatedLogs}
-            />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            {
+                                title: "Logo",
+                                key: "logo",
+                                render: (logo) =>
+                                    logo ? (
+                                        <img
+                                            src={`${API_BASE}${logo}`}
+                                            alt="Log Logo"
+                                            style={{ width: 32, height: 32, objectFit: "contain" }}
+                                        />
+                                    ) : "-",
+                            },
+                            { title: "Name", key: "userName" },
+                            { title: "Logs", key: "log" },
+                            {
+                                title: "Time",
+                                key: "time",
+                                render: (time) =>
+                                    time
+                                        ? new Date(time).toLocaleString("en-IN", {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })
+                                        : "-",
+                            },
+                            { title: "Status", key: "status" },
+                        ]}
+                        data={paginatedLogs}
+                    />
 
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
         </div>
     )

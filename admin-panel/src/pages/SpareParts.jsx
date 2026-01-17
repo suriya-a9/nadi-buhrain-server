@@ -47,42 +47,50 @@ export default function SpareParts() {
                     />
                 </div>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    {
-                        title: "Technician",
-                        key: "technicianId",
-                        render: (tech) =>
-                            tech?.firstName
-                                ? `${tech.firstName} ${tech.lastName || ""}`
-                                : "-"
-                    },
-                    {
-                        title: "Product",
-                        key: "productId",
-                        render: (prod) => prod?.productName || "-"
-                    },
-                    { title: "Count", key: "count" },
-                    {
-                        title: "Timestamp",
-                        key: "updatedAt",
-                        render: (_, row) => formatDateTime(row.updatedAt)
-                    },
-                ]}
-                data={paginatedSpareParts}
-            />
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            {
+                                title: "Technician",
+                                key: "technicianId",
+                                render: (tech) =>
+                                    tech?.firstName
+                                        ? `${tech.firstName} ${tech.lastName || ""}`
+                                        : "-"
+                            },
+                            {
+                                title: "Product",
+                                key: "productId",
+                                render: (prod) => prod?.productName || "-"
+                            },
+                            { title: "Count", key: "count" },
+                            {
+                                title: "Timestamp",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
+                        ]}
+                        data={paginatedSpareParts}
+                    />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
         </div>
     )

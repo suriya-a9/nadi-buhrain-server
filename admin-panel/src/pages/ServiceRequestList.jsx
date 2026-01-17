@@ -316,53 +316,61 @@ export default function ServiceRequestList() {
                     </div>
                 </div>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Request ID", key: "serviceRequestID" },
-                    { title: "Requested By", key: "userId.basicInfo.fullName" },
-                    { title: "Service Name", key: "serviceId.name" },
-                    { title: "Issue Name", key: "issuesId.issue" },
-                    {
-                        title: "Is Urgent?",
-                        dataIndex: "immediateAssistance",
-                        key: "immediateAssistance",
-                        render: (value) => (value ? "Yes" : "No"),
-                    },
-                    {
-                        title: "Status",
-                        key: "statusTimestamps",
-                        render: (_, row) => {
-                            const { status, time } = getLastUpdatedStatusWithTime(row.statusTimestamps);
-                            return (
-                                <span>
-                                    {status} {time && time !== "-" ? `(${formatDateTime(time)})` : ""}
-                                </span>
-                            );
-                        },
-                    },
-                ]}
-                data={paginatedData}
-                actions={(row) => (
-                    <button
-                        className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
-                        onClick={() => navigate(`/service-requests/${row._id}`)}
-                    >
-                        View
-                    </button>
-                )}
-            />
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-            {!loading && paginatedData.length === 0 && (
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Request ID", key: "serviceRequestID" },
+                            { title: "Requested By", key: "userId.basicInfo.fullName" },
+                            { title: "Service Name", key: "serviceId.name" },
+                            { title: "Issue Name", key: "issuesId.issue" },
+                            {
+                                title: "Is Urgent?",
+                                dataIndex: "immediateAssistance",
+                                key: "immediateAssistance",
+                                render: (value) => (value ? "Yes" : "No"),
+                            },
+                            {
+                                title: "Status",
+                                key: "statusTimestamps",
+                                render: (_, row) => {
+                                    const { status, time } = getLastUpdatedStatusWithTime(row.statusTimestamps);
+                                    return (
+                                        <span>
+                                            {status} {time && time !== "-" ? `(${formatDateTime(time)})` : ""}
+                                        </span>
+                                    );
+                                },
+                            },
+                        ]}
+                        data={paginatedData}
+                        actions={(row) => (
+                            <button
+                                className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                                onClick={() => navigate(`/service-requests/${row._id}`)}
+                            >
+                                View
+                            </button>
+                        )}
+                    />
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
+            )}
+            {paginatedData.length === 0 && (
                 <div className="text-center text-gray-500 mt-4">No requests in this category.</div>
             )}
             {detailsOpen && selected && (

@@ -11,7 +11,7 @@ export default function Services() {
     const [services, setServices] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [search, setSearch] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         id: "",
         name: "",
@@ -25,8 +25,10 @@ export default function Services() {
         setCurrentPage(1);
     }, [services]);
     const loadServices = async () => {
+        setLoading(true);
         const res = await api.get("/service");
         setServices(res.data.data);
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -115,74 +117,80 @@ export default function Services() {
                     </button>
                 </div>
             </div>
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Name", key: "name" },
+                            { title: "Points", key: "points" },
+                            {
+                                title: "Image",
+                                key: "serviceImage",
+                                render: (value) =>
+                                    value ? (
+                                        <img
+                                            src={`${import.meta.env.VITE_API_URL}/uploads/${value}`}
+                                            className="h-12 rounded border"
+                                        />
+                                    ) : (
+                                        "-"
+                                    ),
+                            },
+                            {
+                                title: "Logo",
+                                key: "serviceLogo",
+                                render: (value) =>
+                                    value ? (
+                                        <img
+                                            src={`${import.meta.env.VITE_API_URL}/uploads/${value}`}
+                                            className="h-12 rounded border"
+                                        />
+                                    ) : (
+                                        "-"
+                                    ),
+                            },
+                            {
+                                title: "Timestamp",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
+                        ]}
+                        data={paginatedServices}
+                        actions={(row) => (
+                            <div>
+                                <button
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                                    onClick={() => editService(row)}
+                                >
+                                    Edit
+                                </button>
 
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Name", key: "name" },
-                    { title: "Points", key: "points" },
-                    {
-                        title: "Image",
-                        key: "serviceImage",
-                        render: (value) =>
-                            value ? (
-                                <img
-                                    src={`${import.meta.env.VITE_API_URL}/uploads/${value}`}
-                                    className="h-12 rounded border"
-                                />
-                            ) : (
-                                "-"
-                            ),
-                    },
-                    {
-                        title: "Logo",
-                        key: "serviceLogo",
-                        render: (value) =>
-                            value ? (
-                                <img
-                                    src={`${import.meta.env.VITE_API_URL}/uploads/${value}`}
-                                    className="h-12 rounded border"
-                                />
-                            ) : (
-                                "-"
-                            ),
-                    },
-                    {
-                        title: "Timestamp",
-                        key: "updatedAt",
-                        render: (_, row) => formatDateTime(row.updatedAt)
-                    },
-                ]}
-                data={paginatedServices}
-                actions={(row) => (
-                    <div>
-                        <button
-                            className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
-                            onClick={() => editService(row)}
-                        >
-                            Edit
-                        </button>
-
-                        <button
-                            className="bg-red-600 text-white px-3 py-1 rounded"
-                            onClick={() => deleteService(row._id)}
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-
+                                <button
+                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                    onClick={() => deleteService(row._id)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
+            )}
             <Offcanvas
                 open={openCanvas}
                 onClose={() => setOpenCanvas(false)}

@@ -171,47 +171,54 @@ export default function ServiceRequest() {
                     />
                 </div>
             </div>
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "Request ID", key: "serviceRequestID" },
-                    { title: "Requested By", key: "userId.basicInfo.fullName" },
-                    { title: "Service Name", key: "serviceId.name" },
-                    { title: "Issue Name", key: "issuesId.issue" },
-                    { title: "Feedback", key: "feedback" },
-                    {
-                        title: "Scheduled Date",
-                        key: "scheduleService",
-                        render: (value) => formatDateTime(value),
-                    },
-                    {
-                        title: "Is Urgent?",
-                        dataIndex: "immediateAssistance",
-                        key: "immediateAssistance",
-                        render: (value) => (value ? "Yes" : "No"),
-                    },
-                ]}
-                data={paginatedRequests}
-                actions={(row) => (
-                    <button
-                        className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
-                        onClick={() => handleView(row)}
-                    >
-                        View
-                    </button>
-                )}
-            />
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-            {loading && <div className="text-sm text-gray-500 mt-2">Loading...</div>}
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "Request ID", key: "serviceRequestID" },
+                            { title: "Requested By", key: "userId.basicInfo.fullName" },
+                            { title: "Service Name", key: "serviceId.name" },
+                            { title: "Issue Name", key: "issuesId.issue" },
+                            { title: "Feedback", key: "feedback" },
+                            {
+                                title: "Scheduled Date",
+                                key: "scheduleService",
+                                render: (value) => formatDateTime(value),
+                            },
+                            {
+                                title: "Is Urgent?",
+                                dataIndex: "immediateAssistance",
+                                key: "immediateAssistance",
+                                render: (value) => (value ? "Yes" : "No"),
+                            },
+                        ]}
+                        data={paginatedRequests}
+                        actions={(row) => (
+                            <button
+                                className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                                onClick={() => handleView(row)}
+                            >
+                                View
+                            </button>
+                        )}
+                    />
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
+            )}
 
             {detailsOpen && selected && (
                 <div className="fixed inset-0 z-50 overflow-auto">

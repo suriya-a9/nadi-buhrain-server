@@ -11,6 +11,7 @@ export default function Technicians() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [skills, setSkills] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [roleFilter, setRoleFilter] = useState("");
     const [search, setSearch] = useState("");
     const [form, setForm] = useState({
@@ -29,8 +30,10 @@ export default function Technicians() {
     }, [technicians]);
     const loadSkills = async () => {
         try {
+            setLoading(true);
             const res = await api.get("/technical");
             setSkills(res.data.data);
+            setLoading(false);
         } catch (err) {
             toast.error(err.response?.data?.message);
         }
@@ -177,66 +180,73 @@ export default function Technicians() {
                     </button>
                 </div>
             </div>
-
-            <Table
-                columns={[
-                    {
-                        title: "s/no",
-                        key: "sno",
-                        render: (_, __, idx) =>
-                            (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
-                    },
-                    { title: "First Name", key: "firstName" },
-                    { title: "Last Name", key: "lastName" },
-                    { title: "Mobile", key: "mobile" },
-                    { title: "Email", key: "email" },
-                    { title: "Gender", key: "gender" },
-                    {
-                        title: "Role",
-                        key: "role",
-                        render: (role) => role?.skill || "-",
-                    },
-                    {
-                        title: "Enabled",
-                        key: "status",
-                        render: (status) => status ? "Yes" : "No",
-                    },
-                    {
-                        title: "Timestamp",
-                        key: "updatedAt",
-                        render: (_, row) => formatDateTime(row.updatedAt)
-                    },
-                ]}
-                data={paginatedTechnicians}
-                actions={(row) => (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => openEdit(row)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => toggleTechnicianStatus(row)}
-                            className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
-                        >
-                            {row.status ? "Disable" : "Enable"}
-                        </button>
-                        <button
-                            onClick={() => deleteTechnician(row._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            {
+                                title: "s/no",
+                                key: "sno",
+                                render: (_, __, idx) =>
+                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                            },
+                            { title: "First Name", key: "firstName" },
+                            { title: "Last Name", key: "lastName" },
+                            { title: "Mobile", key: "mobile" },
+                            { title: "Email", key: "email" },
+                            { title: "Gender", key: "gender" },
+                            {
+                                title: "Role",
+                                key: "role",
+                                render: (role) => role?.skill || "-",
+                            },
+                            {
+                                title: "Enabled",
+                                key: "status",
+                                render: (status) => status ? "Yes" : "No",
+                            },
+                            {
+                                title: "Timestamp",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
+                        ]}
+                        data={paginatedTechnicians}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEdit(row)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => toggleTechnicianStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
+                                </button>
+                                <button
+                                    onClick={() => deleteTechnician(row._id)}
+                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
             <Offcanvas
                 open={openCanvas}

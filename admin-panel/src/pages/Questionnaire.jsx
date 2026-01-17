@@ -12,6 +12,7 @@ export default function Questionnaire() {
     const [questionnaires, setQuestionnaires] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const [form, setForm] = useState({
         title: "",
@@ -24,10 +25,12 @@ export default function Questionnaire() {
     const token = localStorage.getItem("token");
 
     const loadQuestionnaires = async () => {
+        setLoading(true);
         const res = await api.get("/questionnaire/list", {
             headers: { Authorization: `Bearer ${token}` }
         });
         setQuestionnaires(res.data.data);
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -153,53 +156,59 @@ export default function Questionnaire() {
                     Add Questionnaire
                 </button>
             </div>
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
+                </div>
+            ) : (
+                <>
+                    <Table
+                        columns={[
+                            { title: "S/No", render: (_, __, idx) => idx + 1 },
+                            { title: "Title", key: "title" },
+                            { title: "Total Points", key: "totalPoints" },
+                            {
+                                title: "Timestamp",
+                                key: "createdAt",
+                                render: (_, row) => formatDateTime(row.createdAt)
+                            },
+                        ]}
+                        data={paginatedData}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => navigate(`/questionnaire/${row._id}`)}
+                                    className="bg-blue-600 text-white px-3 py-1 rounded"
+                                >
+                                    View
+                                </button>
 
-            <Table
-                columns={[
-                    { title: "S/No", render: (_, __, idx) => idx + 1 },
-                    { title: "Title", key: "title" },
-                    { title: "Total Points", key: "totalPoints" },
-                    {
-                        title: "Timestamp",
-                        key: "createdAt",
-                        render: (_, row) => formatDateTime(row.createdAt)
-                    },
-                ]}
-                data={paginatedData}
-                actions={(row) => (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => navigate(`/questionnaire/${row._id}`)}
-                            className="bg-blue-600 text-white px-3 py-1 rounded"
-                        >
-                            View
-                        </button>
+                                <button
+                                    onClick={() => openEdit(row)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
 
-                        <button
-                            onClick={() => openEdit(row)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                            Edit
-                        </button>
+                                <button
+                                    onClick={() => deleteQuestionnaire(row._id)}
+                                    className="bg-red-600 text-white px-3 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    />
 
-                        <button
-                            onClick={() => deleteQuestionnaire(row._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            />
-
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
-
             <Offcanvas
                 open={openCanvas}
                 onClose={() => setOpenCanvas(false)}
