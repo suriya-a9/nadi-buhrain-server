@@ -5,6 +5,7 @@ import Offcanvas from "../components/Offcanvas";
 import Pagination from "../components/Pagination";
 import toast from "react-hot-toast";
 import { formatDateTime } from "../utils/dateUtils";
+import { useNavigate } from "react-router-dom";
 
 export default function Inventory() {
     const [inventory, setInventory] = useState([]);
@@ -13,6 +14,7 @@ export default function Inventory() {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState("");
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         productName: "",
         quantity: "",
@@ -21,11 +23,6 @@ export default function Inventory() {
     });
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
-
-    const [viewModal, setViewModal] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [productTechnicians, setProductTechnicians] = useState([]);
-    const [loadingTechs, setLoadingTechs] = useState(false);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -68,19 +65,6 @@ export default function Inventory() {
             price: item.price
         });
         setOpenCanvas(true);
-    };
-
-    const openView = async (item) => {
-        setSelectedProduct(item);
-        setViewModal(true);
-        setLoadingTechs(true);
-        try {
-            const res = await api.get(`/material/product-technicians/${item._id}`);
-            setProductTechnicians(res.data.data || []);
-        } catch {
-            setProductTechnicians([]);
-        }
-        setLoadingTechs(false);
     };
 
     const saveInventory = async (e) => {
@@ -228,7 +212,7 @@ export default function Inventory() {
                         actions={(row) => (
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => openView(row)}
+                                    onClick={() => navigate(`/inventory/${row._id}`)}
                                     className="bg-blue-500 text-white px-3 py-1 rounded"
                                 >
                                     View
@@ -308,44 +292,6 @@ export default function Inventory() {
                     </button>
                 </form>
             </Offcanvas>
-
-            {viewModal && selectedProduct && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white rounded-lg shadow-lg p-6 min-w-[320px] max-w-lg relative">
-                        <button
-                            onClick={() => setViewModal(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl"
-                        >
-                            &times;
-                        </button>
-                        <h3 className="text-xl font-bold mb-4">Product Details</h3>
-                        <div className="space-y-2">
-                            <div><b>Product Name:</b> {selectedProduct.productName}</div>
-                            <div><b>Quantity:</b> {selectedProduct.quantity}</div>
-                            <div><b>Price:</b> {selectedProduct.price}</div>
-                            <div><b>Stock:</b> {selectedProduct.stock ? "In Stock" : "Out of Stock"}</div>
-                        </div>
-                        <div className="mt-4">
-                            <b>Processed To Technicians:</b>
-                            {loadingTechs ? (
-                                <div className="text-gray-500">Loading...</div>
-                            ) : productTechnicians.length === 0 ? (
-                                <div className="text-gray-500">No requests yet.</div>
-                            ) : (
-                                <ul className="list-disc ml-5">
-                                    {productTechnicians.map((item) => (
-                                        <li key={item._id}>
-                                            {item.technician?.firstName} {item.technician?.lastName}
-                                            {" - "} Quantity: {item.quantity}
-                                            {" - "} Status: {item.status}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

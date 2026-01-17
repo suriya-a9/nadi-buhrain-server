@@ -43,6 +43,8 @@ import QuestionnaireDetail from "./pages/QuestionnaireDetail";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import HelpAndSupport from "./pages/HelpAndSupport";
+import NewServiceRequestDetails from "./pages/NewServiceRequestDetails";
+import ProductDetails from "./pages/ProductDetails";
 
 export default function App() {
   return (
@@ -178,6 +180,18 @@ export default function App() {
                   <PermissionRoute permission="service-requests">
                     <DashboardLayout>
                       <ServiceRequestDetails />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/new-requests/:id"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="service-requests">
+                    <DashboardLayout>
+                      <NewServiceRequestDetails />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>
@@ -346,6 +360,18 @@ export default function App() {
                   <PermissionRoute permission="inventory">
                     <DashboardLayout>
                       <Inventory />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/inventory/:id"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="inventory">
+                    <DashboardLayout>
+                      <ProductDetails />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

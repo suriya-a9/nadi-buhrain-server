@@ -97,7 +97,7 @@ export const generateSingleServiceRequestPDF = async ({ request, logoUrl }) => {
                 a.workDuration != null ? `${Math.floor(a.workDuration / 60)} min` : "-",
                 a.usedParts && a.usedParts.length > 0
                     ? a.usedParts.map(
-                        part => `${part.productName} x${part.count} (₹${part.price} each, Total: ₹${part.total})`
+                        part => `${part.productName} x${part.count} (Rs.${part.price} each, Total: Rs.${part.total})`
                     ).join("\n")
                     : "-",
                 a.updatedAt ? formatDateTime(a.updatedAt) : "-"
