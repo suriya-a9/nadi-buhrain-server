@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import api from "../services/api";
@@ -49,6 +49,8 @@ export default function ServiceRequestDetails() {
     const [techWorkStatusLoading, setTechWorkStatusLoading] = useState(false);
     const [technicianAssignments, setTechnicianAssignments] = useState([]);
     const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+    const [removeModalOpen, setRemoveModalOpen] = useState(false);
+    const [removingTech, setRemovingTech] = useState(null);
     useEffect(() => {
         if (request?._id) {
             setAssignmentsLoading(true);
@@ -105,7 +107,17 @@ export default function ServiceRequestDetails() {
             setAssigning(false);
         }
     };
-
+    const handleRemoveTechnician = async () => {
+        if (!removingTech) return;
+        await api.post("/user-service-list/remove-technician", {
+            serviceId: request._id,
+            technicianId: removingTech.technicianId._id || removingTech.technicianId
+        });
+        const res = await api.get(`/user-service-list/all-technician-assignments/${request._id}`);
+        setTechnicianAssignments(res.data.assignments || []);
+        setRemoveModalOpen(false);
+        setRemovingTech(null);
+    };
     const renderMedia = (mediaArr = []) => {
         if (!mediaArr?.length) return <div className="text-gray-500">No media</div>;
         return (
@@ -328,82 +340,126 @@ export default function ServiceRequestDetails() {
                     ) : technicianAssignments.length === 0 ? (
                         <div className="text-gray-500">No technicians assigned</div>
                     ) : (
-                        <Table
-                            columns={[
-                                {
-                                    title: "Technician",
-                                    key: "technicianId",
-                                    render: (val, row) =>
-                                        val?.firstName
-                                            ? `${val.firstName} ${val.lastName || ""} (${val.email || ""})`
-                                            : val
-                                },
-                                {
-                                    title: "Status",
-                                    key: "status",
-                                    render: (val) => <span className="capitalize">{val}</span>
-                                },
-                                {
-                                    title: "Media",
-                                    key: "media",
-                                    render: (media) =>
-                                        media && media.length > 0 ? (
-                                            <ul className="list-disc ml-4">
-                                                {media.map((file, i) => (
-                                                    <li key={i}>
-                                                        <a
-                                                            href={`${API_BASE}/uploads/${file}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-blue-600 underline"
-                                                        >
-                                                            {file}
-                                                        </a>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <span className="text-gray-400">-</span>
+                        <>
+                            <Table
+                                columns={[
+                                    {
+                                        title: "Technician",
+                                        key: "technicianId",
+                                        render: (val, row) =>
+                                            val?.firstName
+                                                ? `${val.firstName} ${val.lastName || ""} (${val.email || ""})`
+                                                : val
+                                    },
+                                    {
+                                        title: "Status",
+                                        key: "status",
+                                        render: (val) => <span className="capitalize">{val}</span>
+                                    },
+                                    {
+                                        title: "Media",
+                                        key: "media",
+                                        render: (media) =>
+                                            media && media.length > 0 ? (
+                                                <ul className="list-disc ml-4">
+                                                    {media.map((file, i) => (
+                                                        <li key={i}>
+                                                            <a
+                                                                href={`${API_BASE}/uploads/${file}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 underline"
+                                                            >
+                                                                {file}
+                                                            </a>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )
+                                    },
+                                    {
+                                        title: "Work Started At",
+                                        key: "workStartedAt",
+                                        render: (val) => val ? formatDateTime(val) : "-"
+                                    },
+                                    {
+                                        title: "Work Duration",
+                                        key: "workDuration",
+                                        render: (val) => val != null ? formatDuration(val) : "-"
+                                    },
+                                    {
+                                        title: "Notes",
+                                        key: "notes"
+                                    },
+                                    {
+                                        title: "Spare Parts",
+                                        key: "usedParts",
+                                        render: (usedParts) =>
+                                            usedParts && usedParts.length > 0 ? (
+                                                <ul className="list-disc ml-4">
+                                                    {usedParts.map((part, i) => (
+                                                        <li key={i}>
+                                                            {part.productName} x{part.count} (₹{part.price} each, Total: ₹{part.total})
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )
+                                    },
+                                    {
+                                        title: "Timeline",
+                                        key: "updatedAt",
+                                        render: (val) => <span className="capitalize">{formatDateTime(val)}</span>
+                                    },
+                                    {
+                                        title: "Actions",
+                                        key: "actions",
+                                        render: (val, row) => (
+                                            <button
+                                                className="px-2 py-1 bg-red-500 text-white rounded"
+                                                onClick={() => {
+                                                    setRemovingTech(row);
+                                                    setRemoveModalOpen(true);
+                                                }}
+                                            >
+                                                Remove
+                                            </button>
                                         )
-                                },
-                                {
-                                    title: "Work Started At",
-                                    key: "workStartedAt",
-                                    render: (val) => val ? formatDateTime(val) : "-"
-                                },
-                                {
-                                    title: "Work Duration",
-                                    key: "workDuration",
-                                    render: (val) => val != null ? formatDuration(val) : "-"
-                                },
-                                {
-                                    title: "Notes",
-                                    key: "notes"
-                                },
-                                {
-                                    title: "Spare Parts",
-                                    key: "usedParts",
-                                    render: (usedParts) =>
-                                        usedParts && usedParts.length > 0 ? (
-                                            <ul className="list-disc ml-4">
-                                                {usedParts.map((part, i) => (
-                                                    <li key={i}>
-                                                        {part.productName} x{part.count} (₹{part.price} each, Total: ₹{part.total})
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <span className="text-gray-400">-</span>
-                                        )
-                                },
-                                {
-                                    title: "Timeline",
-                                    key: "updatedAt",
-                                    render: (val) => <span className="capitalize">{formatDateTime(val)}</span>
-                                }
-                            ]}
-                            data={technicianAssignments}
-                        />
+                                    }
+                                ]}
+                                data={technicianAssignments}
+                            />
+                            {removeModalOpen && (
+                                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+                                    <div className="bg-white rounded shadow-lg p-6 min-w-[300px]">
+                                        <div className="font-bold mb-2">Remove Technician</div>
+                                        <div className="mb-4">
+                                            Are you sure you want to remove technician <span className="font-semibold">{removingTech?.technicianId?.firstName} {removingTech?.technicianId?.lastName}</span>?
+                                        </div>
+                                        <div className="flex gap-2 justify-end">
+                                            <button
+                                                className="px-3 py-1 bg-gray-300 rounded"
+                                                onClick={() => {
+                                                    setRemoveModalOpen(false);
+                                                    setRemovingTech(null);
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                className="px-3 py-1 bg-red-500 text-white rounded"
+                                                onClick={handleRemoveTechnician}
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}

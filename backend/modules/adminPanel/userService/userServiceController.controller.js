@@ -143,7 +143,40 @@ exports.assignTechnician = async (req, res, next) => {
         next(err);
     }
 }
+exports.removeTechnicianAssignment = async (req, res, next) => {
+    try {
+        const { serviceId, technicianId } = req.body;
+        if (!serviceId || !technicianId) {
+            return res.status(400).json({ message: "serviceId and technicianId are required" });
+        }
 
+        const techUserService = await require('./technicianUserService.model').findOneAndUpdate(
+            { userServiceId: serviceId },
+            { $pull: { assignments: { technicianId } } },
+            { new: true }
+        );
+
+        await require('../../user/userService/userService.model').findByIdAndUpdate(
+            serviceId,
+            { $pull: { technicianIds: technicianId } }
+        );
+
+        await require("../../userLogs/userLogs.model").create({
+            userId: req.user.id,
+            log: `Removed technician ${technicianId} from service ${serviceId}`,
+            status: "Removed",
+            logo: "/assets/service request.webp",
+            time: new Date()
+        });
+
+        res.status(200).json({
+            message: "Technician removed from assignment",
+            data: techUserService
+        });
+    } catch (err) {
+        next(err);
+    }
+};
 exports.technicianRespond = async (req, res, next) => {
     const { assignmentId, action, reason } = req.body;
     const technicianId = req.user.id;
@@ -217,7 +250,7 @@ exports.technicianRespond = async (req, res, next) => {
                     $set: {
                         "assignments.$.status": "rejected",
                         "assignments.$.reason": reason,
-                        "assignments.$.statusChangedAt": now 
+                        "assignments.$.statusChangedAt": now
                     }
                 },
                 { new: true }
