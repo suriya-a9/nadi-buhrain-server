@@ -102,8 +102,8 @@ export default function Dashboard() {
         <div className="p-4">
             <h2 className="text-[25px] font-bold mb-6 text-textGreen">Overview</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="grid grid-cols-2 grid-rows-2 gap-[35px] h-full ">
-                    <div className="p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-[215px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[35px] h-full">
+                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Total<br />Technician</span>
                             <span className="bg-[#6c8fcf] text-white p-2 rounded-[10px] ml-auto">
@@ -112,7 +112,7 @@ export default function Dashboard() {
                         </div>
                         {renderAvatars(dashboardData.technicians, "technician")}
                     </div>
-                    <div className="p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-[215px]">
+                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Verified<br /> Users</span>
                             <span className="bg-[#4ad991] text-white p-2 rounded-[10px] ml-auto">
@@ -121,7 +121,7 @@ export default function Dashboard() {
                         </div>
                         {renderAvatars(dashboardData.users, "user")}
                     </div>
-                    <div className="p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-[215px]">
+                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Total Requests</span>
                             <span className="bg-[#ffd600] text-white p-2 rounded-[10px] ml-auto">
@@ -132,7 +132,7 @@ export default function Dashboard() {
                             {dashboardData.serviceRequests.length}
                         </div>
                     </div>
-                    <div className="p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-[215px]">
+                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Total Points Request</span>
                             <span className="bg-[#ffd600] text-white p-2 rounded-[10px] ml-auto">
@@ -151,27 +151,29 @@ export default function Dashboard() {
                             <VscGitPullRequestGoToChanges size={22} />
                         </span>
                     </div>
-                    <ResponsiveContainer width="100%" height={350}>
-                        <BarChart data={chartData}>
-                            <CartesianGrid vertical={false} stroke="#e0e0e0" />
-                            <XAxis dataKey="name" />
-                            <Tooltip />
-                            <Bar
-                                dataKey="value"
-                                barSize={45}
-                            >
-                                {chartData.map((entry, index) => {
-                                    const colors = [
-                                        "#74BFAB",
-                                        "#0D5F48",
-                                        "#519C87",
-                                        "#85B5A8"
-                                    ];
-                                    return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
-                                })}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <div className="w-full h-[250px] sm:h-[350px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData}>
+                                <CartesianGrid vertical={false} stroke="#e0e0e0" />
+                                <XAxis dataKey="name" />
+                                <Tooltip />
+                                <Bar
+                                    dataKey="value"
+                                    barSize={45}
+                                >
+                                    {chartData.map((entry, index) => {
+                                        const colors = [
+                                            "#74BFAB",
+                                            "#0D5F48",
+                                            "#519C87",
+                                            "#85B5A8"
+                                        ];
+                                        return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                                    })}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             </div>
             <div className="mt-10 bg-white rounded-[20px] shadow px-6 py-6">
@@ -184,63 +186,65 @@ export default function Dashboard() {
                         View All
                     </button>
                 </div>
-                <table className="min-w-full text-left">
-                    <thead>
-                        <tr className="border-b-2 border-gray-200">
-                            <th className="py-2 px-4 font-semibold text-gray-700">Request ID</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Request By</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Service Name</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Status</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Feedback</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Scheduled Date</th>
-                            <th className="py-2 px-4 font-semibold text-gray-700">Is Urgent?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {serviceRequests.length === 0 && (
-                            <tr>
-                                <td colSpan={7} className="text-center py-4 text-gray-400">No new service requests</td>
+                <div className="overflow-x-auto">
+                    <table className="min-w-[900px] text-left">
+                        <thead>
+                            <tr className="border-b-2 border-gray-200">
+                                <th className="py-2 px-4 font-semibold text-gray-700">Request ID</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Request By</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Service Name</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Status</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Feedback</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Scheduled Date</th>
+                                <th className="py-2 px-4 font-semibold text-gray-700">Is Urgent?</th>
                             </tr>
-                        )}
-                        {serviceRequests.slice(-5).reverse().map((req, idx) => (
-                            <tr key={req._id} className="border-b border-gray-200">
-                                <td className="py-3 px-4 flex items-center gap-2">
-                                    {/* {req.serviceId?.serviceLogo && (
+                        </thead>
+                        <tbody>
+                            {serviceRequests.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="text-center py-4 text-gray-400">No new service requests</td>
+                                </tr>
+                            )}
+                            {serviceRequests.slice(-5).reverse().map((req, idx) => (
+                                <tr key={req._id} className="border-b border-gray-200">
+                                    <td className="py-3 px-4 flex items-center gap-2">
+                                        {/* {req.serviceId?.serviceLogo && (
                                         <img
                                             src={`${API_URL}/uploads/${req.serviceId.serviceLogo}`}
                                             alt="logo"
                                             className="w-8 h-8 object-contain rounded-full border"
                                         />
                                     )} */}
-                                    <span className="">{req.serviceRequestID}</span>
-                                </td>
-                                <td className="py-3 px-4">{req.userId?.basicInfo?.fullName}</td>
-                                <td className="py-3 px-4">{req.issuesId?.issue || "-"}</td>
-                                <td className="py-3 px-4">
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold
+                                        <span className="">{req.serviceRequestID}</span>
+                                    </td>
+                                    <td className="py-3 px-4">{req.userId?.basicInfo?.fullName}</td>
+                                    <td className="py-3 px-4">{req.issuesId?.issue || "-"}</td>
+                                    <td className="py-3 px-4">
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold
                                 ${req.serviceStatus === "submitted"
-                                                ? "bg-[#e3f5ef] text-[#0D5F48]"
-                                                : req.serviceStatus === "accepted"
-                                                    ? "bg-[#e3eaf5] text-[#0D5F48]"
-                                                    : req.serviceStatus === "completed"
-                                                        ? "bg-[#e3f5e9] text-[#0D5F48]"
-                                                        : "bg-gray-200 text-gray-700"
-                                            }
+                                                    ? "bg-[#e3f5ef] text-[#0D5F48]"
+                                                    : req.serviceStatus === "accepted"
+                                                        ? "bg-[#e3eaf5] text-[#0D5F48]"
+                                                        : req.serviceStatus === "completed"
+                                                            ? "bg-[#e3f5e9] text-[#0D5F48]"
+                                                            : "bg-gray-200 text-gray-700"
+                                                }
                             `}
-                                    >
-                                        {req.serviceStatus === "submitted"
-                                            ? "Pending"
-                                            : req.serviceStatus.charAt(0).toUpperCase() + req.serviceStatus.slice(1)}
-                                    </span>
-                                </td>
-                                <td className="py-3 px-4">{req.feedback || "-"}</td>
-                                <td className="py-3 px-4">{req.scheduleService || "-"}</td>
-                                <td className="py-3 px-4">{req.immediateAssistance ? "Yes" : "No"}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                        >
+                                            {req.serviceStatus === "submitted"
+                                                ? "Pending"
+                                                : req.serviceStatus.charAt(0).toUpperCase() + req.serviceStatus.slice(1)}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4">{req.feedback || "-"}</td>
+                                    <td className="py-3 px-4">{req.scheduleService || "-"}</td>
+                                    <td className="py-3 px-4">{req.immediateAssistance ? "Yes" : "No"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

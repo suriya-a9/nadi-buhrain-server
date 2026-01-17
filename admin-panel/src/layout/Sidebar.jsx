@@ -2,13 +2,14 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { TbLayoutDashboard, TbLogs } from "react-icons/tb";
 import { BsThreeDotsVertical, BsPersonVideo3, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
-import { FaRegFileImage, FaUsers } from "react-icons/fa";
+import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
 import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip } from "react-icons/md";
 import { PiBuildingApartment } from "react-icons/pi";
 import { BiCartAdd } from "react-icons/bi";
 import { CgUnavailable } from "react-icons/cg";
+import { IoIosHelpCircleOutline } from "react-icons/io";
 import { FaWarehouse, FaClipboardUser } from "react-icons/fa6";
 import { SlBadge } from "react-icons/sl";
 import { GiRoad } from "react-icons/gi";
@@ -134,7 +135,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 <SlBadge size={20} /> &nbsp;&nbsp;&nbsp;Points List
                             </NavLink>
                             <NavLink to="/questionnaires" className={linkClasses}>
-                                <SlBadge size={20} /> &nbsp;&nbsp;&nbsp;Questionnaires List
+                                <FaTasks size={20} /> &nbsp;&nbsp;&nbsp;Questionnaires List
                             </NavLink>
                         </>
                     )}
@@ -171,7 +172,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 <MdOutlinePrivacyTip size={20} /> &nbsp;&nbsp;&nbsp;Privacy Policy
                             </NavLink>
                             <NavLink to="/help-support" className={linkClasses}>
-                                <MdOutlinePrivacyTip size={20} /> &nbsp;&nbsp;&nbsp;Help and Support
+                                <IoIosHelpCircleOutline size={20} /> &nbsp;&nbsp;&nbsp;Help and Support
                             </NavLink>
                         </>
                     )}

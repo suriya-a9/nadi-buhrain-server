@@ -143,17 +143,19 @@ export default function ServiceRequest() {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[25px] font-bold mb-6 text-textGreen">New Service Requests</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen">
+                    New Service Requests
+                </h2>
             </div>
-            <div className="flex gap-4 items-end mb-4">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-end mb-4">
                 <div className="flex flex-col">
                     <label htmlFor="search" className="text-xs font-medium mb-1">Search</label>
                     <input
                         id="search"
                         type="text"
                         placeholder="Search by Request ID, Requested By, or Status"
-                        className="border px-3 py-2 rounded w-[200px]"
+                        className="border px-3 py-2 rounded w-full sm:w-[200px]"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                     />
@@ -228,7 +230,7 @@ export default function ServiceRequest() {
                                     Close
                                 </button>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
                                 <div>
                                     <div className="font-medium">Request ID</div>
                                     <div className="text-gray-700 dark:text-gray-300">{selected.serviceRequestID}</div>
@@ -270,7 +272,7 @@ export default function ServiceRequest() {
 
                             <div className="mb-4">
                                 <div className="font-medium mb-2">Status Timeline</div>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {Object.entries(selected.statusTimestamps || {}).map(([status, time]) => (
                                         <div key={status}>
                                             <span className="font-medium">{status}:</span>{" "}
@@ -282,7 +284,7 @@ export default function ServiceRequest() {
 
                             <div className="mb-2">
                                 <div className="font-medium mb-2">Update Status</div>
-                                <div className="flex gap-2 flex-wrap">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                     <button
                                         disabled={statusUpdating || selected.serviceStatus === "accepted"}
                                         className={`px-3 py-1 rounded ${selected.serviceStatus === "accepted"

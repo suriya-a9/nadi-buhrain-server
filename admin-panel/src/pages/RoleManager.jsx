@@ -58,10 +58,10 @@ export default function RoleManager() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-8 bg-white rounded-xl shadow-lg mt-8">
+        <div className="max-w-5xl mx-auto p-4 sm:p-8 bg-white rounded-xl shadow-lg mt-4 sm:mt-8">
             <h2 className="text-[25px] font-bold mb-6 text-textGreen">Role Permissions Management</h2>
-            <div className="flex gap-10">
-                <div className="w-1/3">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+                <div className="w-full md:w-1/3">
                     <h3 className="font-semibold mb-4 text-lg text-gray-700">Roles</h3>
                     <ul className="space-y-2">
                         {roles.map(role => (
@@ -82,7 +82,7 @@ export default function RoleManager() {
                 </div>
                 {selectedRole && (
                     <div className="flex-1">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                             <h3 className="font-semibold text-lg text-gray-700">
                                 Permissions for <span className="text-bgGreen">{selectedRole.name}</span>
                             </h3>
@@ -94,7 +94,7 @@ export default function RoleManager() {
                                 {saving ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                             {ALL_PERMISSIONS.map(perm => (
                                 <label
                                     key={perm}

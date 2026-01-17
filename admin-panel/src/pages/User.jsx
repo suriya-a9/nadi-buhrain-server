@@ -220,9 +220,11 @@ export default function User() {
 
     return (
         <div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
-                <h2 className="text-[25px] font-bold mb-6 text-textGreen">Users</h2>
-                <div className="flex gap-2 flex-1 md:justify-end">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen">
+                    Users
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
                     <select
                         value={statusFilter}
                         onChange={e => setStatusFilter(e.target.value)}
@@ -237,10 +239,10 @@ export default function User() {
                         placeholder="Search users"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="border p-2 rounded w-48"
+                        className="border p-2 rounded w-full sm:w-48"
                     />
                     <button
-                        className="px-3 py-2 bg-bgGreen text-white rounded font-medium"
+                        className="px-3 py-2 bg-bgGreen text-white rounded font-medium w-full sm:w-auto"
                         onClick={() => navigate("/add-user")}
                     >
                         Add User
@@ -308,7 +310,7 @@ export default function User() {
                     <div className="fixed inset-0 z-50 overflow-auto">
                         <div className="min-h-screen flex items-start justify-center py-8 px-4">
                             <div className="absolute inset-0 bg-black opacity-40" onClick={() => setDetailsOpen(false)} />
-                            <div className="relative bg-white text-black p-6 rounded shadow-lg max-w-4xl w-full z-10 max-h-[90vh] overflow-auto">
+                            <div className="relative bg-white text-black p-4 sm:p-6 rounded shadow-lg max-w-4xl w-full z-10 max-h-[90vh] overflow-auto">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-semibold">User Details</h3>
                                     <div>
@@ -328,7 +330,10 @@ export default function User() {
                                 </div>
 
                                 {editMode ? (
-                                    <form onSubmit={handleSubmit(onEditSubmit)} className="grid grid-cols-2 gap-3 mb-4">
+                                    <form
+                                        onSubmit={handleSubmit(onEditSubmit)}
+                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"
+                                    >
                                         <div>
                                             <label className="block text-xs mb-1">Full Name</label>
                                             <input {...register("fullName")} className="border p-2 rounded w-full" />
@@ -394,7 +399,7 @@ export default function User() {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="col-span-2 flex gap-2 mt-2">
+                                        <div className="col-span-1 sm:col-span-2 flex flex-col sm:flex-row gap-2 mt-2">
                                             <button type="submit" className="bg-bgGreen text-white px-4 py-2 rounded">Save</button>
                                             <button type="button" onClick={() => setEditMode(false)} className="text-gray-500 px-4 py-2 rounded border">Cancel</button>
                                         </div>
@@ -468,7 +473,7 @@ export default function User() {
                                                             <FaRegAddressCard size={25} />
                                                             <span>Address</span>
                                                         </div>
-                                                        <div className="bg-white border-2 border-gray-300 rounded-lg shadow p-4 flex flex-col gap-2 max-w-md">
+                                                        <div className="bg-white border-2 border-gray-300 rounded-lg shadow p-4 flex flex-col gap-2 w-full max-w-md">
                                                             {selectedUser.addresses.map((a) => {
                                                                 const roadName = a.roadId && typeof a.roadId === "object" ? a.roadId.name : a.roadId;
                                                                 const blockName = a.blockId && typeof a.blockId === "object" ? a.blockId.name : a.blockId;
@@ -516,7 +521,7 @@ export default function User() {
                                                         <div className="space-y-2">
                                                             {familyMembers.map((fm) => (
                                                                 <div key={fm._id} className="p-3 border rounded bg-gray-50">
-                                                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                                                                         <div>
                                                                             <div className="text-xs text-gray-500">Name</div>
                                                                             <div className="text-gray-800">{fm.fullName}</div>

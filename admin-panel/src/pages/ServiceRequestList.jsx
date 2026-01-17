@@ -242,10 +242,10 @@ export default function ServiceRequestList() {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[25px] font-bold mb-6 text-textGreen">Service Requests List</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen">Service Requests List</h2>
                 <button
-                    className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2"
+                    className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2 w-full sm:w-auto"
                     onClick={() =>
                         generateServiceRequestsPDF({
                             data: filteredData,
@@ -257,7 +257,7 @@ export default function ServiceRequestList() {
                     Print <IoPrintOutline size={20} />
                 </button>
             </div>
-            <div className="mb-4 flex gap-2">
+            <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
                 <button
                     className={`px-4 py-2 rounded ${activeTab === 0 ? "bg-blue-600 text-white" : "bg-gray-200"}`}
                     onClick={() => setActiveTab(0)}
@@ -290,16 +290,16 @@ export default function ServiceRequestList() {
                     Technician Completed
                 </button>
             </div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
                 <h2 className="text-2xl font-semibold">Service Requests List</h2>
-                <div className="flex gap-4 items-end">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
                     <div className="flex flex-col">
                         <label htmlFor="search" className="text-xs font-medium mb-1">Search</label>
                         <input
                             id="search"
                             type="text"
                             placeholder="Search by Request ID, Requested By, or Status"
-                            className="border px-3 py-2 rounded w-[200px]"
+                            className="border px-3 py-2 rounded w-full sm:w-[200px]"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
@@ -382,7 +382,7 @@ export default function ServiceRequestList() {
                                     Close
                                 </button>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
                                 <div>
                                     <div className="font-medium">Request ID</div>
                                     <div className="text-gray-700">{selected.serviceRequestID}</div>
@@ -457,16 +457,15 @@ export default function ServiceRequestList() {
                             {!selected.technicianId && (
                                 <div className="mb-4">
                                     <div className="font-medium mb-2">Assign Technician(s)</div>
-                                    <div className="flex gap-2 items-center">
+                                    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                                         <select
-                                            className="border rounded px-2 py-1"
+                                            className="border rounded px-2 py-1 w-full sm:w-[220px] min-h-[80px]"
                                             multiple
                                             value={selectedTechnician}
                                             onChange={e => {
                                                 const options = Array.from(e.target.selectedOptions, opt => opt.value);
                                                 setSelectedTechnician(options);
                                             }}
-                                            style={{ minHeight: "80px", minWidth: "220px" }}
                                         >
                                             {technicians.map(tech => (
                                                 <option key={tech._id} value={tech._id}>
