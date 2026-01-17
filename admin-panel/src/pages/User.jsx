@@ -35,10 +35,17 @@ export default function User() {
     const loadUsers = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/account-verify/all-user-list");
+            const res = await api.get(
+                "/account-verify/all-user-list",
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
             setUsers(res.data.data || []);
         } catch (err) {
-            toast.error(err.response?.data?.message);
+            toast.error(err.response?.data?.message || "Server error");
         } finally {
             setLoading(false);
         }

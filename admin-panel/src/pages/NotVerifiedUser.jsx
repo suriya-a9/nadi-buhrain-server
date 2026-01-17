@@ -26,10 +26,17 @@ export default function NotVerifiedUser() {
     const loadUsers = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/account-verify/list");
+            const res = await api.get(
+                "/account-verify/list",
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
             setUsers(res.data.data || []);
         } catch (err) {
-            toast.error(err.response?.data?.message);
+            toast.error(err.response?.data?.message || "Server error");
         } finally {
             setLoading(false);
         }
