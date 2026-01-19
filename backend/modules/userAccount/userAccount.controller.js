@@ -39,6 +39,7 @@ exports.saveBasicInfo = async (req, res, next) => {
     try {
         const existingUser = await UserAccount.findOne({
             _id: { $ne: userId },
+            status: "completed",
             $or: [
                 { "basicInfo.mobileNumber": mobileNumber },
                 { "basicInfo.email": email }
