@@ -229,3 +229,23 @@ exports.listSpareParts = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.listByUser = async (req, res, next) => {
+    try {
+        const technicianId = req.user.id;
+        if (!technicianId) {
+            return res.status(403).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        const listData = await MaterialRequest.find({ technicianId }).
+            populate("productId");
+        res.status(200).json({
+            success: true,
+            data: listData
+        })
+    } catch (err) {
+        next(err)
+    }
+}

@@ -239,6 +239,13 @@ exports.requestToAdmin = async (req, res, next) => {
             status: "requested",
             reason
         })
+        await UserLog.create({
+            userId: req.user.id,
+            log: `${points} points requested`,
+            status: "Requested to nadi bahrain",
+            logo: "/assets/badge.webp",
+            time: new Date()
+        });
         res.status(200).json({
             success: true,
             message: "Success"
@@ -250,7 +257,8 @@ exports.requestToAdmin = async (req, res, next) => {
 
 exports.listAdminRequest = async (req, res, next) => {
     try {
-        const list = await RequestPointsAdmin.find();
+        const list = await RequestPointsAdmin.find()
+        .populate("userId");
         res.status(200).json({
             success: true,
             message: "Success",
@@ -260,3 +268,34 @@ exports.listAdminRequest = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.handleAdminRequestAction = async (req, res, next) => {
+    const { requestId, actionType, questionnaireId } = req.body;
+    try {
+        const request = await RequestPointsAdmin.findById(requestId);
+        if (!request) {
+            return res.status(404).json({ message: "Request not found" });
+        }
+        if (!["raise_payment", "send_questionnaire"].includes(actionType)) {
+            return res.status(400).json({ message: "Invalid actionType" });
+        }
+
+        request.actionType = actionType;
+
+        if (actionType === "raise_payment") {
+            request.status = "payment requested";
+        } else if (actionType === "send_questionnaire") {
+            if (!questionnaireId) {
+                return res.status(400).json({ message: "questionnaireId required" });
+            }
+            request.status = "sent questionnaire";
+            request.questionnaireId = questionnaireId;
+        }
+
+        await request.save();
+
+        res.status(200).json({ message: "Action updated", data: request });
+    } catch (err) {
+        next(err);
+    }
+};

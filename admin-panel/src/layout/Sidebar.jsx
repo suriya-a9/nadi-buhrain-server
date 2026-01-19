@@ -5,7 +5,7 @@ import { BsThreeDotsVertical, BsPersonVideo3, BsReverseLayoutSidebarInsetReverse
 import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
-import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip } from "react-icons/md";
+import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip, MdOutlineRequestPage } from "react-icons/md";
 import { PiBuildingApartment } from "react-icons/pi";
 import { BiCartAdd } from "react-icons/bi";
 import { CgUnavailable } from "react-icons/cg";
@@ -133,6 +133,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <div className={sectionTitle}>Points</div>
                             <NavLink to="/points" className={linkClasses}>
                                 <SlBadge size={20} /> &nbsp;&nbsp;&nbsp;Points List
+                            </NavLink>
+                            <NavLink to="/requested-points" className={linkClasses}>
+                                <MdOutlineRequestPage size={20} /> &nbsp;&nbsp;&nbsp;Requested Points list
                             </NavLink>
                             <NavLink to="/questionnaires" className={linkClasses}>
                                 <FaTasks size={20} /> &nbsp;&nbsp;&nbsp;Questionnaires List

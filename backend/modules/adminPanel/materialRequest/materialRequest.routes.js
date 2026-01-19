@@ -1,4 +1,4 @@
-const { singleRequest, bulkRequest, responseMaterialRequest, productTechnicians, listMaterialRequests, listSpareParts } = require('./materialRequest.controller');
+const { singleRequest, bulkRequest, responseMaterialRequest, productTechnicians, listMaterialRequests, listSpareParts, listByUser } = require('./materialRequest.controller');
 const auth = require('../../../middleware/authMiddleware');
 
 const express = require('express');
@@ -11,5 +11,6 @@ router.post('/request-status', auth, responseMaterialRequest);
 router.get('/product-technicians/:productId', productTechnicians);
 router.get('/', listMaterialRequests);
 router.get('/spare-parts', listSpareParts);
+router.post("/list", auth, listByUser)
 
 module.exports = router;

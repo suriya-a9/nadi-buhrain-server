@@ -14,7 +14,8 @@ export default function Dashboard() {
         technicians: [],
         users: [],
         serviceRequests: [],
-        requests: []
+        requests: [],
+        points: []
     });
     const [loading, setLoading] = useState(false);
 
@@ -24,7 +25,7 @@ export default function Dashboard() {
         setLoading(true);
         try {
             const res = await api.get("/dashboard/technicians");
-            setDashboardData(res.data || { technicians: [], users: [], serviceRequests: [], requests: [] });
+            setDashboardData(res.data || { technicians: [], users: [], serviceRequests: [], requests: [], points: [] });
         } catch (err) {
             console.error(err);
         } finally {
@@ -140,7 +141,7 @@ export default function Dashboard() {
                             </span>
                         </div>
                         <div className="mt-2 text-3xl font-bold text-[#0D5F48] text-[80px]">
-                            0
+                            {dashboardData.points.length}
                         </div>
                     </div>
                 </div>

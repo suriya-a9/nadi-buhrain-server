@@ -45,6 +45,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import HelpAndSupport from "./pages/HelpAndSupport";
 import NewServiceRequestDetails from "./pages/NewServiceRequestDetails";
 import ProductDetails from "./pages/ProductDetails";
+import RequestPoints from "./pages/RequestPoints";
 
 export default function App() {
   return (
@@ -324,6 +325,18 @@ export default function App() {
                   <PermissionRoute permission="points">
                     <DashboardLayout>
                       <Points />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/requested-points"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="points">
+                    <DashboardLayout>
+                      <RequestPoints />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>
