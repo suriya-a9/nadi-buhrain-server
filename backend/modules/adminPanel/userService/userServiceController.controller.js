@@ -2,6 +2,8 @@ const UserService = require('../../user/userService/userService.model');
 const TechnicianUserService = require('./technicianUserService.model');
 const formatDate = require('../../../utils/formatDate');
 const UserLog = require("../../userLogs/userLogs.model");
+const Technician = require("../technician/technician.model")
+const Notification = require("../notification/notification.model");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -183,7 +185,7 @@ exports.technicianRespond = async (req, res, next) => {
 
     try {
         const now = new Date();
-
+        const technician = await Technician.findById(technicianId);
         if (action === 'accept') {
 
             const assignment = await TechnicianUserService.findOneAndUpdate(
@@ -194,7 +196,7 @@ exports.technicianRespond = async (req, res, next) => {
                 {
                     $set: {
                         "assignments.$.status": "accepted",
-                        "assignments.$.statusChangedAt": now // ✅ TIMESTAMP
+                        "assignments.$.statusChangedAt": now
                     }
                 },
                 { new: true }
@@ -227,7 +229,15 @@ exports.technicianRespond = async (req, res, next) => {
                 logo: "/assets/service request.webp",
                 time: now
             });
-
+            const notification = await Notification.create({
+                type: 'Accepted',
+                message: `${technician.firstName} accepted the request`,
+                userId: technicianId,
+                time: new Date(),
+                read: false
+            });
+            const io = req.app.get('io');
+            io.emit('notification', notification);
             return res.status(200).json({
                 message: "Service accepted",
                 data: assignment
@@ -267,7 +277,15 @@ exports.technicianRespond = async (req, res, next) => {
                 logo: "/assets/service request.webp",
                 time: now
             });
-
+            const notification = await Notification.create({
+                type: 'Rejected',
+                message: `${technician.firstName} rejected the request`,
+                userId: technicianId,
+                time: new Date(),
+                read: false
+            });
+            const io = req.app.get('io');
+            io.emit('notification', notification);
             return res.status(200).json({
                 message: "Service rejected",
                 data: assignment

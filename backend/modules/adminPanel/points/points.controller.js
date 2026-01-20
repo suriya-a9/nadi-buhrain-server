@@ -6,6 +6,7 @@ const PointsHistory = require("./pointsHistory.model");
 const RequestPointsAdmin = require("../../requests/requestAdmin.model");
 const UserNotification = require("../notification/userNotification.model");
 const sendPushNotification = require("../../../utils/sendPush");
+const Notification = require('../../adminPanel/notification/notification.model');
 
 exports.addPoints = async (req, res, next) => {
     const { points, accountType } = req.body;
@@ -233,12 +234,22 @@ exports.requestToAdmin = async (req, res, next) => {
                 message: "User id needed"
             })
         }
+        const user = await UserAccount.findById(userId);
         await RequestPointsAdmin.create({
             userId: userId,
             points,
             status: "requested",
             reason
-        })
+        });
+        const notification = await Notification.create({
+            type: 'Request',
+            message: `${points} points requested by ${user.basicInfo.fullName}`,
+            userId: user._id,
+            time: new Date(),
+            read: false
+        });
+        const io = req.app.get('io');
+        io.emit('notification', notification);
         await UserLog.create({
             userId: req.user.id,
             log: `${points} points requested`,
@@ -258,7 +269,7 @@ exports.requestToAdmin = async (req, res, next) => {
 exports.listAdminRequest = async (req, res, next) => {
     try {
         const list = await RequestPointsAdmin.find()
-        .populate("userId");
+            .populate("userId");
         res.status(200).json({
             success: true,
             message: "Success",

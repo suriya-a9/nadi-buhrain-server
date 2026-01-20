@@ -2,6 +2,8 @@ const MaterialRequest = require('./materialRequest.model');
 const Inventory = require("../inventory/inventory.model");
 const SpareParts = require("../spareParts/spareParts.model");
 const UserLog = require("../../userLogs/userLogs.model");
+const Technician = require("../../adminPanel/technician/technician.model");
+const Notification = require("../notification/notification.model");
 
 exports.singleRequest = async (req, res, next) => {
     const { productId, quantity, notes } = req.body;
@@ -11,6 +13,8 @@ exports.singleRequest = async (req, res, next) => {
                 message: "user id needed"
             });
         }
+        const technicianId = req.user.id;
+        const technician = await Technician.findById(req.user.id)
         const product = await Inventory.findById(productId);
         if (!product) {
             return res.status(404).json({
@@ -47,6 +51,15 @@ exports.singleRequest = async (req, res, next) => {
             logo: "/assets/product-management.webp",
             time: new Date()
         });
+        const notification = await Notification.create({
+            type: 'Request',
+            message: `${product.productName} has been requested for ${quantity} quantity by ${technician.firstName}`,
+            userId: technicianId,
+            time: new Date(),
+            read: false
+        });
+        const io = req.app.get('io');
+        io.emit('notification', notification);
         res.status(201).json({
             message: "Material request created successfully"
         });
@@ -62,7 +75,8 @@ exports.bulkRequest = async (req, res, next) => {
         if (!req.user.id) {
             return res.status(400).json({ message: "user id needed" });
         }
-
+        const technicianId = req.user.id;
+        const technician = await Technician.findById(req.user.id)
         if (!Array.isArray(requests) || requests.length === 0) {
             return res.status(400).json({ message: "No requests provided" });
         }
@@ -112,6 +126,15 @@ exports.bulkRequest = async (req, res, next) => {
             logo: "/assets/product-management.webp",
             time: new Date()
         });
+        const notification = await Notification.create({
+            type: 'Request',
+            message: `Bulk products requested by ${technician.firstName}`,
+            userId: technicianId,
+            time: new Date(),
+            read: false
+        });
+        const io = req.app.get('io');
+        io.emit('notification', notification);
         res.status(201).json({
             message: "Bulk material requests submitted successfully",
             totalRequests: requests.length
