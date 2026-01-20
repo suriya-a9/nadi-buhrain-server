@@ -100,11 +100,25 @@ exports.loginTechnician = async (req, res, next) => {
 }
 
 exports.updateTechnician = async (req, res, next) => {
-    const { id, ...updateFields } = req.body;
+    const id = req.user.id;
+    const updateFields = { ...req.body };
+
     try {
+        if (typeof updateFields.status === "string") {
+            updateFields.status = updateFields.status === "true";
+        }
+
+        if (updateFields.role && typeof updateFields.role === "string") {
+            try {
+                updateFields.role = JSON.parse(updateFields.role);
+            } catch (e) {
+            }
+        }
+
         if (req.files?.image) {
             updateFields.image = req.files.image[0].filename;
         }
+
         const technicianUpdate = await Technician.findByIdAndUpdate(
             id,
             updateFields,
@@ -118,7 +132,8 @@ exports.updateTechnician = async (req, res, next) => {
             time: new Date()
         });
         res.status(200).json({
-            message: "Profile updated successfully"
+            message: "Profile updated successfully",
+            data: technicianUpdate
         });
     } catch (err) {
         next(err);
