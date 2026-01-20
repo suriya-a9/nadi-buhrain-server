@@ -11,6 +11,7 @@ export default function Technicians() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [skills, setSkills] = useState([]);
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [roleFilter, setRoleFilter] = useState("");
     const [search, setSearch] = useState("");
@@ -68,6 +69,7 @@ export default function Technicians() {
             role: "",
             password: "",
         });
+        setImage(null);
         setEditData(null);
         setOpenCanvas(true);
     };
@@ -83,6 +85,7 @@ export default function Technicians() {
             role: tech.role?._id || "",
             password: "",
         });
+        setImage(null);
         setOpenCanvas(true);
     };
 
@@ -91,7 +94,9 @@ export default function Technicians() {
 
         const fd = new FormData();
         Object.keys(form).forEach((key) => fd.append(key, form[key]));
-
+        if (image) {
+            fd.append("image", image);
+        }
         if (editData) fd.append("id", editData._id);
         try {
             const res = await api.post(
@@ -327,6 +332,23 @@ export default function Technicians() {
                                 </option>
                             ))}
                         </select>
+                    </div>
+
+                    <div>
+                        <label className="block mb-1 font-medium">Image</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => setImage(e.target.files[0])}
+                            className="w-full border p-2 rounded"
+                        />
+                        {editData && editData.image && (
+                            <img
+                                src={`${import.meta.env.VITE_API_URL}/uploads/${editData.image}`}
+                                alt="Technician"
+                                className="mt-2 h-16 rounded border"
+                            />
+                        )}
                     </div>
 
                     {!editData && (
