@@ -100,7 +100,7 @@ export default function Technicians() {
         if (editData) fd.append("id", editData._id);
         try {
             const res = await api.post(
-                editData ? "/technician/update-profile" : "/technician/register",
+                editData ? "/technician/admin-update" : "/technician/register",
                 fd,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

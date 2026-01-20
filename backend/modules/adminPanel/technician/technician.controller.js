@@ -140,6 +140,57 @@ exports.updateTechnician = async (req, res, next) => {
     }
 }
 
+exports.adminUpdateTechnician = async (req, res, next) => {
+    try {
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ message: "Technician ID is required" });
+        }
+
+        const updateFields = { ...req.body };
+        delete updateFields.id; 
+
+        if (typeof updateFields.status === "string") {
+            updateFields.status = updateFields.status === "true";
+        }
+
+        if (updateFields.role && typeof updateFields.role === "string") {
+            updateFields.role = updateFields.role;
+        }
+
+        if (req.files?.image) {
+            updateFields.image = req.files.image[0].filename;
+        }
+
+        const technician = await Technician.findByIdAndUpdate(
+            id,
+            updateFields,
+            { new: true }
+        );
+
+        if (!technician) {
+            return res.status(404).json({ message: "Technician not found" });
+        }
+
+        await UserLog.create({
+            userId: req.user.id,
+            log: `Admin updated technician (${technician.firstName} ${technician.lastName})`,
+            status: "Updated",
+            logo: "/assets/update-profile.webp",
+            time: new Date()
+        });
+
+        res.status(200).json({
+            message: "Technician updated successfully",
+            data: technician
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
 exports.deleteTechnician = async (req, res, next) => {
     const { id } = req.body;
     try {
@@ -168,7 +219,7 @@ exports.profile = async (req, res, next) => {
             })
         }
         const technicianData = await Technician.findById(userId)
-        .populate("role");
+            .populate("role");
         res.status(200).json({
             data: technicianData
         })

@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerTechnician, loginTechnician, updateTechnician, deleteTechnician, profile, technicianList, setUserStatus, forgotPassword, resetPassword } = require('./technician.controller');
+const { registerTechnician, loginTechnician, updateTechnician, deleteTechnician, profile, technicianList, setUserStatus, forgotPassword, resetPassword, adminUpdateTechnician } = require('./technician.controller');
 const upload = require('../../../middleware/fileUpload');
 const router = express.Router();
 const auth = require('../../../middleware/authMiddleware');
@@ -11,6 +11,9 @@ router.post('/login', loginTechnician);
 router.post('/update-profile', auth, upload.fields([
     { name: 'image', maxCount: 1 },
 ]), updateTechnician);
+router.post('/admin-update', auth, upload.fields([
+    { name: 'image', maxCount: 1 },
+]), adminUpdateTechnician);
 router.post('/delete', auth, deleteTechnician);
 router.post('/profile', auth, profile);
 router.post('/list', auth, technicianList);
