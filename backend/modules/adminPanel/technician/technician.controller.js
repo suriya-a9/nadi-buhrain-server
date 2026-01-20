@@ -148,7 +148,11 @@ exports.adminUpdateTechnician = async (req, res, next) => {
         }
 
         const updateFields = { ...req.body };
-        delete updateFields.id; 
+        delete updateFields.id;
+
+        if (!updateFields.password) {
+            delete updateFields.password;
+        }
 
         if (typeof updateFields.status === "string") {
             updateFields.status = updateFields.status === "true";
@@ -172,14 +176,6 @@ exports.adminUpdateTechnician = async (req, res, next) => {
             return res.status(404).json({ message: "Technician not found" });
         }
 
-        await UserLog.create({
-            userId: req.user.id,
-            log: `Admin updated technician (${technician.firstName} ${technician.lastName})`,
-            status: "Updated",
-            logo: "/assets/update-profile.webp",
-            time: new Date()
-        });
-
         res.status(200).json({
             message: "Technician updated successfully",
             data: technician
@@ -189,7 +185,6 @@ exports.adminUpdateTechnician = async (req, res, next) => {
         next(err);
     }
 };
-
 
 exports.deleteTechnician = async (req, res, next) => {
     const { id } = req.body;
