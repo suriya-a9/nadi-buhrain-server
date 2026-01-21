@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateServiceRequestsPDF } from "../utils/pdf/serviceRequestsPdf";
+import { generateServiceRequestsExcel } from "../utils/excel/serviceRequestsExcel";
 import { IoPrintOutline } from "react-icons/io5";
 import Table from "../components/Table";
 import api from "../services/api";
@@ -40,6 +41,8 @@ export default function ServiceRequestList() {
     const [selectedTechnician, setSelectedTechnician] = useState("");
     const [techWorkStatus, setTechWorkStatus] = useState(null);
     const [techWorkStatusLoading, setTechWorkStatusLoading] = useState(false);
+    const [showExportDropdown, setShowExportDropdown] = useState(false);
+    const printBtnRef = useRef(null);
     const [activeTab, setActiveTab] = useState(0);
     const [scheduledDateFilter, setScheduledDateFilter] = useState("");
     const [allAssignments, setAllAssignments] = useState({});
@@ -240,22 +243,77 @@ export default function ServiceRequestList() {
         }
     }, [detailsOpen, selected]);
 
+    const excelData = filteredData.map((row) => ({
+        "Request ID": row.serviceRequestID,
+        "Requested By": row.userId?.basicInfo?.fullName,
+        "Service Name": row.serviceId?.name,
+        "Issue Name": row.issuesId?.issue,
+        "Is Urgent": row.immediateAssistance ? "Yes" : "No",
+        "Status": Object.entries(row.statusTimestamps || {}).pop()?.[0] || "-",
+        "Scheduled": row.scheduleService,
+        "Feedback": row.feedback
+    }));
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                printBtnRef.current &&
+                !printBtnRef.current.contains(event.target)
+            ) {
+                setShowExportDropdown(false);
+            }
+        }
+        if (showExportDropdown) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showExportDropdown]);
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen">Service Requests List</h2>
-                <button
-                    className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2 w-full sm:w-auto"
-                    onClick={() =>
-                        generateServiceRequestsPDF({
-                            data: filteredData,
-                            logoUrl: "/assets/mail-logo.jpg",
-                            subtitle: `Total Records: ${filteredData.length}`
-                        })
-                    }
-                >
-                    PDF <IoPrintOutline size={20} />
-                </button>
+                <div className="relative" ref={printBtnRef}>
+                    <button
+                        className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2 w-full sm:w-auto"
+                        onClick={() => setShowExportDropdown((v) => !v)}
+                    >
+                        Print <IoPrintOutline size={20} />
+                    </button>
+                    {showExportDropdown && (
+                        <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-10">
+                            <button
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() => {
+                                    generateServiceRequestsPDF({
+                                        data: filteredData,
+                                        logoUrl: "/assets/mail-logo.jpg",
+                                        subtitle: `Total Records: ${filteredData.length}`,
+                                    });
+                                    setShowExportDropdown(false);
+                                }}
+                            >
+                                PDF
+                            </button>
+                            <button
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                onClick={() => {
+                                    generateServiceRequestsExcel({
+                                        data: excelData,
+                                        filename: "service-requests.xlsx",
+                                    });
+                                    setShowExportDropdown(false);
+                                }}
+                            >
+                                Excel
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
                 <button

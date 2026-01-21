@@ -2,11 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import api from "../services/api";
+import * as XLSX from "xlsx";
 import { IoPrintOutline } from "react-icons/io5";
 import { formatDateTime } from "../utils/dateUtils";
 import { formatDuration } from "../utils/timeUtils";
 import Table from "../components/Table";
 import { generateSingleServiceRequestPDF } from "../utils/pdf/generateSingleServiceRequestPDF";
+import { generateServiceRequestsExcel } from "../utils/excel/serviceRequestsExcel";
 // function formatDateTime(dateStr) {
 //     if (!dateStr) return "-";
 //     const d = new Date(dateStr);
@@ -51,6 +53,8 @@ export default function ServiceRequestDetails() {
     const [assignmentsLoading, setAssignmentsLoading] = useState(false);
     const [removeModalOpen, setRemoveModalOpen] = useState(false);
     const [removingTech, setRemovingTech] = useState(null);
+    const [showExportDropdown, setShowExportDropdown] = useState(false);
+    const printBtnRef = useRef(null);
     useEffect(() => {
         if (request?._id) {
             setAssignmentsLoading(true);
@@ -150,6 +154,79 @@ export default function ServiceRequestDetails() {
         );
     };
 
+    const excelDetails = [
+        {
+            "Request ID": request?.serviceRequestID,
+            "Requested By": request?.userId?.basicInfo?.fullName,
+            "Service Name": request?.serviceId?.name,
+            "Issue Name": request?.issuesId?.issue,
+            "Feedback": request?.feedback,
+            "Scheduled Date": formatDateTime(request?.scheduleService),
+            "Is Urgent": request?.immediateAssistance ? "Yes" : "No",
+            "Status": request?.serviceStatus,
+            "Amount to pay": request?.payment ? request.payment : "0",
+        },
+    ];
+
+    const excelTimeline = Object.entries(request?.statusTimestamps || {}).map(
+        ([status, time]) => ({
+            Status: status,
+            Time: time ? formatDateTime(time) : "-",
+        })
+    );
+
+    const excelTechnicians = (technicianAssignments || []).map(a => ({
+        Technician: a.technicianId?.firstName
+            ? `${a.technicianId.firstName} ${a.technicianId.lastName || ""} (${a.technicianId.email || ""})`
+            : a.technicianId,
+        Status: a.status,
+        "Work Duration": a.workDuration != null ? `${Math.floor(a.workDuration / 60)} min` : "-",
+        "Spare Parts": a.usedParts && a.usedParts.length > 0
+            ? a.usedParts.map(
+                part => `${part.productName} x${part.count} (₹${part.price} each, Total: ₹${part.total})`
+            ).join("; ")
+            : "-",
+        Timeline: a.updatedAt ? formatDateTime(a.updatedAt) : "-",
+        Notes: a.notes || "-",
+    }));
+
+    function handleExcelExport() {
+        const wb = XLSX.utils.book_new();
+        const wsDetails = XLSX.utils.json_to_sheet(excelDetails);
+        XLSX.utils.book_append_sheet(wb, wsDetails, "Details");
+
+        if (excelTimeline.length > 0) {
+            const wsTimeline = XLSX.utils.json_to_sheet(excelTimeline);
+            XLSX.utils.book_append_sheet(wb, wsTimeline, "Status Timeline");
+        }
+
+        if (excelTechnicians.length > 0) {
+            const wsTechs = XLSX.utils.json_to_sheet(excelTechnicians);
+            XLSX.utils.book_append_sheet(wb, wsTechs, "Technicians");
+        }
+
+        XLSX.writeFile(wb, `service-request-${request?.serviceRequestID || "details"}.xlsx`);
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                printBtnRef.current &&
+                !printBtnRef.current.contains(event.target)
+            ) {
+                setShowExportDropdown(false);
+            }
+        }
+        if (showExportDropdown) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showExportDropdown]);
+
     if (loading) return <div>Loading...</div>;
     if (!request) return <div>Request not found</div>;
 
@@ -158,17 +235,39 @@ export default function ServiceRequestDetails() {
             <div className="flex justify-between">
                 <button className="mb-4 text-blue-600 underline" onClick={() => navigate(-1)}>← Back</button>
                 {!loading && request && (
-                    <button
-                        className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2"
-                        onClick={() =>
-                            generateSingleServiceRequestPDF({
-                                request: { ...request, technicianAssignments },
-                                logoUrl: "/assets/mail-logo.jpg"
-                            })
-                        }
-                    >
-                        PDF <IoPrintOutline size={20} />
-                    </button>
+                    <div className="relative" ref={printBtnRef}>
+                        <button
+                            className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2"
+                            onClick={() => setShowExportDropdown((v) => !v)}
+                        >
+                            Print <IoPrintOutline size={20} />
+                        </button>
+                        {showExportDropdown && (
+                            <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-10">
+                                <button
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    onClick={() => {
+                                        generateSingleServiceRequestPDF({
+                                            request: { ...request, technicianAssignments },
+                                            logoUrl: "/assets/mail-logo.jpg"
+                                        });
+                                        setShowExportDropdown(false);
+                                    }}
+                                >
+                                    PDF
+                                </button>
+                                <button
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    onClick={() => {
+                                        handleExcelExport();
+                                        setShowExportDropdown(false);
+                                    }}
+                                >
+                                    Excel
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
             <h2 className="text-[25px] font-bold mb-6 text-textGreen">Service Request Details</h2>

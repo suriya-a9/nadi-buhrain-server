@@ -82,9 +82,7 @@ export const generateSingleServiceRequestPDF = async ({ request, logoUrl }) => {
                 [
                     "Technician",
                     "Status",
-                    "Work Started At",
                     "Work Duration",
-                    "Notes",
                     "Spare Parts",
                     "Timeline"
                 ]
