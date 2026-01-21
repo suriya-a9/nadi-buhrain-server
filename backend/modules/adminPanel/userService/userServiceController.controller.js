@@ -5,6 +5,8 @@ const UserLog = require("../../userLogs/userLogs.model");
 const Technician = require("../technician/technician.model")
 const Notification = require("../notification/notification.model");
 const Admin = require("../../admin/admin.model");
+const UserAccount = require("../../userAccount/userAccount.model");
+const sendPushNotification = require("../../../utils/sendPush");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -53,7 +55,8 @@ exports.updateServiceStatus = async (req, res, next) => {
         if (!userService) {
             return res.status(404).json({ message: "Service not found" });
         }
-
+        const userId = userService.userId;
+        const user = await UserAccount.findById(userId)
         if (serviceStatus === "paymentInProgress") {
             const assignments = await TechnicianUserService.find({ userServiceId: id });
             if (!assignments.length) {
@@ -94,6 +97,11 @@ exports.updateServiceStatus = async (req, res, next) => {
             logo: "/assets/service request.webp",
             time: new Date()
         });
+        await sendPushNotification(
+            user.fcmToken,
+            "Service Request",
+            `Service request ${serviceStatus}`
+        );
         res.status(200).json({
             message: "Status updated",
             data: updated

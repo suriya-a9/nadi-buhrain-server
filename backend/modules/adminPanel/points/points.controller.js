@@ -104,6 +104,11 @@ exports.requestPointsToFamily = async (req, res, next) => {
             logo: "/assets/badge.webp",
             time: new Date()
         });
+        await sendPushNotification(
+            receiver.fcmToken,
+            "Points Request",
+            `New request for points ${points} by ${sender.basicInfo.fullName}`
+        );
         res.status(201).json({
             message: "Request sent"
         });
@@ -320,7 +325,7 @@ exports.pointsHistory = async (req, res, next) => {
                 message: "user id needed"
             })
         }
-        const userHistory = await PointsHistory.find({userId: userId});
+        const userHistory = await PointsHistory.find({ userId: userId });
         res.status(200).json({
             success: true,
             data: userHistory
