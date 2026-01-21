@@ -6,6 +6,7 @@ const Notification = require('../../../modules/adminPanel/notification/notificat
 const TechnicianUserService = require('../../adminPanel/userService/technicianUserService.model');
 const UserLog = require("../../userLogs/userLogs.model");
 const Service = require("../../service/service.model");
+const Technician = require("../../adminPanel/technician/technician.model")
 const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
 
 exports.createRequest = async (req, res, next) => {
@@ -203,6 +204,71 @@ exports.userServiceList = async (req, res, next) => {
         });
 
         res.status(200).json({ data: formattedList });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.ongoingRequest = async (req, res, next) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            });
+        }
+
+        const userService = await UserService.findOne({
+            userId,
+            serviceStatus: "inProgress"
+        });
+
+        if (!userService) {
+            return res.status(404).json({
+                success: false,
+                message: "No in-progress request found"
+            });
+        }
+
+        const technicianService = await TechnicianUserService.findOne({
+            userServiceId: userService._id
+        });
+
+        if (!technicianService) {
+            return res.status(404).json({
+                success: false,
+                message: "Technician not assigned"
+            });
+        }
+
+        const activeAssignment = technicianService.assignments.find(
+            a => a.status === "in-progress"
+        );
+
+        if (!activeAssignment) {
+            return res.status(404).json({
+                success: false,
+                message: "No technician currently working"
+            });
+        }
+
+        const technician = await Technician.findById(
+            activeAssignment.technicianId
+        ).select("firstName lastName");
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                requestId: userService.serviceRequestID,
+                status: userService.serviceStatus,
+                technicianName: technician
+                    ? `${technician.firstName} ${technician.lastName}`
+                    : null
+            }
+        });
 
     } catch (err) {
         next(err);
