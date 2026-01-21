@@ -310,3 +310,22 @@ exports.handleAdminRequestAction = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.pointsHistory = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        const userHistory = await PointsHistory.find({userId: userId});
+        res.status(200).json({
+            success: true,
+            data: userHistory
+        })
+    } catch (err) {
+        next(err)
+    }
+}

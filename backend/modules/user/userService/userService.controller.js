@@ -6,6 +6,7 @@ const Notification = require('../../../modules/adminPanel/notification/notificat
 const TechnicianUserService = require('../../adminPanel/userService/technicianUserService.model');
 const UserLog = require("../../userLogs/userLogs.model");
 const Service = require("../../service/service.model");
+const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
 
 exports.createRequest = async (req, res, next) => {
     const { serviceId, issuesId, feedback, scheduleService, immediateAssistance, otherIssue } = req.body;
@@ -83,6 +84,13 @@ exports.createRequest = async (req, res, next) => {
             status: "Submitted",
             logo: "/assets/service request.webp",
             time: new Date()
+        });
+        await PointsHistory.create({
+            userId: req.user.id,
+            history: `Deducted ${servicePoints} for service request`,
+            points: servicePoints,
+            time: new Date(),
+            status: "debit"
         });
         res.status(201).json({
             success: true,

@@ -4,6 +4,7 @@ const formatDate = require('../../../utils/formatDate');
 const UserLog = require("../../userLogs/userLogs.model");
 const Technician = require("../technician/technician.model")
 const Notification = require("../notification/notification.model");
+const Admin = require("../../admin/admin.model");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -47,7 +48,7 @@ exports.updateServiceStatus = async (req, res, next) => {
         if (!validStatuses.includes(serviceStatus)) {
             return res.status(400).json({ message: "Invalid status" });
         }
-
+        const adminUser = await Admin.findById(req.user.id)
         const userService = await UserService.findById(id);
         if (!userService) {
             return res.status(404).json({ message: "Service not found" });
@@ -70,6 +71,7 @@ exports.updateServiceStatus = async (req, res, next) => {
 
         const update = {
             serviceStatus,
+            acceptedBy: adminUser.name,
             [`statusTimestamps.${serviceStatus}`]: new Date()
         };
 

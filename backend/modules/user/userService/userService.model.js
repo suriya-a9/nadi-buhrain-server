@@ -39,6 +39,9 @@ const userServiceSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    acceptedBy: {
+        type: String
+    },
     serviceStatus: {
         type: String,
         enum: [
