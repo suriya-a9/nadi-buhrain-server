@@ -167,7 +167,7 @@ export default function ServiceRequestDetails() {
                             })
                         }
                     >
-                        Print <IoPrintOutline size={20} />
+                        PDF <IoPrintOutline size={20} />
                     </button>
                 )}
             </div>

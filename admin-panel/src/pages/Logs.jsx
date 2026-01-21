@@ -93,7 +93,7 @@ export default function Logs() {
                     <Table
                         columns={[
                             {
-                                title: "s/no",
+                                title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
@@ -113,7 +113,7 @@ export default function Logs() {
                             { title: "Name", key: "userName" },
                             { title: "Logs", key: "log" },
                             {
-                                title: "Time",
+                                title: "Date & Time",
                                 key: "time",
                                 render: (time) =>
                                     time

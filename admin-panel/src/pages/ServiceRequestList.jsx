@@ -254,7 +254,7 @@ export default function ServiceRequestList() {
                         })
                     }
                 >
-                    Print <IoPrintOutline size={20} />
+                    PDF <IoPrintOutline size={20} />
                 </button>
             </div>
             <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
@@ -325,7 +325,7 @@ export default function ServiceRequestList() {
                     <Table
                         columns={[
                             {
-                                title: "s/no",
+                                title: "S.Nno",
                                 key: "sno",
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,

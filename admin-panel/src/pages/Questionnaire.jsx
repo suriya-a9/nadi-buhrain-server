@@ -164,11 +164,11 @@ export default function Questionnaire() {
                 <>
                     <Table
                         columns={[
-                            { title: "S/No", render: (_, __, idx) => idx + 1 },
+                            { title: "S.No", render: (_, __, idx) => idx + 1 },
                             { title: "Title", key: "title" },
                             { title: "Total Points", key: "totalPoints" },
                             {
-                                title: "Timestamp",
+                                title: "Date & Time",
                                 key: "createdAt",
                                 render: (_, row) => formatDateTime(row.createdAt)
                             },

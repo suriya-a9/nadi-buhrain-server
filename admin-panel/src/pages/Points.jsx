@@ -73,7 +73,7 @@ export default function Points() {
                     { title: "Points", key: "points" },
                     { title: "Account type", key: "accountType.name" },
                     {
-                        title: "Timestamp",
+                        title: "Date & Time",
                         key: "updatedAt",
                         render: (_, row) => formatDateTime(row.updatedAt)
                     },

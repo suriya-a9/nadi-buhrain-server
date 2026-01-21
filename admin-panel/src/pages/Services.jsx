@@ -126,7 +126,7 @@ export default function Services() {
                     <Table
                         columns={[
                             {
-                                title: "s/no",
+                                title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
@@ -160,7 +160,7 @@ export default function Services() {
                                     ),
                             },
                             {
-                                title: "Timestamp",
+                                title: "Date & Time",
                                 key: "updatedAt",
                                 render: (_, row) => formatDateTime(row.updatedAt)
                             },

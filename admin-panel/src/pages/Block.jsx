@@ -151,7 +151,7 @@ export default function Block() {
                     <Table
                         columns={[
                             {
-                                title: "s/no",
+                                title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
@@ -163,7 +163,7 @@ export default function Block() {
                                 render: getRoadNames
                             },
                             {
-                                title: "Timestamp",
+                                title: "Date & Time",
                                 key: "updatedAt",
                                 render: (_, row) => formatDateTime(row.updatedAt)
                             },
