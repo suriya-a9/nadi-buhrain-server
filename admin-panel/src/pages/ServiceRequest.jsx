@@ -128,7 +128,30 @@ export default function ServiceRequest() {
                             {
                                 title: "Scheduled Date",
                                 key: "scheduleService",
-                                render: (value) => formatDateTime(value),
+                                render: (_, row) => {
+                                    const d = new Date(row.scheduleService);
+                                    let dateStr = "-";
+                                    if (!isNaN(d)) {
+                                        const day = d.getDate().toString().padStart(2, "0");
+                                        const month = (d.getMonth() + 1).toString().padStart(2, "0");
+                                        const year = d.getFullYear();
+                                        dateStr = `${day}/${month}/${year}`;
+                                    }
+                                    let timeStr = "-";
+                                    if (row.scheduleServiceTime && row.scheduleServiceTime !== "-") {
+                                        const [h, m] = row.scheduleServiceTime.split(":");
+                                        if (!isNaN(h) && !isNaN(m)) {
+                                            let hours = parseInt(h, 10);
+                                            const minutes = m.padStart(2, "0");
+                                            const ampm = hours >= 12 ? "PM" : "AM";
+                                            hours = hours % 12 || 12;
+                                            timeStr = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+                                        } else {
+                                            timeStr = row.scheduleServiceTime;
+                                        }
+                                    }
+                                    return `${dateStr} ${timeStr}`;
+                                },
                             },
                             {
                                 title: "Is Urgent?",

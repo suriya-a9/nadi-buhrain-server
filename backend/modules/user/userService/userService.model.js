@@ -38,6 +38,10 @@ const userServiceSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    scheduleServiceTime: {
+        type: String,
+        default: null
+    },
     immediateAssistance: {
         type: Boolean,
         default: false

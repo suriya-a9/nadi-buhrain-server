@@ -10,7 +10,7 @@ const Technician = require("../../adminPanel/technician/technician.model")
 const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
 
 exports.createRequest = async (req, res, next) => {
-    const { serviceId, issuesId, feedback, scheduleService, immediateAssistance, otherIssue } = req.body;
+    const { serviceId, issuesId, feedback, scheduleService, scheduleServiceTime, immediateAssistance, otherIssue } = req.body;
     try {
         const userId = req.user.id;
         if (!userId) {
@@ -57,6 +57,7 @@ exports.createRequest = async (req, res, next) => {
             voice: voiceFile,
             feedback,
             scheduleService: scheduleService ? new Date(scheduleService) : null,
+            scheduleServiceTime: scheduleServiceTime || null,
             immediateAssistance: !!immediateAssistance,
             serviceStatus: "submitted",
             statusTimestamps: {

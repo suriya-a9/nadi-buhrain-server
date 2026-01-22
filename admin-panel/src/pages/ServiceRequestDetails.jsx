@@ -298,7 +298,32 @@ export default function ServiceRequestDetails() {
                 </div>
                 <div>
                     <div className="font-medium">Scheduled Date</div>
-                    <div className="text-gray-700">{formatDateTime(request.scheduleService)}</div>
+                    <div className="text-gray-700">
+                        {(() => {
+                            const d = new Date(request.scheduleService);
+                            let dateStr = "-";
+                            if (!isNaN(d)) {
+                                const day = d.getDate().toString().padStart(2, "0");
+                                const month = (d.getMonth() + 1).toString().padStart(2, "0");
+                                const year = d.getFullYear();
+                                dateStr = `${day}/${month}/${year}`;
+                            }
+                            let timeStr = "-";
+                            if (request.scheduleServiceTime && request.scheduleServiceTime !== "-") {
+                                const [h, m] = request.scheduleServiceTime.split(":");
+                                if (!isNaN(h) && !isNaN(m)) {
+                                    let hours = parseInt(h, 10);
+                                    const minutes = m.padStart(2, "0");
+                                    const ampm = hours >= 12 ? "PM" : "AM";
+                                    hours = hours % 12 || 12;
+                                    timeStr = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+                                } else {
+                                    timeStr = request.scheduleServiceTime;
+                                }
+                            }
+                            return `${dateStr} ${timeStr}`;
+                        })()}
+                    </div>
                 </div>
                 <div>
                     <div className="font-medium">Is Urgent?</div>
