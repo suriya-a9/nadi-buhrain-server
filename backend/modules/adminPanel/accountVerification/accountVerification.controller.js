@@ -4,6 +4,8 @@ const FamilyMember = require('../../userAccount/familyMember.model');
 const Address = require('../../address/address.model');
 const UserLog = require('../../userLogs/userLogs.model');
 const PointsHistory = require("../points/pointsHistory.model");
+const sendPushNotification = require("../../../utils/sendPush");
+const UserNotification = require("../notification/userNotification.model");
 
 exports.verifyAccount = async (req, res, next) => {
     const { userId, status, reason } = req.body;
@@ -54,6 +56,17 @@ exports.verifyAccount = async (req, res, next) => {
             log: `Account verification has been done for user ${user.basicInfo.fullName}`,
             status: "Account Verification",
             logo: "/assets/verification.webp",
+            time: new Date()
+        })
+        await sendPushNotification(
+            user.fcmToken,
+            "Account verification",
+            `Your account has been verified. You earned ${pointsDoc.points} points.`
+        );
+        await UserNotification({
+            message: "Account verified",
+            type: "Verification",
+            userId: user._id,
             time: new Date()
         })
         res.status(200).json({ message: "Account verification updated", data: result });

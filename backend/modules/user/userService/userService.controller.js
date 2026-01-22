@@ -8,6 +8,8 @@ const UserLog = require("../../userLogs/userLogs.model");
 const Service = require("../../service/service.model");
 const Technician = require("../../adminPanel/technician/technician.model")
 const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
+const sendPushNotification = require("../../../utils/sendPush");
+const UserNotification = require("../../adminPanel/notification/userNotification.model");
 
 exports.createRequest = async (req, res, next) => {
     const { serviceId, issuesId, feedback, scheduleService, scheduleServiceTime, immediateAssistance, otherIssue } = req.body;
@@ -95,6 +97,17 @@ exports.createRequest = async (req, res, next) => {
             points: servicePoints,
             time: new Date(),
             status: "debit"
+        });
+        await sendPushNotification(
+            user.fcmToken,
+            "Service Request",
+            `Your service request has been submitted. Kindly wait till we process`
+        );
+        await UserNotification({
+            message: "Account Created Successfully",
+            type: "Created",
+            userId: user._id,
+            time: new Date()
         });
         res.status(201).json({
             success: true,

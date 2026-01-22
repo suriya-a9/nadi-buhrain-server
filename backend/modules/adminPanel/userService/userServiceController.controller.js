@@ -7,6 +7,7 @@ const Notification = require("../notification/notification.model");
 const Admin = require("../../admin/admin.model");
 const UserAccount = require("../../userAccount/userAccount.model");
 const sendPushNotification = require("../../../utils/sendPush");
+const UserNotification = require("../../adminPanel/notification/userNotification.model");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -102,6 +103,12 @@ exports.updateServiceStatus = async (req, res, next) => {
             "Service Request",
             `Service request ${serviceStatus}`
         );
+        await UserNotification({
+            message: `Service request ${serviceStatus}`,
+            type: "Service request",
+            userId: user._id,
+            time: new Date()
+        })
         res.status(200).json({
             message: "Status updated",
             data: updated
@@ -231,7 +238,8 @@ exports.technicianRespond = async (req, res, next) => {
                     }
                 );
             }
-
+            const userService = await UserService.findById(assignmentId);
+            const user = await UserAccount.findById(userService.userId);
             await UserLog.create({
                 userId: technicianId,
                 log: 'Accepted a request',
@@ -248,6 +256,17 @@ exports.technicianRespond = async (req, res, next) => {
             });
             const io = req.app.get('io');
             io.emit('notification', notification);
+            await sendPushNotification(
+                user.fcmToken,
+                "Service Request",
+                `${technician.firstName} has been assigned for your request`
+            );
+            await UserNotification({
+                message: `${technician.firstName} has been assigned for your request`,
+                type: "Service Request",
+                userId: user._id,
+                time: new Date()
+            })
             return res.status(200).json({
                 message: "Service accepted",
                 data: assignment

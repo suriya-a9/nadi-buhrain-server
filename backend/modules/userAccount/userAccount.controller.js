@@ -359,6 +359,11 @@ exports.completeSignUp = async (req, res, next) => {
             config.jwt,
             { expiresIn: '30d' }
         );
+        await sendPushNotification(
+            user.fcmToken,
+            "Account Registration",
+            `Your account has been created successfully. `
+        );
         res.status(200).json({
             message: 'user registered successfully',
             data: user,

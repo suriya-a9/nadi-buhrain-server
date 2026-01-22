@@ -164,6 +164,12 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 time: new Date(),
                 status: "debit"
             });
+            await UserNotification.create({
+                type: 'Points Request',
+                message: `Request Accepted`,
+                userId: receiver._id,
+                time: new Date()
+            });
             await sendPushNotification(
                 sender.fcmToken,
                 "Request Accepted",
@@ -194,6 +200,17 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 logo: "/assets/badge.webp",
                 time: new Date()
             });
+            await UserNotification.create({
+                type: 'Points Request',
+                message: `Request Rejected`,
+                userId: receiver._id,
+                time: new Date()
+            });
+            await sendPushNotification(
+                sender.fcmToken,
+                "Request Rejected",
+                `Your points request rejected`
+            );
             return res.status(200).json({ message: "Request rejected" });
         } else {
             return res.status(400).json({ message: 'Invalid action' });

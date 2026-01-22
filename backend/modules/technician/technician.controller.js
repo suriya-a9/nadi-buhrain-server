@@ -8,6 +8,8 @@ const SpareParts = require("../adminPanel/spareParts/spareParts.model");
 const UserAccount = require('../userAccount/userAccount.model');
 const UserLog = require("../userLogs/userLogs.model");
 const mongoose = require('mongoose');
+const sendPushNotification = require("../../utils/sendPush");
+const UserNotification = require("../adminPanel/notification/userNotification.model");
 
 exports.assignedServices = async (req, res, next) => {
     try {
@@ -177,13 +179,21 @@ exports.startWork = async (req, res, next) => {
         const technicianId = req.user.id;
 
         if (!technicianId) {
-            return res.status(404).json({ message: "user id not found" });
+            return res.status(404).json({ message: "Technician id not found" });
         }
+
         if (!userServiceId) {
             return res.status(400).json({ message: "userServiceId is required" });
         }
+
+        const technician = await Technician.findById(technicianId);
+        if (!technician) {
+            return res.status(404).json({ message: "Technician not found" });
+        }
+
         const now = new Date();
-        await UserService.findByIdAndUpdate(
+
+        const userService = await UserService.findByIdAndUpdate(
             userServiceId,
             {
                 serviceStatus: "inProgress",
@@ -193,8 +203,15 @@ exports.startWork = async (req, res, next) => {
             { new: true }
         );
 
+        if (!userService) {
+            return res.status(404).json({ message: "User service not found" });
+        }
+
         const techUserService = await TechnicianUserService.findOneAndUpdate(
-            { userServiceId, "assignments.technicianId": technicianId },
+            {
+                userServiceId,
+                "assignments.technicianId": technicianId
+            },
             {
                 $set: {
                     "assignments.$.status": "in-progress",
@@ -204,20 +221,34 @@ exports.startWork = async (req, res, next) => {
             },
             { new: true }
         );
+
         if (!techUserService) {
             return res.status(404).json({ message: "Technician assignment not found" });
         }
+
+        const user = await UserAccount.findById(userService.userId);
+
+        if (user?.fcmToken) {
+            await sendPushNotification(
+                user.fcmToken,
+                "Work Started",
+                `${technician.firstName} has started working on your request`
+            );
+        }
+
         await UserLog.create({
             userId: technicianId,
-            log: `Work ${userServiceId} started`,
+            log: `Work started for service ${userServiceId}`,
             status: "Started",
             logo: "/assets/technician.webp",
-            time: new Date()
+            time: now
         });
+
         res.status(200).json({
-            message: "Work started, statuses updated",
+            message: "Work started successfully",
             techUserService
         });
+
     } catch (err) {
         next(err);
     }
@@ -320,6 +351,9 @@ exports.updateServiceStatus = async (req, res, next) => {
             }
         );
 
+        const userService = await UserService.findById(userServiceId);
+        const user = await UserAccount.findById(userService.userId);
+
         await UserLog.create({
             userId: req.user.id,
             log: `Updated status for work ${userServiceId}`,
@@ -327,7 +361,18 @@ exports.updateServiceStatus = async (req, res, next) => {
             logo: "/assets/technician.webp",
             time: new Date()
         });
+        await sendPushNotification(
+            user.fcmToken,
+            "Service Update",
+            "The technician has finished the work"
+        );
 
+        await UserNotification.create({
+            message: "Service finished by technician",
+            type: "Service",
+            userId: user._id,
+            time: now
+        });
         res.status(200).json({
             message: "Service completed, notes and media saved",
             techUserService: updatedTechUserService
