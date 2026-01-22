@@ -4,7 +4,10 @@ const router = express.Router();
 const upload = require('../../../middleware/fileUpload');
 const auth = require('../../../middleware/authMiddleware');
 
-router.post('/create', auth, upload.array('media', 10), createRequest);
+router.post('/create', auth, upload.fields([
+    { name: 'media', maxCount: 10 },
+    { name: 'voice', maxCount: 1 }
+]), createRequest);
 router.post('/ongoin', auth, ongoingRequest)
 router.post('/', auth, userServiceList);
 

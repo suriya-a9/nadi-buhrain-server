@@ -45,7 +45,8 @@ exports.createRequest = async (req, res, next) => {
             return res.status(400).json({ message: "Insufficient points to request this service" });
         }
 
-        const fileNames = req.files ? req.files.map(file => file.filename) : [];
+        const fileNames = req.files && req.files.media ? req.files.media.map(file => file.filename) : [];
+        const voiceFile = req.files && req.files.voice && req.files.voice[0] ? req.files.voice[0].filename : null;
 
         const requestCreate = await UserService.create({
             userId: userId,
@@ -53,6 +54,7 @@ exports.createRequest = async (req, res, next) => {
             issuesId: issuesId ? issuesId : null,
             otherIssue: otherIssue ? otherIssue : null,
             media: fileNames,
+            voice: voiceFile,
             feedback,
             scheduleService: scheduleService ? new Date(scheduleService) : null,
             immediateAssistance: !!immediateAssistance,

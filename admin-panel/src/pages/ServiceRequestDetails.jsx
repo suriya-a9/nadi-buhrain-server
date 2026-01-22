@@ -412,6 +412,19 @@ export default function ServiceRequestDetails() {
                 <div className="font-medium mb-2">Media</div>
                 {renderMedia(request.media)}
             </div>
+            <div className="mb-4">
+                <div className="font-medium mb-2">Voice</div>
+                {request.voice ? (
+                    (() => {
+                        const url = `${API_BASE}/uploads/${request.voice}`;
+                        return (
+                            <audio src={url} controls className="w-full" />
+                        );
+                    })()
+                ) : (
+                    <div className="text-gray-500">No voice file</div>
+                )}
+            </div>
 
             <div className="mb-4">
                 <div className="font-medium mb-2">Status Timeline</div>

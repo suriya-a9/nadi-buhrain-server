@@ -116,6 +116,21 @@ export default function NewServiceRequestDetails() {
                 )}
             </div>
             <div className="mb-4">
+                <div className="font-medium mb-2">Voice</div>
+                {request.voice ? (
+                    (() => {
+                        const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+                        const url = `${API_BASE}/uploads/${request.voice}`;
+                        const ext = request.voice.split('.').pop().toLowerCase();
+                        return (
+                            <audio src={url} controls className="w-full" />
+                        );
+                    })()
+                ) : (
+                    <div className="text-gray-500">No voice file</div>
+                )}
+            </div>
+            <div className="mb-4">
                 <div className="font-medium mb-2">Status Timeline</div>
                 <div className="grid grid-cols-2 gap-2">
                     {Object.entries(request.statusTimestamps || {}).map(([status, time]) => (

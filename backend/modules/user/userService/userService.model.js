@@ -28,6 +28,9 @@ const userServiceSchema = new mongoose.Schema({
     media: {
         type: [String]
     },
+    voice: {
+        type: String
+    },
     feedback: {
         type: String
     },
