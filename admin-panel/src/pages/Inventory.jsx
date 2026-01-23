@@ -116,7 +116,7 @@ export default function Inventory() {
     useEffect(() => {
         const lowStockProducts = inventory.filter(item => {
             const qty = Number(item.quantity);
-            return !isNaN(qty) && qty <= 10;
+            return !isNaN(qty) && qty <= 5;
         });
         if (lowStockProducts.length > 0) {
             toast.error(

@@ -183,7 +183,7 @@ export default function ServiceRequestDetails() {
         "Work Duration": a.workDuration != null ? `${Math.floor(a.workDuration / 60)} min` : "-",
         "Spare Parts": a.usedParts && a.usedParts.length > 0
             ? a.usedParts.map(
-                part => `${part.productName} x${part.count} (₹${part.price} each, Total: ₹${part.total})`
+                part => `${part.productName} x${part.count} (BHD${part.price} each, Total: BHD${part.total})`
             ).join("; ")
             : "-",
         Timeline: a.updatedAt ? formatDateTime(a.updatedAt) : "-",
@@ -630,7 +630,7 @@ export default function ServiceRequestDetails() {
                                                 <ul className="list-disc ml-4">
                                                     {usedParts.map((part, i) => (
                                                         <li key={i}>
-                                                            {part.productName} x{part.count} (₹{part.price} each, Total: ₹{part.total})
+                                                            {part.productName} x{part.count} (BHD{part.price} each, Total: BHD{part.total})
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -732,7 +732,7 @@ export default function ServiceRequestDetails() {
                                             <ul className="list-disc ml-4">
                                                 {techWorkStatus.usedParts.map((part, idx) => (
                                                     <li key={idx}>
-                                                        {part.productName} x{part.count} (₹{part.price} each, Total: ₹{part.total})
+                                                        {part.productName} x{part.count} (BHD{part.price} each, Total: BHD{part.total})
                                                     </li>
                                                 ))}
                                             </ul>

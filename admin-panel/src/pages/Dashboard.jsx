@@ -10,6 +10,8 @@ import api from "../services/api";
 
 export default function Dashboard() {
     const [serviceRequests, setServiceRequests] = useState([]);
+    const [inventory, setInventory] = useState([]);
+    const [lowStockProducts, setLowStockProducts] = useState([]);
     const [dashboardData, setDashboardData] = useState({
         technicians: [],
         users: [],
@@ -62,7 +64,23 @@ export default function Dashboard() {
         });
         return counts;
     };
+    useEffect(() => {
+        loadDashboardData();
+        api.get("/user-service-list/")
+            .then(res => setServiceRequests(res.data.data || []))
+            .catch(() => setServiceRequests([]));
 
+        api.get("/inventory/product-list")
+            .then(res => {
+                setInventory(res.data.data || []);
+                const lowStock = (res.data.data || []).filter(item => {
+                    const qty = Number(item.quantity);
+                    return !isNaN(qty) && qty <= 5;
+                });
+                setLowStockProducts(lowStock);
+            })
+            .catch(() => setInventory([]));
+    }, []);
     const API_URL = import.meta.env.VITE_API_URL;
     const renderAvatars = (items, type = "technician") => {
         const maxToShow = 3;
@@ -102,6 +120,18 @@ export default function Dashboard() {
     return (
         <div className="p-4">
             <h2 className="text-[25px] font-bold mb-6 text-textGreen">Overview</h2>
+            {lowStockProducts.length > 0 && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="font-semibold text-red-700 mb-2">Low Stock Alert</div>
+                    <ul className="list-disc pl-5 text-red-800 text-sm">
+                        {lowStockProducts.map(product => (
+                            <li key={product._id}>
+                                <span className="font-medium">{product.productName}</span> — Quantity: <span className="font-bold">{product.quantity}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[35px] h-full">
                     <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
