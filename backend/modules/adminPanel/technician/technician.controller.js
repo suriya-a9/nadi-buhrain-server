@@ -6,6 +6,7 @@ const UserLog = require("../../userLogs/userLogs.model");
 const crypto = require("crypto");
 const sendMail = require("../../../utils/mailer");
 const technicianResetPasswordTemplate = require("../../../template/technicianResetPassword.template")
+const sendPushNotification = require("../../../utils/sendPush");
 
 exports.registerTechnician = async (req, res, next) => {
     const { firstName, lastName, email, mobile, gender, password, role } = req.body;
@@ -59,45 +60,58 @@ exports.registerTechnician = async (req, res, next) => {
 }
 
 exports.loginTechnician = async (req, res, next) => {
-    const { email, password } = req.body;
     try {
-        const emailData = await Technician.findOne({ email });
-        if (!emailData) {
-            return res.status(404).json({
-                message: 'no account found with this email id'
-            })
+        const { email, password, fcmToken } = req.body;
+
+        const technician = await Technician.findOne({
+            email: email.toLowerCase()
+        });
+
+        if (!technician) {
+            return res.status(401).json({
+                message: 'Invalid email or password'
+            });
         }
-        if (emailData.status !== true) {
-            return res.status(404).json({
-                message: 'account disabled'
-            })
+
+        if (!technician.status) {
+            return res.status(403).json({
+                message: 'Account disabled'
+            });
         }
-        const passwordMatch = await bcrypt.compare(password, emailData.password);
+
+        const passwordMatch = await bcrypt.compare(password, technician.password);
         if (!passwordMatch) {
             return res.status(401).json({
-                message: "credentials mismatch"
-            })
+                message: 'Invalid email or password'
+            });
         }
+
+        if (fcmToken) {
+            await Technician.findByIdAndUpdate(technician._id, { fcmToken });
+        }
+
         const token = jwt.sign(
-            { id: emailData._id, role: emailData.role },
+            { id: technician._id, role: technician.role },
             config.jwt,
             { expiresIn: '30d' }
         );
+
         await UserLog.create({
-            userId: emailData._id,
+            userId: technician._id,
             log: 'Signed In',
-            status: "Logged",
-            logo: "/assets/user-login-logo.webp",
+            status: 'Logged',
+            logo: '/assets/user-login-logo.webp',
             time: new Date()
         });
+
         res.status(200).json({
-            message: "Logged in successfully",
-            token: token
-        })
+            message: 'Logged in successfully',
+            token
+        });
     } catch (err) {
-        next(err)
+        next(err);
     }
-}
+};
 
 exports.updateTechnician = async (req, res, next) => {
     const id = req.user.id;

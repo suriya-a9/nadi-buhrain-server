@@ -5,6 +5,10 @@ const technicianSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TechnicalSkillSet'
     },
+    fcmToken: {
+        type: String,
+        default: null
+    },
     firstName: {
         type: String
     },

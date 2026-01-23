@@ -12,7 +12,7 @@ const sendPushNotification = async (token, title, body) => {
         android: {
             priority: "high",
             notification: {
-                channelId: "otp_channel",
+                channelId: "high_importance_channel",
                 sound: "default"
             }
         },

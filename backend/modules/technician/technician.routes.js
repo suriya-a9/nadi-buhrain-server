@@ -1,4 +1,4 @@
-const { assignedServices, servicesList, inventory, startWork, onHoldService, updateServiceStatus, paymentRaise } = require('./technician.controller');
+const { assignedServices, servicesList, inventory, startWork, onHoldService, updateServiceStatus, paymentRaise, listNotification } = require('./technician.controller');
 const auth = require('../../middleware/authMiddleware');
 const express = require('express');
 const upload = require("../../middleware/fileUpload");
@@ -12,5 +12,6 @@ router.post('/start-work', auth, startWork);
 router.post('/hold-work', auth, onHoldService);
 router.post('/update-service', auth, upload.array('media', 10), updateServiceStatus);
 router.post('/update-payment', auth, paymentRaise);
+router.post("/notifications", auth, listNotification);
 
 module.exports = router;

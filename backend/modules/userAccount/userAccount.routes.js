@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const controller = require("./userAccount.controller");
 const upload = require("../../middleware/fileUpload");
+const auth = require("../../middleware/authMiddleware");
 
 router.post("/", controller.startSignUp);
 router.post("/basic-info", controller.saveBasicInfo);
@@ -28,5 +29,7 @@ router.post('/signin-otp', controller.signInWithOtp);
 router.post("/forgot-password", controller.forgotPassword);
 router.post("/user/reset-password/:token", controller.resetPassword);
 router.post("/delete-user", controller.deleteUser);
+
+router.post('/notification', auth, controller.listNotification);
 
 module.exports = router;

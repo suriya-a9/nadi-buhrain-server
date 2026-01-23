@@ -10,6 +10,7 @@ const UserLog = require("../userLogs/userLogs.model");
 const mongoose = require('mongoose');
 const sendPushNotification = require("../../utils/sendPush");
 const UserNotification = require("../adminPanel/notification/userNotification.model");
+const TechNotification = require("../adminPanel/notification/techNotification.model");
 
 exports.assignedServices = async (req, res, next) => {
     try {
@@ -500,3 +501,22 @@ exports.paymentRaise = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.listNotification = async (req, res, next) => {
+    try {
+        const technicianId = req.user.id;
+        if (!technicianId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        const technicianNotificationLists = await TechNotification.find({ userId: technicianId })
+        res.status(200).json({
+            success: true,
+            data: technicianNotificationLists
+        })
+    } catch (err) {
+        next(err)
+    }
+}

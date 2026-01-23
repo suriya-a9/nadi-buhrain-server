@@ -8,6 +8,7 @@ const Admin = require("../../admin/admin.model");
 const UserAccount = require("../../userAccount/userAccount.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const UserNotification = require("../../adminPanel/notification/userNotification.model");
+const TechNotification = require("../../adminPanel/notification/techNotification.model");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -153,7 +154,27 @@ exports.assignTechnician = async (req, res, next) => {
             logo: "/assets/service request.webp",
             time: new Date()
         });
+        const technicians = await require("../technician/technician.model").find(
+            { _id: { $in: technicianIds } },
+            { fcmToken: 1, firstName: 1 }
+        );
 
+        for (const tech of technicians) {
+            if (tech.fcmToken) {
+                await sendPushNotification(
+                    tech.fcmToken,
+                    "New Service Assignment",
+                    "You have been assigned a new service request."
+                );
+            }
+
+            await TechNotification.create({
+                message: "New service request assigned to you.",
+                type: "Service Request",
+                userId: tech._id,
+                time: new Date()
+            });
+        }
         res.status(200).json({
             message: "Technician assignments created",
             data: techUserService

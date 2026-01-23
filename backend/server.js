@@ -46,6 +46,7 @@ const aboutRouter = require("./modules/adminPanel/about/about.routes");
 const privacyPolicyRouter = require("./modules/adminPanel/privacyPolicy/privacyPolicy.routes");
 const helpAndSupport = require("./modules/adminPanel/helpAndSupport/helpAndSupport.routes.js");
 const userSpareParts = require("./modules/adminPanel/spareParts/spareParts.routes.js");
+const techNotificationRouter = require("./modules/adminPanel/notification/techNotification.routes.js");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -110,6 +111,7 @@ app.use("/api/about", aboutRouter);
 app.use("/api/privacy", privacyPolicyRouter);
 app.use("/api/help", helpAndSupport);
 app.use("/api/spare", userSpareParts);
+app.use("/api/techNotifications", techNotificationRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

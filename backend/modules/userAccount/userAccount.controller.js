@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Notification = require('../adminPanel/notification/notification.model');
 const sendPushNotification = require("../../utils/sendPush");
+const UserNotification = require("../adminPanel/notification/userNotification.model");
 const UserLog = require('../userLogs/userLogs.model');
 const crypto = require("crypto");
 const sendMail = require("../../utils/mailer");
@@ -757,3 +758,22 @@ exports.deleteUser = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.listNotification = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        };
+        const notificationList = await UserNotification.find({ userId: userId });
+        res.status(200).json({
+            success: true,
+            data: notificationList
+        })
+    } catch (err) {
+        next(err)
+    }
+}

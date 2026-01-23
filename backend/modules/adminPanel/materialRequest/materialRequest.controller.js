@@ -4,6 +4,8 @@ const SpareParts = require("../spareParts/spareParts.model");
 const UserLog = require("../../userLogs/userLogs.model");
 const Technician = require("../../adminPanel/technician/technician.model");
 const Notification = require("../notification/notification.model");
+const sendPushNotification = require("../../../utils/sendPush");
+const TechNotification = require("../../adminPanel/notification/techNotification.model");
 
 exports.singleRequest = async (req, res, next) => {
     const { productId, quantity, notes } = req.body;
@@ -152,7 +154,8 @@ exports.responseMaterialRequest = async (req, res, next) => {
         if (!request) {
             return res.status(404).json({ message: "Material request not found" });
         }
-
+        const technicianId = request.technicianId;
+        const technician = await Technician.findById(technicianId);
         if (status === "processed") {
             request.status = "processed";
             await request.save();
@@ -191,6 +194,17 @@ exports.responseMaterialRequest = async (req, res, next) => {
                 logo: "/assets/product-management.webp",
                 time: new Date()
             });
+            await sendPushNotification(
+                technician.fcmToken,
+                "Matrial Request",
+                "Your material request processed"
+            );
+            await TechNotification.create({
+                message: "Your material request processed",
+                type: "Matrial Request",
+                userId: technician._id,
+                time: new Date()
+            });
             return res.status(200).json({
                 message: "Request processed, inventory and spare parts updated",
                 data: request
@@ -198,6 +212,17 @@ exports.responseMaterialRequest = async (req, res, next) => {
         } else {
             request.status = status;
             await request.save();
+            await sendPushNotification(
+                technician.fcmToken,
+                "Matrial Request",
+                "Your material request rejected"
+            );
+            await TechNotification.create({
+                message: "Your material request rejected",
+                type: "Matrial Request",
+                userId: technician._id,
+                time: new Date()
+            });
             return res.status(200).json({
                 message: "Request status updated",
                 data: request
