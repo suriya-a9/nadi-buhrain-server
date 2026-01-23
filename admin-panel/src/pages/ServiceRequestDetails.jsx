@@ -539,7 +539,14 @@ export default function ServiceRequestDetails() {
                                             </span>
                                             <div className="ml-3 flex flex-col">
                                                 <span className={`font-medium capitalize text-sm ${isCompleted ? "text-green-700" : "text-gray-700"}`}>{statusLabels[status]}</span>
-                                                <span className="text-xs text-gray-500">{time ? formatDateTime(time) : "-"}</span>
+                                                <span className="text-xs text-gray-500">
+                                                    {time ? formatDateTime(time) : "-"}
+                                                    {status === "accepted" && time && request.acceptedBy && (
+                                                        <span className="ml-2 text-xs text-gray-700 font-semibold">
+                                                            Accepted By: {request.acceptedBy}
+                                                        </span>
+                                                    )}
+                                                </span>
                                             </div>
                                         </li>
                                     );
