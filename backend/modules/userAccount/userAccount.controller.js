@@ -406,7 +406,7 @@ exports.userprofile = async (req, res, next) => {
 }
 
 exports.signIn = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, fcmToken } = req.body;
     try {
         const user = await UserAccount.findOne({ "basicInfo.email": email });
         if (!user) {
@@ -431,7 +431,9 @@ exports.signIn = async (req, res, next) => {
             });
         }
         const accountType = await Account.findById(user.accountTypeId);
-
+        if (fcmToken) {
+            await UserAccount.updateOne(user._id, { fcmToken });
+        }
         const token = jwt.sign(
             { id: user._id },
             config.jwt,
