@@ -222,29 +222,36 @@ exports.transferPointsWithFamily = async (req, res, next) => {
 
 exports.requestList = async (req, res, next) => {
     try {
-        if (!req.user.id) {
+        const userId = req.user.id;
+        const { peopleId } = req.body;
+
+        if (!userId) {
             return res.status(400).json({
                 message: 'User id is required'
             });
         }
-        const requestList = await Request.find({
-            $or: [
-                { senderId: req.user.id },
-                { receiverId: req.user.id }
-            ]
-        });
-        if (requestList.length === 0) {
-            return res.status(200).json({
-                message: "no request data"
+
+        if (!peopleId) {
+            return res.status(400).json({
+                message: 'peopleId is required'
             });
         }
-        res.status(200).json({
+
+        const requestList = await Request.find({
+            $or: [
+                { senderId: userId, receiverId: peopleId },
+                { senderId: peopleId, receiverId: userId }
+            ]
+        });
+
+        return res.status(200).json({
             data: requestList
-        })
+        });
+
     } catch (err) {
         next(err);
     }
-}
+};
 
 exports.requestToAdmin = async (req, res, next) => {
     const { points, reason } = req.body;
@@ -386,7 +393,7 @@ exports.requestedList = async (req, res, next) => {
                 { receiverId: req.user.id }
             ]
         })
-        .populate("senderId");
+            .populate("senderId");
 
         return res.status(200).json({
             data: requestList
@@ -396,3 +403,18 @@ exports.requestedList = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.peopleList = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        
+    } catch (err) {
+        next(err)
+    }
+}

@@ -23,14 +23,6 @@ exports.verifyAccount = async (req, res, next) => {
         }
 
         let updateFields = { accountVerification: status };
-        let pointsDoc = null;
-
-        if (status === "verified") {
-            pointsDoc = await Points.findOne({ accountType: user.accountTypeId });
-            if (pointsDoc) {
-                updateFields.points = pointsDoc.points;
-            }
-        }
 
         if (status === "rejected") {
             if (!reason) {
@@ -44,13 +36,6 @@ exports.verifyAccount = async (req, res, next) => {
             updateFields,
             { new: true }
         );
-        await PointsHistory.create({
-            userId: user._id,
-            history: "Account Verification points",
-            points: pointsDoc.points,
-            time: new Date(),
-            status: "credit"
-        })
         await UserLog.create({
             userId: req.user.id,
             log: `Account verification has been done for user ${user.basicInfo.fullName}`,
@@ -61,7 +46,7 @@ exports.verifyAccount = async (req, res, next) => {
         await sendPushNotification(
             user.fcmToken,
             "Account verification",
-            `Your account has been verified. You earned ${pointsDoc.points} points.`
+            `Your account has been verified.`
         );
         await UserNotification({
             message: "Account verified",

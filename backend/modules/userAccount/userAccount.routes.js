@@ -19,7 +19,14 @@ router.post("/terms-verify", controller.termsAndConditionVerify);
 router.post("/complete", controller.completeSignUp);
 
 router.post('/profile', controller.userprofile);
-router.post('/profile-update', upload.array("idProof", 5), controller.updateBasicInfoAndAddress);
+router.post(
+  '/profile-update',
+  upload.fields([
+    { name: "idProof", maxCount: 5 },
+    { name: "image", maxCount: 1 }
+  ]),
+  controller.updateBasicInfoAndAddress
+);
 
 router.post('/signin', controller.signIn)
 

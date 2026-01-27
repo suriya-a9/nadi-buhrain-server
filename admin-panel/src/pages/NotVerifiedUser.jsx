@@ -44,7 +44,15 @@ export default function NotVerifiedUser() {
 
     const viewDetails = async (id) => {
         try {
-            const res = await api.post(`/account-verify/view`, { id });
+            const res = await api.post(
+                `/account-verify/view`,
+                { id },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
             setSelectedUser(res.data.data);
             setDetailsOpen(true);
         } catch (err) {
@@ -56,7 +64,15 @@ export default function NotVerifiedUser() {
         try {
             const payload = { userId: id, status };
             if (status === "rejected" && reason) payload.reason = reason;
-            const res = await api.post("/account-verify", payload);
+            const res = await api.post(
+                "/account-verify",
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
             toast.success(res.data.message);
             await loadUsers();
             setDetailsOpen(false);

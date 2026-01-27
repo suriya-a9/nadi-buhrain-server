@@ -24,6 +24,9 @@ const userAccountSchema = new mongoose.Schema({
         email: {
             type: String
         },
+        image:{
+            type: String
+        },
         gender: {
             type: String,
             enum: ["male", "female", "others"],

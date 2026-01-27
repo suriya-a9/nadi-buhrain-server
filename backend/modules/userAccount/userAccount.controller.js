@@ -14,6 +14,8 @@ const UserLog = require('../userLogs/userLogs.model');
 const crypto = require("crypto");
 const sendMail = require("../../utils/mailer");
 const userResetPasswordTemplate = require("../../template/userResetPasswordTemplate");
+const Points = require("../adminPanel/points/points.model");
+const PointsHistory = require("../adminPanel/points/pointsHistory.model");
 
 exports.startSignUp = async (req, res, next) => {
     const { accountTypeId } = req.body;
@@ -59,6 +61,7 @@ exports.saveBasicInfo = async (req, res, next) => {
                 fullName,
                 mobileNumber,
                 email,
+                image: "/assets/user-image.webp",
                 gender,
                 password: hashedPassword
             },
@@ -338,6 +341,17 @@ exports.completeSignUp = async (req, res, next) => {
         user.accountStatus = true;
         user.status = "completed";
         user.singnUpCompleted = true;
+        const pointsDoc = await Points.findOne({ accountType: user.accountTypeId });
+        if (pointsDoc) {
+            user.points = pointsDoc.points;
+            await PointsHistory.create({
+                userId: user._id,
+                history: `Signup points`,
+                points: pointsDoc.points,
+                time: new Date(),
+                status: "credit"
+            });
+        }
         await user.save();
         const notification = await Notification.create({
             type: 'signup',
@@ -568,7 +582,10 @@ exports.updateBasicInfoAndAddress = async (req, res, next) => {
         if (req.files && req.files.length > 0) {
             idProofUrl = req.files.map(file => file.filename);
         }
-
+        if (req.files && req.files["image"] && req.files["image"].length > 0) {
+            if (!basicInfo) basicInfo = {};
+            basicInfo.image = req.files["image"][0].filename;
+        }
         let updatedFields = [];
 
         if (basicInfo) {
@@ -578,6 +595,9 @@ exports.updateBasicInfoAndAddress = async (req, res, next) => {
                     updateBasic["basicInfo.password"] =
                         await bcrypt.hash(basicInfo.password, 10);
                     updatedFields.push("password");
+                } else if (key === "image") {
+                    updateBasic["basicInfo.image"] = basicInfo.image;
+                    updatedFields.push("image");
                 } else {
                     updateBasic[`basicInfo.${key}`] = basicInfo[key];
                     updatedFields.push(key);
