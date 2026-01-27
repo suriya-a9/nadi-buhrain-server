@@ -779,3 +779,36 @@ exports.listNotification = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.logout = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            });
+        }
+
+        await UserAccount.findByIdAndUpdate(
+            userId,
+            { $set: { fcmToken: "" } },
+            { new: true }
+        );
+        await UserLog.create({
+            userId: userId,
+            log: "Logout",
+            status: "Logged out successfully",
+            logo: "/assets/logout.webp",
+            time: new Date()
+        })
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};

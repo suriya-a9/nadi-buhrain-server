@@ -351,3 +351,48 @@ exports.pointsHistory = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.listFamilyMembersWithPoints = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(400).json({ message: "User id required" });
+        }
+
+        const familyMembers = await UserAccount.find({ familyOwnerId: userId, isFamilyMember: true })
+            .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email points");
+
+        res.status(200).json({
+            success: true,
+            data: familyMembers
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.requestedList = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(400).json({
+                message: 'User id is required'
+            });
+        }
+
+        const requestList = await Request.find({
+            status: "requested",
+            $or: [
+                { senderId: req.user.id },
+                { receiverId: req.user.id }
+            ]
+        })
+        .populate("senderId");
+
+        return res.status(200).json({
+            data: requestList
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};

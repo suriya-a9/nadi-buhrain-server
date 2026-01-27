@@ -5,10 +5,12 @@ const requestSchema = new mongoose.Schema({
         type: String
     },
     senderId: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserAccount"
     },
     receiverId: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserAccount"
     },
     points: {
         type: String

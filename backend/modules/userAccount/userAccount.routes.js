@@ -32,4 +32,6 @@ router.post("/delete-user", controller.deleteUser);
 
 router.post('/notification', auth, controller.listNotification);
 
+router.post('/logout', auth, controller.logout);
+
 module.exports = router;
