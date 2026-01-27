@@ -411,10 +411,81 @@ exports.peopleList = async (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: "user id needed"
-            })
+            });
         }
-        
+
+        const requests = await Request.find({
+            $or: [
+                { senderId: userId },
+                { receiverId: userId }
+            ]
+        });
+
+        const peopleIds = new Set();
+        requests.forEach(req => {
+            if (req.senderId.toString() !== userId) peopleIds.add(req.senderId.toString());
+            if (req.receiverId.toString() !== userId) peopleIds.add(req.receiverId.toString());
+        });
+
+        const people = await UserAccount.find({ _id: { $in: Array.from(peopleIds) } })
+            .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email points");
+
+        res.status(200).json({
+            success: true,
+            data: people
+        });
     } catch (err) {
-        next(err)
+        next(err);
+    }
+}
+
+exports.requestWithOutMobileNumber = async (req, res, next) => {
+    const { receiverId, points, reason } = req.body;
+    try {
+        const userId = req.user.id
+        if (!userId) {
+            return res.status(400).json({
+                message: 'User id is required'
+            });
+        }
+        const sender = await UserAccount.findById(userId);
+        const receiver = await UserAccount.findById(receiverId);
+        if (!receiver) {
+            return res.status(404).json({
+                message: 'Receiver not found'
+            });
+        }
+        const userNotification = await UserNotification.create({
+            type: 'Points Request',
+            message: `New request from ${sender.basicInfo.fullName}`,
+            userId: receiver._id,
+            time: new Date()
+        });
+        await Request.create({
+            request: "Requesting points transfer",
+            senderId: req.user.id,
+            receiverId: receiver._id,
+            points,
+            reason
+        });
+        const io = req.app.get('io');
+        io.emit('userNotification', userNotification);
+        await UserLog.create({
+            userId: req.user.id,
+            log: `${points} points requested`,
+            status: "Requested",
+            logo: "/assets/badge.webp",
+            time: new Date()
+        });
+        await sendPushNotification(
+            receiver.fcmToken,
+            "Points Request",
+            `New request for points ${points} by ${sender.basicInfo.fullName}`
+        );
+        res.status(201).json({
+            message: "Request sent"
+        });
+    } catch (err) {
+        next(err);
     }
 }

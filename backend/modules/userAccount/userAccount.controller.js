@@ -61,7 +61,6 @@ exports.saveBasicInfo = async (req, res, next) => {
                 fullName,
                 mobileNumber,
                 email,
-                image: "/assets/user-image.webp",
                 gender,
                 password: hashedPassword
             },
