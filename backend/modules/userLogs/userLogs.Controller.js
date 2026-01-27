@@ -3,17 +3,32 @@ const UserAccount = require("../userAccount/userAccount.model");
 const Technician = require("../adminPanel/technician/technician.model");
 const Admin = require("../admin/admin.model");
 
-async function getUserNameById(userId) {
-    let user = await UserAccount.findById(userId).select("basicInfo.fullName basicInfo.email");
-    if (user) return user.basicInfo.fullName || user.basicInfo.email;
+async function getUserNameAndMobileById(userId) {
+    let user = await UserAccount.findById(userId).select("basicInfo.fullName basicInfo.email basicInfo.mobileNumber");
+    if (user) {
+        return {
+            name: user.basicInfo.fullName || user.basicInfo.email,
+            mobile: user.basicInfo.mobileNumber ? user.basicInfo.mobileNumber.toString() : ""
+        };
+    }
 
-    let tech = await Technician.findById(userId).select("firstName lastName name email");
-    if (tech) return tech.firstName ? `${tech.firstName} ${tech.lastName || ""}` : tech.name || tech.email;
+    let tech = await Technician.findById(userId).select("firstName lastName name email mobile");
+    if (tech) {
+        return {
+            name: tech.firstName ? `${tech.firstName} ${tech.lastName || ""}` : tech.name || tech.email,
+            mobile: tech.mobile ? tech.mobile.toString() : ""
+        };
+    }
 
     let admin = await Admin.findById(userId).select("name email");
-    if (admin) return admin.name || admin.email;
+    if (admin) {
+        return {
+            name: admin.name || admin.email,
+            mobile: ""
+        };
+    }
 
-    return "Unknown User";
+    return { name: "Unknown User", mobile: "" };
 }
 
 exports.listLogs = async (req, res, next) => {
@@ -28,8 +43,8 @@ exports.listLogs = async (req, res, next) => {
         const logData = await UserLogs.find({ userId: userId }).sort({ time: -1 });
 
         const logsWithNames = await Promise.all(logData.map(async log => {
-            const name = await getUserNameById(log.userId);
-            return { ...log.toObject(), userName: name };
+            const { name, mobile } = await getUserNameAndMobileById(log.userId);
+            return { ...log.toObject(), userName: name, userMobileNumber: mobile };
         }));
 
         res.status(200).json({
@@ -46,8 +61,8 @@ exports.listAllUserLogs = async (req, res, next) => {
         const logData = await UserLogs.find().sort({ time: -1 });
 
         const logsWithNames = await Promise.all(logData.map(async log => {
-            const name = await getUserNameById(log.userId);
-            return { ...log.toObject(), userName: name };
+            const { name, mobile } = await getUserNameAndMobileById(log.userId);
+            return { ...log.toObject(), userName: name, userMobileNumber: mobile };
         }));
 
         res.status(200).json({

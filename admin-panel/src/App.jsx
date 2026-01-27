@@ -46,6 +46,8 @@ import HelpAndSupport from "./pages/HelpAndSupport";
 import NewServiceRequestDetails from "./pages/NewServiceRequestDetails";
 import ProductDetails from "./pages/ProductDetails";
 import RequestPoints from "./pages/RequestPoints";
+import UserDetails from "./pages/UserDetails";
+import NotVerifiedUserDetails from "./pages/NotVerifiedUserDetails";
 
 export default function App() {
   return (
@@ -241,6 +243,30 @@ export default function App() {
                   <PermissionRoute permission="users">
                     <DashboardLayout>
                       <User />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users/:id"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="users">
+                    <DashboardLayout>
+                      <UserDetails />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/not-verified/:id"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="users">
+                    <DashboardLayout>
+                      <NotVerifiedUserDetails />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

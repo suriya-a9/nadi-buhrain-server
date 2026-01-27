@@ -9,8 +9,11 @@ import { LiaPhoneSquareSolid } from "react-icons/lia";
 import { BsGenderAmbiguous } from "react-icons/bs";
 import { FaRegAddressCard, FaRegIdCard } from "react-icons/fa6";
 import toast from "react-hot-toast";
+import { formatDateTime } from "../utils/dateUtils";
+import { useNavigate } from "react-router-dom";
 
 export default function NotVerifiedUser() {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -160,12 +163,17 @@ export default function NotVerifiedUser() {
                             { title: "Account Type", key: "accountTypeId.name" },
                             { title: "Status", key: "accountVerification" },
                             { title: "Rejection Reason", key: "reason" },
+                            {
+                                title: "Date & Time",
+                                key: "updatedAt",
+                                render: (_, row) => formatDateTime(row.updatedAt)
+                            },
                         ]}
                         data={paginatedUsers}
                         actions={(row) => (
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => viewDetails(row._id)}
+                                    onClick={() => navigate(`/not-verified/${row._id}`)}
                                     className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
                                 >
                                     View

@@ -110,7 +110,20 @@ export default function Logs() {
                                         />
                                     ) : "-",
                             },
-                            { title: "Name", key: "userName" },
+                            {
+                                title: "Name",
+                                key: "userName",
+                                render: (_, row) => {
+                                    const mobile =
+                                        row.userMobileNumber ||
+                                        (row.userId && row.userId.basicInfo && row.userId.basicInfo.mobileNumber) ||
+                                        row.mobileNumber ||
+                                        "";
+                                    return mobile
+                                        ? `${row.userName} / ${mobile}`
+                                        : row.userName;
+                                },
+                            },
                             { title: "Logs", key: "log" },
                             {
                                 title: "Date & Time",
