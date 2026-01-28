@@ -311,6 +311,7 @@ exports.completeSignUp = async (req, res, next) => {
         if (!user.termsVerfied) {
             return res.status(400).json({ message: "need to accept terms and condition" });
         }
+        const pointsDoc = await Points.findOne({ accountType: user.accountTypeId });
         const familyMembers = await FamilyMember.find({ userId });
         for (const member of familyMembers) {
             const existing = await UserAccount.findOne({ "basicInfo.mobileNumber": member.mobile });
@@ -332,6 +333,17 @@ exports.completeSignUp = async (req, res, next) => {
                 familyOwnerId: user._id,
                 familyMemberRef: member._id
             });
+            if (pointsDoc) {
+                newFamilyUser.points = pointsDoc.points;
+                await newFamilyUser.save();
+                await PointsHistory.create({
+                    userId: newFamilyUser._id,
+                    history: `Signup points`,
+                    points: pointsDoc.points,
+                    time: new Date(),
+                    status: "credit"
+                });
+            }
             if (member.addressId) {
                 await Address.findByIdAndUpdate(member.addressId, { userId: newFamilyUser._id }, { new: true });
             }
@@ -340,7 +352,6 @@ exports.completeSignUp = async (req, res, next) => {
         user.accountStatus = true;
         user.status = "completed";
         user.singnUpCompleted = true;
-        const pointsDoc = await Points.findOne({ accountType: user.accountTypeId });
         if (pointsDoc) {
             user.points = pointsDoc.points;
             await PointsHistory.create({

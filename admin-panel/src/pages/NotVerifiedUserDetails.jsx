@@ -21,14 +21,16 @@ export default function NotVerifiedUserDetails() {
             setLoading(true);
             try {
                 const res = await api.post("/account-verify/view", { id });
-                if (res.data.data.user) {
+                if (res.data.data.type === "user") {
                     setUser(res.data.data.user);
                     setAddresses(res.data.data.addresses || []);
                     setFamilyMembers(res.data.data.familyMembers || []);
-                } else {
-                    setUser(res.data.data);
-                    setAddresses(res.data.data.addresses || []);
-                    setFamilyMembers(res.data.data.familyMembers || []);
+                    setOwner(res.data.data.parentUser || null);
+                } else if (res.data.data.type === "familyMember") {
+                    setUser(res.data.data.familyMember);
+                    setAddresses(res.data.data.address ? [res.data.data.address] : []);
+                    setFamilyMembers([]);
+                    setOwner(res.data.data.parentUser || null);
                 }
             } catch (err) {
                 toast.error(err.response?.data?.message || "Failed to load user");
@@ -38,7 +40,7 @@ export default function NotVerifiedUserDetails() {
         };
         fetchUser();
     }, [id]);
-
+    const [owner, setOwner] = useState(null);
     const updateStatus = async (status, reason) => {
         try {
             const payload = { userId: id, status };
@@ -113,7 +115,38 @@ export default function NotVerifiedUserDetails() {
                             </div>
                         </div>
                     )}
-                    {familyMembers && familyMembers.length > 0 && (
+                    {user.isFamilyMember && owner && (
+                        <div className="mb-4 p-3 border rounded bg-gray-50">
+                            <div className="font-medium mb-2">Owner Details</div>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div><b>Full Name:</b> {owner.basicInfo?.fullName || "—"}</div>
+                                <div><b>Email:</b> {owner.basicInfo?.email || "—"}</div>
+                                <div><b>Mobile:</b> {owner.basicInfo?.mobileNumber || "—"}</div>
+                                <div><b>Account Type:</b> {owner.accountTypeId?.name || "—"}</div>
+                            </div>
+                            {owner.idProofUrl && owner.idProofUrl.length > 0 && (
+                                <div className="mt-2">
+                                    <div className="text-xs text-gray-500 mb-2">Owner ID Proofs</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {owner.idProofUrl.map((f, i) => {
+                                            const url = `${API_BASE}/uploads/${f}`;
+                                            const ext = f.split('.').pop().toLowerCase();
+                                            const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext);
+                                            return (
+                                                <div key={i} className="p-2 border rounded bg-white" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                                    {isImage && <img src={url} alt={f} className="mt-2 max-h-28 rounded" />}
+                                                    <a href={url} target="_blank" rel="noreferrer" className="text-blue-600 underline break-all text-sm">
+                                                        view
+                                                    </a>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {!user.isFamilyMember && familyMembers && familyMembers.length > 0 && (
                         <div>
                             <div className="font-medium mb-2">Family Members</div>
                             <div className="space-y-2">

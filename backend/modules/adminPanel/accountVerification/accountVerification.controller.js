@@ -30,7 +30,9 @@ exports.verifyAccount = async (req, res, next) => {
             }
             updateFields.reason = reason;
         }
-
+        if (status === "verified") {
+            updateFields.accountStatus = true;
+        }
         const result = await UserAccount.findByIdAndUpdate(
             userId,
             updateFields,
@@ -135,12 +137,20 @@ exports.viewAccount = async (req, res, next) => {
                 return { ...fm, address: addr || null };
             }));
 
+            let parentUser = null;
+            if (accountData.isFamilyMember && accountData.familyOwnerId) {
+                parentUser = await UserAccount.findById(accountData.familyOwnerId)
+                    .populate('accountTypeId')
+                    .lean();
+            }
+
             return res.status(200).json({
                 data: {
                     type: 'user',
                     user: accountData,
                     addresses: userAddresses,
-                    familyMembers: familyWithAddress
+                    familyMembers: familyWithAddress,
+                    parentUser: parentUser 
                 }
             });
         }
@@ -169,7 +179,7 @@ exports.usersList = async (req, res, next) => {
     try {
         const listacceptedUsers = await UserAccount.find({ accountVerification: "verified" })
             .populate("accountTypeId")
-            .populate().sort({createdAt: -1})
+            .populate().sort({ createdAt: -1 })
         res.status(200).json({
             data: listacceptedUsers
         })

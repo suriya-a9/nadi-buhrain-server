@@ -7,6 +7,7 @@ const RequestPointsAdmin = require("../../requests/requestAdmin.model");
 const UserNotification = require("../notification/userNotification.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const Notification = require('../../adminPanel/notification/notification.model');
+const FamilyMember = require('../../userAccount/familyMember.model');
 
 exports.addPoints = async (req, res, next) => {
     const { points, accountType } = req.body;
@@ -298,7 +299,7 @@ exports.requestToAdmin = async (req, res, next) => {
 exports.listAdminRequest = async (req, res, next) => {
     try {
         const list = await RequestPointsAdmin.find()
-            .populate("userId").sort({createdAt: -1});
+            .populate("userId").sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             message: "Success",
@@ -361,17 +362,45 @@ exports.pointsHistory = async (req, res, next) => {
 
 exports.listFamilyMembersWithPoints = async (req, res, next) => {
     try {
-        const userId = req.user.id;
+        let userId = req.user.id;
         if (!userId) {
             return res.status(400).json({ message: "User id required" });
         }
 
-        const familyMembers = await UserAccount.find({ familyOwnerId: userId, isFamilyMember: true })
-            .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email points");
+        const currentUser = await UserAccount.findById(userId);
+
+        let owner = null;
+
+        if (currentUser && currentUser.isFamilyMember && currentUser.familyOwnerId) {
+            owner = await UserAccount.findById(currentUser.familyOwnerId)
+                .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points accountTypeId");
+            userId = currentUser.familyOwnerId;
+        }
+
+        const familyMembers = await UserAccount.find({
+            familyOwnerId: userId,
+            isFamilyMember: true,
+            _id: { $ne: currentUser._id }
+        }).select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points familyMemberRef");
+
+        const familyMemberRefs = familyMembers.map(fm => fm.familyMemberRef).filter(Boolean);
+        const relations = await FamilyMember.find({ _id: { $in: familyMemberRefs } })
+            .select("relation");
+
+        const relationMap = {};
+        relations.forEach(r => {
+            relationMap[r._id.toString()] = r.relation;
+        });
+
+        const data = familyMembers.map(fm => ({
+            ...fm.toObject(),
+            relation: relationMap[fm.familyMemberRef?.toString()] || null
+        }));
 
         res.status(200).json({
             success: true,
-            data: familyMembers
+            owner: owner,
+            data
         });
     } catch (err) {
         next(err);
@@ -428,7 +457,7 @@ exports.peopleList = async (req, res, next) => {
         });
 
         const people = await UserAccount.find({ _id: { $in: Array.from(peopleIds) } })
-            .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email points");
+            .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points");
 
         res.status(200).json({
             success: true,
