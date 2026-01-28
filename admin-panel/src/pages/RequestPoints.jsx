@@ -69,6 +69,9 @@ export default function RequestPoints() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Requests: {requests.length}
+                    </div>
                     <Table
                         columns={[
                             {

@@ -162,6 +162,9 @@ export default function User() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Users: {filteredUsers.length}
+                    </div>
                     <Table
                         columns={[
                             {

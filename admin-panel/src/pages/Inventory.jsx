@@ -19,7 +19,8 @@ export default function Inventory() {
         productName: "",
         quantity: "",
         stock: true,
-        price: ""
+        price: "",
+        lowStock: ""
     });
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +51,8 @@ export default function Inventory() {
             productName: "",
             quantity: "",
             stock: true,
-            price: ""
+            price: "",
+            lowStock: ""
         });
         setEditData(null);
         setOpenCanvas(true);
@@ -62,7 +64,8 @@ export default function Inventory() {
             productName: item.productName,
             quantity: item.quantity,
             stock: !!item.stock,
-            price: item.price
+            price: item.price,
+            lowStock: item.lowStock
         });
         setOpenCanvas(true);
     };
@@ -116,7 +119,8 @@ export default function Inventory() {
     useEffect(() => {
         const lowStockProducts = inventory.filter(item => {
             const qty = Number(item.quantity);
-            return !isNaN(qty) && qty <= 5;
+            const threshold = Number(item.lowStock);
+            return !isNaN(qty) && !isNaN(threshold) && qty <= threshold;
         });
         if (lowStockProducts.length > 0) {
             toast.error(
@@ -131,7 +135,8 @@ export default function Inventory() {
         (
             String(s.productName || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.quantity || "").toLowerCase().includes(search.toLowerCase()) ||
-            String(s.price || "").toLowerCase().includes(search.toLowerCase())
+            String(s.price || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.lowStock || "").toLowerCase().includes(search.toLowerCase())
         )
     );
 
@@ -179,6 +184,9 @@ export default function Inventory() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Products: {filteredInventory.length}
+                    </div>
                     <Table
                         columns={[
                             {
@@ -190,6 +198,7 @@ export default function Inventory() {
                             { title: "Product Name", key: "productName" },
                             { title: "Quantity", key: "quantity" },
                             { title: "Price", key: "price" },
+                            { title: "Low Stock", key: "lowStock" },
                             {
                                 title: "Stock",
                                 key: "stock",
@@ -273,6 +282,16 @@ export default function Inventory() {
                             type="number"
                             value={form.price}
                             onChange={(e) => setForm({ ...form, price: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Low Stock</label>
+                        <input
+                            type="number"
+                            value={form.lowStock}
+                            onChange={(e) => setForm({ ...form, lowStock: e.target.value })}
                             className="w-full border p-2 rounded"
                             required
                         />

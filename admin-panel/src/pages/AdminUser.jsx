@@ -159,6 +159,9 @@ export default function AdminUser() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Admin users: {filteredAdmins.length}
+                    </div>
                     <Table
                         columns={[
                             {

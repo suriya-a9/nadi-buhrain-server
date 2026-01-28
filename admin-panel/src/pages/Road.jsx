@@ -119,6 +119,9 @@ export default function Road() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Roads: {filteredRoad.length}
+                    </div>
                     <Table
                         columns={[
                             {

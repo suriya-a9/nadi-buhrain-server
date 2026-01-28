@@ -162,6 +162,9 @@ export default function Questionnaire() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Questionnaires: {questionnaires.length}
+                    </div>
                     <Table
                         columns={[
                             { title: "S.No", render: (_, __, idx) => idx + 1 },

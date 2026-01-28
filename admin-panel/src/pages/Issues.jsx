@@ -120,6 +120,9 @@ export default function Issues() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Issues: {filteredIssues.length}
+                    </div>
                     <Table
                         columns={[
                             {

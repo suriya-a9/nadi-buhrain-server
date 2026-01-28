@@ -78,6 +78,9 @@ export default function MaterialRequests() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Requests: {filteredMaterialRequest.length}
+                    </div>
                     <Table
                         columns={[
                             {

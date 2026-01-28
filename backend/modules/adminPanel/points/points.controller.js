@@ -298,7 +298,7 @@ exports.requestToAdmin = async (req, res, next) => {
 exports.listAdminRequest = async (req, res, next) => {
     try {
         const list = await RequestPointsAdmin.find()
-            .populate("userId");
+            .populate("userId").sort({createdAt: -1});
         res.status(200).json({
             success: true,
             message: "Success",

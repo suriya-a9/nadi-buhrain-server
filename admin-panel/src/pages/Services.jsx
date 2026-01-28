@@ -123,6 +123,9 @@ export default function Services() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Services: {filteredServices.length}
+                    </div>
                     <Table
                         columns={[
                             {

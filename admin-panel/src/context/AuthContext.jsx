@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [name, setName] = useState(null);
   const [role, setRole] = useState(null);
   const [permissions, setPermissions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -36,19 +37,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      if (isTokenExpired(storedToken)) {
-        logout();
-      } else {
-        setToken(storedToken);
-        const decoded = jwtDecode(storedToken);
-        setRole(decoded.role);
-        setPermissions(decoded.permissions || []);
-      }
+useEffect(() => {
+  const storedToken = localStorage.getItem("token");
+  if (storedToken) {
+    if (isTokenExpired(storedToken)) {
+      logout();
+      setLoading(false);
+    } else {
+      setToken(storedToken);
+      const decoded = jwtDecode(storedToken);
+      setName(decoded.name);
+      setRole(decoded.role);
+      setPermissions(decoded.permissions || []);
+      setLoading(false);
     }
-  }, []);
+  } else {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     if (!token) return;
@@ -65,7 +71,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, name, role, permissions, login, logout }}>
+    <AuthContext.Provider value={{ token, name, role, permissions, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

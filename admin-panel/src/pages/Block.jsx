@@ -148,6 +148,9 @@ export default function Block() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Blocks: {filteredBlock.length}
+                    </div>
                     <Table
                         columns={[
                             {

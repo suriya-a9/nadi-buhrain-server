@@ -13,7 +13,7 @@ exports.listSpareParts = async (req, res, next) => {
 
         const sparePartsData = await SpareParts
             .find({ technicianId })
-            .populate("productId");
+            .populate("productId").sort({createdAt: -1});
 
         res.status(200).json({
             success: true,

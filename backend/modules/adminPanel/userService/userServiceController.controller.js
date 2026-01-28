@@ -9,13 +9,16 @@ const UserAccount = require("../../userAccount/userAccount.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const UserNotification = require("../../adminPanel/notification/userNotification.model");
 const TechNotification = require("../../adminPanel/notification/techNotification.model");
+const sendEmail = require('../../../utils/mailer');
+const serviceStatusUpdateTemplate = require('../../../template/serviceStatusUpdate');
+const Logger = require("../../../logger");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
         const newServiceList = await UserService.find({ serviceStatus: "submitted" })
             .populate("userId")
             .populate('serviceId')
-            .populate('issuesId');
+            .populate('issuesId').sort({ serviceRequestID: -1 });
         const formattedList = newServiceList.map(service => {
             const formattedTimestamps = {};
             Object.entries(service.statusTimestamps).forEach(([key, value]) => {
@@ -104,18 +107,29 @@ exports.updateServiceStatus = async (req, res, next) => {
             "Service Request",
             `Service request ${serviceStatus}`
         );
-        await UserNotification({
+        await UserNotification.create({
             message: `Service request ${serviceStatus}`,
             type: "Service request",
             userId: user._id,
             time: new Date()
-        })
+        });
+        const html = serviceStatusUpdateTemplate({
+            name: user.basicInfo.fullName,
+            status: serviceStatus
+        });
+
+        await sendEmail({
+            to: user.basicInfo.email,
+            subject: "Service Request Status Updated",
+            html
+        });
+
         res.status(200).json({
             message: "Status updated",
             data: updated
         });
     } catch (err) {
-        console.log("Service error", err)
+        Logger.info("Service error", err)
         next(err);
     }
 };
@@ -358,7 +372,7 @@ exports.acceptedServiceRequests = async (req, res, next) => {
             .populate("userId")
             .populate('serviceId')
             .populate('issuesId')
-            .populate('technicianId');
+            .populate('technicianId').sort({ serviceRequestID: -1 });
         const formattedList = newServiceList.map(service => {
             const formattedTimestamps = {};
             Object.entries(service.statusTimestamps).forEach(([key, value]) => {

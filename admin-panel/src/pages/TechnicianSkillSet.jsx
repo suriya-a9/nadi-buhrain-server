@@ -115,6 +115,9 @@ export default function TechnicianSkills() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Technicians skills: {filteredTechnician.length}
+                    </div>
                     <Table
                         columns={[
                             {

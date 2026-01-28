@@ -75,7 +75,8 @@ export default function Dashboard() {
                 setInventory(res.data.data || []);
                 const lowStock = (res.data.data || []).filter(item => {
                     const qty = Number(item.quantity);
-                    return !isNaN(qty) && qty <= 5;
+                    const threshold = Number(item.lowStock);
+                    return !isNaN(qty) && !isNaN(threshold) && qty <= threshold;
                 });
                 setLowStockProducts(lowStock);
             })

@@ -2,13 +2,14 @@ const Inventory = require('./inventory.model');
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addInventory = async (req, res, next) => {
-    const { productName, quantity, stock, price } = req.body;
+    const { productName, quantity, stock, price, lowStock } = req.body;
     try {
         await Inventory.create({
             productName,
             quantity,
             price,
-            stock: true
+            stock: true,
+            lowStock
         });
         await UserLog.create({
             userId: req.user.id,

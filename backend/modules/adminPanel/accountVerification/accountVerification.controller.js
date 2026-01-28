@@ -169,7 +169,7 @@ exports.usersList = async (req, res, next) => {
     try {
         const listacceptedUsers = await UserAccount.find({ accountVerification: "verified" })
             .populate("accountTypeId")
-            .populate()
+            .populate().sort({createdAt: -1})
         res.status(200).json({
             data: listacceptedUsers
         })

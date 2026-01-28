@@ -380,6 +380,9 @@ export default function ServiceRequestList() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Service Requests: {filteredData.length}
+                    </div>
                     <Table
                         columns={[
                             {

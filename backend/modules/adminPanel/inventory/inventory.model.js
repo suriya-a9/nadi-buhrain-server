@@ -12,6 +12,9 @@ const inventorySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    lowStock: {
+        type: Number,
+    },
     price: {
         type: Number
     }

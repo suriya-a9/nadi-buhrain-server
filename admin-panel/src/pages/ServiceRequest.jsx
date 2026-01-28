@@ -112,6 +112,9 @@ export default function ServiceRequest() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of Service Requests: {filteredRequests.length}
+                    </div>
                     <Table
                         columns={[
                             {

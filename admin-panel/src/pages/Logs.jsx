@@ -90,6 +90,9 @@ export default function Logs() {
                 </div>
             ) : (
                 <>
+                    <div className="mb-2 text-left text-sm text-gray-600">
+                        Total no of User Logs: {filteredUserLogs.length}
+                    </div>
                     <Table
                         columns={[
                             {
