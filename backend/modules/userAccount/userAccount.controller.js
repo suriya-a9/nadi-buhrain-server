@@ -329,6 +329,7 @@ exports.completeSignUp = async (req, res, next) => {
                 termsVerfied: true,
                 status: "completed",
                 singnUpCompleted: true,
+                accountStatus: true,
                 isFamilyMember: true,
                 familyOwnerId: user._id,
                 familyMemberRef: member._id

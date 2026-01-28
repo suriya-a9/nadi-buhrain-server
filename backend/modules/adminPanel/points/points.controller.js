@@ -188,10 +188,10 @@ exports.transferPointsWithFamily = async (req, res, next) => {
             });
             return res.status(200).json({ message: "Points transferred successfully" });
         } else if (action === "reject") {
-            if (!reason) {
-                return res.status(400).json({ message: 'Reason is required for rejection' });
-            }
-            request.status = "rejected";
+            // if (!reason) {
+            //     return res.status(400).json({ message: 'Reason is required for rejection' });
+            // }
+            // request.status = "rejected";
             request.reason = reason;
             await request.save();
             await UserLog.create({
@@ -369,11 +369,11 @@ exports.listFamilyMembersWithPoints = async (req, res, next) => {
 
         const currentUser = await UserAccount.findById(userId);
 
-        let owner = null;
+        let ownerDoc = null;
 
         if (currentUser && currentUser.isFamilyMember && currentUser.familyOwnerId) {
-            owner = await UserAccount.findById(currentUser.familyOwnerId)
-                .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points accountTypeId");
+            ownerDoc = await UserAccount.findById(currentUser.familyOwnerId)
+                .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points accountTypeId familyMemberRef");
             userId = currentUser.familyOwnerId;
         }
 
@@ -383,7 +383,12 @@ exports.listFamilyMembersWithPoints = async (req, res, next) => {
             _id: { $ne: currentUser._id }
         }).select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points familyMemberRef");
 
-        const familyMemberRefs = familyMembers.map(fm => fm.familyMemberRef).filter(Boolean);
+        let allMembers = familyMembers.map(fm => fm.toObject());
+        if (ownerDoc) {
+            allMembers.unshift(ownerDoc.toObject());
+        }
+
+        const familyMemberRefs = allMembers.map(fm => fm.familyMemberRef).filter(Boolean);
         const relations = await FamilyMember.find({ _id: { $in: familyMemberRefs } })
             .select("relation");
 
@@ -392,14 +397,13 @@ exports.listFamilyMembersWithPoints = async (req, res, next) => {
             relationMap[r._id.toString()] = r.relation;
         });
 
-        const data = familyMembers.map(fm => ({
-            ...fm.toObject(),
+        const data = allMembers.map(fm => ({
+            ...fm,
             relation: relationMap[fm.familyMemberRef?.toString()] || null
         }));
 
         res.status(200).json({
             success: true,
-            owner: owner,
             data
         });
     } catch (err) {

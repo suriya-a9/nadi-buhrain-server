@@ -4,7 +4,7 @@ const SpareParts = require("../spareParts/spareParts.model");
 const UserLog = require("../../userLogs/userLogs.model");
 const Technician = require("../../adminPanel/technician/technician.model");
 const Notification = require("../notification/notification.model");
-const sendPushNotification = require("../../../utils/sendPush");
+const sendPushNotificationStaff = require("../../../utils/sendPushStaff");
 const TechNotification = require("../../adminPanel/notification/techNotification.model");
 
 exports.singleRequest = async (req, res, next) => {
@@ -194,7 +194,7 @@ exports.responseMaterialRequest = async (req, res, next) => {
                 logo: "/assets/product-management.webp",
                 time: new Date()
             });
-            await sendPushNotification(
+            await sendPushNotificationStaff(
                 technician.fcmToken,
                 "Matrial Request",
                 "Your material request processed"
@@ -212,7 +212,7 @@ exports.responseMaterialRequest = async (req, res, next) => {
         } else {
             request.status = status;
             await request.save();
-            await sendPushNotification(
+            await sendPushNotificationStaff(
                 technician.fcmToken,
                 "Matrial Request",
                 "Your material request rejected"

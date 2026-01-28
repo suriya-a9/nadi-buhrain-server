@@ -7,6 +7,7 @@ const Notification = require("../notification/notification.model");
 const Admin = require("../../admin/admin.model");
 const UserAccount = require("../../userAccount/userAccount.model");
 const sendPushNotification = require("../../../utils/sendPush");
+const sendPushNotificationStaff = require("../../../utils/sendPushStaff");
 const UserNotification = require("../../adminPanel/notification/userNotification.model");
 const TechNotification = require("../../adminPanel/notification/techNotification.model");
 const sendEmail = require('../../../utils/mailer');
@@ -175,7 +176,7 @@ exports.assignTechnician = async (req, res, next) => {
 
         for (const tech of technicians) {
             if (tech.fcmToken) {
-                await sendPushNotification(
+                await sendPushNotificationStaff(
                     tech.fcmToken,
                     "New Service Assignment",
                     "You have been assigned a new service request."
