@@ -21,7 +21,8 @@ const requestSchema = new mongoose.Schema({
         default: "requested"
     },
     reason: {
-        type: String
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 

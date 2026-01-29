@@ -191,8 +191,8 @@ exports.transferPointsWithFamily = async (req, res, next) => {
             // if (!reason) {
             //     return res.status(400).json({ message: 'Reason is required for rejection' });
             // }
-            // request.status = "rejected";
-            request.reason = reason;
+            request.status = "rejected";
+            // request.reason = reason;
             await request.save();
             await UserLog.create({
                 userId: req.user.id,
