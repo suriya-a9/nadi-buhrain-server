@@ -29,6 +29,7 @@ exports.uploadLoadingScreen = async (req, res, next) => {
       userId: req.user.id,
       log: "Loading content added",
       status: "Created",
+      role: "admin",
       logo: "/assets/loading.webp",
       time: new Date(),
     });
@@ -118,6 +119,7 @@ exports.deleteLoadingScreen = async (req, res, next) => {
       userId: req.user.id,
       log: "Loading content deleted",
       status: "Deleted",
+      role: "admin",
       logo: "/assets/loading.webp",
       time: new Date(),
     });

@@ -4,6 +4,13 @@ import api from "../services/api";
 import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
 
+const ROLES = [
+    { label: "All", value: "all" },
+    { label: "Admin User", value: "admin" },
+    { label: "User", value: "user" },
+    { label: "Technician", value: "technician" },
+];
+
 export default function Logs() {
     const [logs, setLogs] = useState([]);
     const [search, setSearch] = useState("");
@@ -11,6 +18,7 @@ export default function Logs() {
     const [loading, setLoading] = useState(true);
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
+    const [activeTab, setActiveTab] = useState("all");
     const API_BASE = (import.meta.env.VITE_API_URL).replace(/\/$/, "");
     useEffect(() => {
         setCurrentPage(1);
@@ -56,7 +64,10 @@ export default function Logs() {
             ? new Date(s.time).toISOString().slice(0, 10) === searchDate
             : true;
 
-        return matchesText && matchesDate;
+        const matchesRole =
+            activeTab === "all" ? true : String(s.role || "").toLowerCase() === activeTab;
+
+        return matchesText && matchesDate && matchesRole;
     });
     const totalPages = Math.ceil(filteredUserLogs.length / ITEMS_PER_PAGE);
 
@@ -84,6 +95,19 @@ export default function Logs() {
                     />
                 </div>
             </div>
+            {role === "Super Admin" && (
+                <div className="flex gap-2 mb-4">
+                    {ROLES.map(tab => (
+                        <button
+                            key={tab.value}
+                            className={`px-4 py-2 rounded ${activeTab === tab.value ? "bg-textGreen text-white" : "bg-gray-200 text-gray-700"}`}
+                            onClick={() => setActiveTab(tab.value)}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            )}
             {loading ? (
                 <div className="flex justify-center items-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>

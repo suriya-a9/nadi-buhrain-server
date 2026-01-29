@@ -9,6 +9,7 @@ exports.addAccountType = async (req, res, next) => {
       userId: req.user.id,
       log: `Account type - ${accountTypeData.name} added`,
       status: "Created",
+      role: "admin",
       logo: "/assets/account-type.webp",
       time: new Date()
     });
@@ -33,6 +34,7 @@ exports.updateAccountType = async (req, res, next) => {
       userId: req.user.id,
       log: `Account type - ${updateAccount.name} Updated`,
       status: "Updated",
+      role: "admin",
       logo: "/assets/account-type.webp",
       time: new Date()
     });
@@ -64,6 +66,7 @@ exports.deleteAccountType = async (req, res, next) => {
       userId: req.user.id,
       log: `Account type - ${accountTypeDelete.name} Deleted`,
       status: "Deleted",
+      role: "admin",
       logo: "/assets/account-type.webp",
       time: new Date()
     });

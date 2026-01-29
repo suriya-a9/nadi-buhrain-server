@@ -15,6 +15,7 @@ exports.addInventory = async (req, res, next) => {
             userId: req.user.id,
             log: `${productName} product added to inventory`,
             status: "Added",
+            role: "admin",
             logo: "/assets/product-added.webp",
             time: new Date()
         });
@@ -49,6 +50,7 @@ exports.updateInventory = async (req, res, next) => {
             userId: req.user.id,
             log: `${updatedProduct.productName} product details updated`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/product-added.webp",
             time: new Date()
         })
@@ -68,6 +70,7 @@ exports.deleteInventory = async (req, res, next) => {
             userId: req.user.id,
             log: `${deletedProduct.productName} product has been removed from inventory`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/product-added.webp",
             time: new Date()
         })
@@ -91,6 +94,7 @@ exports.stockUpdate = async (req, res, next) => {
             userId: req.user.id,
             log: `${updatedProduct.productName} product stock details updated`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/product-added.webp",
             time: new Date()
         })

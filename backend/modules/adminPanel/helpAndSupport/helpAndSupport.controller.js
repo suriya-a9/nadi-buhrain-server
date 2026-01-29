@@ -19,6 +19,7 @@ exports.addHelp = async (req, res, next) => {
             userId: userId,
             log: `Created help and support content`,
             status: "Created",
+            role: "admin",
             logo: "/assets/help-support.webp",
             time: new Date()
         })
@@ -74,6 +75,7 @@ exports.updateHelp = async (req, res, next) => {
             userId: userId,
             log: `Updated help and support content`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/help-support.webp",
             time: new Date()
         })
@@ -105,6 +107,7 @@ exports.toggleStatus = async (req, res, next) => {
             userId: userId,
             log: `Updated help and support content status`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/help-support.webp",
             time: new Date()
         })
@@ -132,6 +135,7 @@ exports.deleteHelp = async (req, res, next) => {
             userId: userId,
             log: `Deleted help and support content`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/help-support.webp",
             time: new Date()
         })

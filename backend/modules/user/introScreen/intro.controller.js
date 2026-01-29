@@ -12,6 +12,7 @@ exports.addIntro = async (req, res, next) => {
             userId: req.user.id,
             log: "Intro content added",
             status: "Created",
+            role: "admin",
             logo: "/assets/intro.webp",
             time: new Date()
         });
@@ -79,6 +80,7 @@ exports.updateIntro = async (req, res, next) => {
             userId: req.user.id,
             log: "Intro content updated",
             status: "Updated",
+            role: "admin",
             logo: "/assets/intro.webp",
             time: new Date()
         });
@@ -99,6 +101,7 @@ exports.deleteIntro = async (req, res, next) => {
             userId: req.user.id,
             log: "Intro content Deleted",
             status: "Deleted",
+            role: "admin",
             logo: "/assets/intro.webp",
             time: new Date()
         });

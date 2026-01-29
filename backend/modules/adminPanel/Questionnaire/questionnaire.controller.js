@@ -17,6 +17,7 @@ exports.addQuestionnaire = async (req, res, next) => {
             userId: req.user.id,
             log: `created questionnaire - ${title}`,
             status: "Created",
+            role: "admin",
             logo: "/assets/questionnaire.webp",
             time: new Date()
         });
@@ -48,6 +49,7 @@ exports.editQuestionnaire = async (req, res, next) => {
             userId: req.user.id,
             log: `edited questionnaire ${questionnaire.title}`,
             status: "Edited",
+            role: "admin",
             logo: "/assets/questionnaire.webp",
             time: new Date()
         });
@@ -69,6 +71,7 @@ exports.deleteQuestionnaire = async (req, res, next) => {
             userId: req.user.id,
             log: `deleted questionnaire ${questionnaireData.title}`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/questionnaire.webp",
             time: new Date()
         });
@@ -164,6 +167,7 @@ exports.submitQuestionnaire = async (req, res, next) => {
             userId: req.user.id,
             log: `submitted questionnaire`,
             status: "submitted",
+            role: "user",
             logo: "/assets/questionnaire.webp",
             time: new Date()
         });

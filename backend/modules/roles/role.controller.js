@@ -17,6 +17,7 @@ exports.addRole = async (req, res, next) => {
             userId: req.user.id,
             log: "Role created",
             status: "New Role",
+            role: "admin",
             logo: "/assets/role.webp",
             time: new Date()
         })
@@ -59,6 +60,7 @@ exports.updateRole = async (req, res, next) => {
             userId: req.user.id,
             log: `${updateData.name} role updated`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/role.webp",
             time: new Date()
         })
@@ -87,6 +89,7 @@ exports.deleteRole = async (req, res, next) => {
             userId: req.user.id,
             log: `${deleteData.name} role deleted`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/role.webp",
             time: new Date()
         })

@@ -11,6 +11,7 @@ exports.addSkillSet = async (req, res, next) => {
             userId: req.user.id,
             log: `Created skillset - ${skillsAdd.skill}`,
             status: "Created",
+            role: "admin",
             logo: "/assets/technician.webp",
             time: new Date()
         });
@@ -42,6 +43,7 @@ exports.updateSkillSet = async (req, res, next) => {
             userId: req.user.id,
             log: `Updated skillset - ${skillSetUpdate.skill}`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/technician.webp",
             time: new Date()
         });
@@ -61,6 +63,7 @@ exports.deleteSkillSet = async (req, res, next) => {
             userId: req.user.id,
             log: `Deleted skillset - ${skillSetDelete.skill}`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/technician.webp",
             time: new Date()
         });

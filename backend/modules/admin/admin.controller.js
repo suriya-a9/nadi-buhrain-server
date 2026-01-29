@@ -65,6 +65,7 @@ exports.adminLogin = async (req, res, next) => {
             userId: admin._id,
             log: "Signed In",
             status: "Logged",
+            role: "admin",
             logo: "/assets/user-login-logo.webp",
             time: new Date()
         });
@@ -202,6 +203,7 @@ exports.deleteAdminUser = async (req, res, next) => {
             log: "Deleted admin user",
             status: "Deleted",
             logo: "/assets/user-login-logo.webp",
+            role: "admin",
             time: new Date()
         });
     } catch (err) {

@@ -24,6 +24,7 @@ exports.addAbout = async (req, res, next) => {
             userId: userId,
             log: `Created ${aboutData.title} about content`,
             status: "Created",
+            role: "admin",
             logo: "/assets/about-page.webp",
             time: new Date()
         })
@@ -84,6 +85,7 @@ exports.updateAbout = async (req, res, next) => {
             userId: userId,
             log: `Updated ${aboutUpdate.title} about content`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/about-page.webp",
             time: new Date()
         });
@@ -118,6 +120,7 @@ exports.toggleAboutStatus = async (req, res, next) => {
             userId,
             log: `${isActive ? "Enabled" : "Disabled"} ${aboutData.title} about content`,
             status: isActive ? "Enabled" : "Disabled",
+            role: "admin",
             logo: "/assets/about-page.webp",
             time: new Date()
         });
@@ -147,6 +150,7 @@ exports.deleteAbout = async (req, res, next) => {
             userId: userId,
             log: `Deleted ${aboutData.title} about content`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/about-page.webp",
             time: new Date()
         });

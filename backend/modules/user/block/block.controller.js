@@ -13,6 +13,7 @@ exports.addBlock = async (req, res, next) => {
       userId: req.user.id,
       log: `Block - ${blockData.name} created`,
       status: "Created",
+      role: "admin",
       logo: "/assets/apartment.webp",
       time: new Date()
     });
@@ -27,7 +28,7 @@ exports.addBlock = async (req, res, next) => {
 
 exports.listBlockWithRoads = async (req, res) => {
   try {
-    const data = await Block.find().populate("roads"); 
+    const data = await Block.find().populate("roads");
     res.status(200).json({ data });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,6 +47,7 @@ exports.updateBlock = async (req, res, next) => {
       userId: req.user.id,
       log: `Block - ${blockData.name} updated`,
       status: "Updated",
+      role: "admin",
       logo: "/assets/apartment.webp",
       time: new Date()
     });
@@ -66,6 +68,7 @@ exports.deleteBlock = async (req, res, next) => {
       userId: req.user.id,
       log: `Block - ${blockData.name} Deleted`,
       status: "Deleted",
+      role: "admin",
       logo: "/assets/apartment.webp",
       time: new Date()
     });

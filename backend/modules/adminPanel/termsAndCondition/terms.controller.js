@@ -11,6 +11,7 @@ exports.addTerms = async (req, res, next) => {
             userId: req.user.id,
             log: `Created terms and condition`,
             status: "Created",
+            role: "admin",
             logo: "/assets/terms-and-conditions.webp",
             time: new Date()
         });
@@ -46,6 +47,7 @@ exports.updateTerms = async (req, res, next) => {
             userId: req.user.id,
             log: `Updated terms and condition`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/terms-and-conditions.webp",
             time: new Date()
         });
@@ -66,6 +68,7 @@ exports.deleteTerms = async (req, res, next) => {
             userId: req.user.id,
             log: `Deleted terms and condition`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/terms-and-conditions.webp",
             time: new Date()
         });
@@ -100,6 +103,7 @@ exports.setTermsEnabled = async (req, res, next) => {
             userId: req.user.id,
             log: `Set terms and condition ${enabled ? "enabled" : "disabled"}`,
             status: enabled ? "Enabled" : "Disabled",
+            role: "admin",
             logo: "/assets/terms-and-conditions.webp",
             time: new Date()
         });

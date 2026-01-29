@@ -11,6 +11,7 @@ exports.addRoad = async (req, res, next) => {
       userId: req.user.id,
       log: `${roadData.name} added`,
       status: "Created",
+      role: "admin",
       logo: "/assets/road.webp",
       time: new Date()
     });
@@ -47,6 +48,7 @@ exports.updateRoad = async (req, res, next) => {
       userId: req.user.id,
       log: `${updateRoad.name} updated`,
       status: "Updated",
+      role: "admin",
       logo: "/assets/road.webp",
       time: new Date()
     });
@@ -67,6 +69,7 @@ exports.deleteRoad = async (req, res, next) => {
       userId: req.user.id,
       log: `${roadData.name} deleted`,
       status: "Deleted",
+      role: "admin",
       logo: "/assets/road.webp",
       time: new Date()
     });

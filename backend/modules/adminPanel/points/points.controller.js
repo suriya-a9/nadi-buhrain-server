@@ -20,6 +20,7 @@ exports.addPoints = async (req, res, next) => {
             userId: req.user.id,
             log: `${points} added to ${accountType}`,
             status: "Added",
+            role: "admin",
             logo: "/assets/badge.webp.webp",
             time: new Date()
         });
@@ -56,6 +57,7 @@ exports.updatePoints = async (req, res, next) => {
             userId: req.user.id,
             log: `${updatedPoints.points} Points updated`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/badge.webp",
             time: new Date()
         });
@@ -102,6 +104,7 @@ exports.requestPointsToFamily = async (req, res, next) => {
             userId: req.user.id,
             log: `${points} points requested`,
             status: "Requested",
+            role: "user",
             logo: "/assets/badge.webp",
             time: new Date()
         });
@@ -183,6 +186,7 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 userId: req.user.id,
                 log: "Accepted the point request",
                 status: "Accepted",
+                role: "user",
                 logo: "/assets/badge.webp",
                 time: new Date()
             });
@@ -198,6 +202,7 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 userId: req.user.id,
                 log: "Rejected the point request",
                 status: "Rejected",
+                role: "user",
                 logo: "/assets/badge.webp",
                 time: new Date()
             });
@@ -283,6 +288,7 @@ exports.requestToAdmin = async (req, res, next) => {
         await UserLog.create({
             userId: req.user.id,
             log: `${points} points requested`,
+            role: "user",
             status: "Requested to nadi bahrain",
             logo: "/assets/badge.webp",
             time: new Date()
@@ -507,6 +513,7 @@ exports.requestWithOutMobileNumber = async (req, res, next) => {
             userId: req.user.id,
             log: `${points} points requested`,
             status: "Requested",
+            role: "user",
             logo: "/assets/badge.webp",
             time: new Date()
         });

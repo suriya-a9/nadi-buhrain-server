@@ -16,6 +16,7 @@ exports.createService = async (req, res, next) => {
             userId: req.user.id,
             log: `Created ${serviceCreate.name} service to list`,
             status: "Created",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });
@@ -45,6 +46,7 @@ exports.updateService = async (req, res, next) => {
             userId: req.user.id,
             log: `Updated ${serviceUpdate.name} service to list`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });
@@ -75,6 +77,7 @@ exports.deleteService = async (req, res, next) => {
             userId: req.user.id,
             log: `Deleted ${serviceDelete.name} service to list`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });

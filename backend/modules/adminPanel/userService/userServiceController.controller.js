@@ -100,6 +100,7 @@ exports.updateServiceStatus = async (req, res, next) => {
             userId: req.user.id,
             log: `Service request ${updated._id} updated to status: ${serviceStatus}`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });
@@ -166,6 +167,7 @@ exports.assignTechnician = async (req, res, next) => {
             userId: req.user.id,
             log: `Requested technician for server id ${serviceId}`,
             status: "Requested",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });
@@ -220,6 +222,7 @@ exports.removeTechnicianAssignment = async (req, res, next) => {
             userId: req.user.id,
             log: `Removed technician ${technicianId} from service ${serviceId}`,
             status: "Removed",
+            role: "admin",
             logo: "/assets/service request.webp",
             time: new Date()
         });
@@ -280,6 +283,7 @@ exports.technicianRespond = async (req, res, next) => {
                 userId: technicianId,
                 log: 'Accepted a request',
                 status: "Accepted",
+                role: "technician",
                 logo: "/assets/service request.webp",
                 time: now
             });
@@ -339,6 +343,7 @@ exports.technicianRespond = async (req, res, next) => {
                 userId: technicianId,
                 log: 'Rejected a request',
                 status: "Rejected",
+                role: "technician",
                 logo: "/assets/service request.webp",
                 time: now
             });

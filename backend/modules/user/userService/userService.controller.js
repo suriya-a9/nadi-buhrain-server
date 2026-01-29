@@ -88,6 +88,7 @@ exports.createRequest = async (req, res, next) => {
             userId: req.user.id,
             log: `New service requested submitted`,
             status: "Submitted",
+            role: "user",
             logo: "/assets/service request.webp",
             time: new Date()
         });

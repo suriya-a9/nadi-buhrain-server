@@ -24,6 +24,7 @@ exports.addPolicy = async (req, res, next) => {
             userId: userId,
             log: `Created ${privacyData.title} privacy policy content`,
             status: "Created",
+            role: "admin",
             logo: "/assets/privacy-policy.webp",
             time: new Date()
         })
@@ -84,6 +85,7 @@ exports.updatePrivacy = async (req, res, next) => {
             userId: userId,
             log: `Updated ${privacyUpdate.title} privacy policy content`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/privacy-policy.webp",
             time: new Date()
         });
@@ -118,6 +120,7 @@ exports.togglePrivacyStatus = async (req, res, next) => {
             userId,
             log: `${isActive ? "Enabled" : "Disabled"} ${privacyData.title} privacy content`,
             status: isActive ? "Enabled" : "Disabled",
+            role: "admin",
             logo: "/assets/privacy-policy.webp",
             time: new Date()
         });
@@ -147,6 +150,7 @@ exports.deletePrivacy = async (req, res, next) => {
             userId: userId,
             log: `Deleted ${privacyData.title} privacy policy content`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/privacy-policy.webp",
             time: new Date()
         });

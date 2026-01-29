@@ -12,6 +12,7 @@ exports.addIssue = async (req, res, next) => {
             userId: req.user.id,
             log: `Created ${addIssue.issue} issue to list`,
             status: "Created",
+            role: "admin",
             logo: "/assets/verification.webp",
             time: new Date()
         });
@@ -47,6 +48,7 @@ exports.updateIssue = async (req, res, next) => {
             userId: req.user.id,
             log: `Updated ${issueUpdate.issue} issue to list`,
             status: "Updated",
+            role: "admin",
             logo: "/assets/verification.webp",
             time: new Date()
         });
@@ -66,6 +68,7 @@ exports.deleteIssue = async (req, res, next) => {
             userId: req.user.id,
             log: `Deleted ${issueDelete.issue} issue from list`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/verification.webp",
             time: new Date()
         });

@@ -44,6 +44,7 @@ exports.verifyAccount = async (req, res, next) => {
             userId: req.user.id,
             log: `Account verification has been done for user ${user.basicInfo.fullName}`,
             status: "Account Verification",
+            role: "admin",
             logo: "/assets/verification.webp",
             time: new Date()
         })

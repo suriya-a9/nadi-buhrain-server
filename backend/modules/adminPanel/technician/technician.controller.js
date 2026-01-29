@@ -47,6 +47,7 @@ exports.registerTechnician = async (req, res, next) => {
             userId: req.user.id,
             log: `Created account for techician ${firstName} ${lastName}`,
             status: "Created",
+            role: "admin",
             logo: "/assets/technician.webp",
             time: new Date()
         });
@@ -100,6 +101,7 @@ exports.loginTechnician = async (req, res, next) => {
             userId: technician._id,
             log: 'Signed In',
             status: 'Logged',
+            role: "technician",
             logo: '/assets/user-login-logo.webp',
             time: new Date()
         });
@@ -142,6 +144,7 @@ exports.updateTechnician = async (req, res, next) => {
             userId: req.user.id,
             log: 'Updated profile',
             status: "Updated",
+            role: "technician",
             logo: "/assets/update-profile.webp",
             time: new Date()
         });
@@ -208,6 +211,7 @@ exports.deleteTechnician = async (req, res, next) => {
             userId: req.user.id,
             log: `Deleted Technician ${technicianDelete.firstName} ${technicianDelete.lastName}`,
             status: "Deleted",
+            role: "admin",
             logo: "/assets/remove-user.webp",
             time: new Date()
         });
@@ -359,6 +363,7 @@ exports.resetPassword = async (req, res, next) => {
             userId: technician._id,
             log: "Password reset successfully",
             status: "Password reset",
+            role: "technician",
             logo: "/assets/reset-password.webp",
             time: new Date()
         })
@@ -389,6 +394,7 @@ exports.logout = async (req, res, next) => {
             userId: userId,
             log: 'Logout',
             status: "Logged out successfully",
+            role: "technician",
             logo: "/assets/logout.webp",
             time: new Date()
         });

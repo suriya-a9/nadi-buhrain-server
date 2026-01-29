@@ -50,6 +50,7 @@ exports.singleRequest = async (req, res, next) => {
             userId: req.user.id,
             log: `Requested for ${product.productName}`,
             status: "Requested",
+            role: "technician",
             logo: "/assets/product-management.webp",
             time: new Date()
         });
@@ -125,6 +126,7 @@ exports.bulkRequest = async (req, res, next) => {
             userId: req.user.id,
             log: `Bulk requested for products`,
             status: "Requested",
+            role: "technician",
             logo: "/assets/product-management.webp",
             time: new Date()
         });
@@ -191,6 +193,7 @@ exports.responseMaterialRequest = async (req, res, next) => {
                 userId: req.user.id,
                 log: `Processed material request for ${inventory.productName}`,
                 status: "Requested",
+                role: "admin",
                 logo: "/assets/product-management.webp",
                 time: new Date()
             });

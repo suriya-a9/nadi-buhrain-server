@@ -15,6 +15,9 @@ const userLogsSchema = new mongoose.Schema({
     },
     logo: {
         type: String
+    },
+    role: {
+        type: String
     }
 }, { timestamps: true });
 

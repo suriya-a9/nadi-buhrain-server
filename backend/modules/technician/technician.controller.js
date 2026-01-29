@@ -241,6 +241,7 @@ exports.startWork = async (req, res, next) => {
             userId: technicianId,
             log: `Work started for service ${userServiceId}`,
             status: "Started",
+            role: "technician",
             logo: "/assets/technician.webp",
             time: now
         });
@@ -291,6 +292,7 @@ exports.onHoldService = async (req, res, next) => {
             userId: technicianId,
             log: `Work ${userServiceId} on hold`,
             status: "On hold",
+            role: "technician",
             logo: "/assets/technician.webp",
             time: new Date()
         });
@@ -359,6 +361,7 @@ exports.updateServiceStatus = async (req, res, next) => {
             userId: req.user.id,
             log: `Updated status for work ${userServiceId}`,
             status: "Updated",
+            role: "technician",
             logo: "/assets/technician.webp",
             time: new Date()
         });
@@ -489,6 +492,7 @@ exports.paymentRaise = async (req, res, next) => {
             userId: req.user.id,
             log: `${userServiceId} - work completed`,
             status: "Updated",
+            role: "technician",
             logo: "/assets/technician.webp",
             time: new Date()
         });
