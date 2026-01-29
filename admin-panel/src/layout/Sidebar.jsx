@@ -6,6 +6,7 @@ import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
 import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip, MdOutlineRequestPage } from "react-icons/md";
+import { GrTransaction } from "react-icons/gr";
 import { PiBuildingApartment } from "react-icons/pi";
 import { BiCartAdd } from "react-icons/bi";
 import { CgUnavailable } from "react-icons/cg";
@@ -133,6 +134,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <div className={sectionTitle}>Points</div>
                             <NavLink to="/points" className={linkClasses}>
                                 <SlBadge size={20} /> &nbsp;&nbsp;&nbsp;Points List
+                            </NavLink>
+                            <NavLink to="/users-point-transactions" className={linkClasses}>
+                                <GrTransaction size={20} /> &nbsp;&nbsp;&nbsp;User Transactions
                             </NavLink>
                             <NavLink to="/requested-points" className={linkClasses}>
                                 <MdOutlineRequestPage size={20} /> &nbsp;&nbsp;&nbsp;Requested Points list

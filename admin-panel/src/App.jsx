@@ -48,6 +48,7 @@ import ProductDetails from "./pages/ProductDetails";
 import RequestPoints from "./pages/RequestPoints";
 import UserDetails from "./pages/UserDetails";
 import NotVerifiedUserDetails from "./pages/NotVerifiedUserDetails";
+import UserPointTransaction from "./pages/UserPointTransaction";
 
 export default function App() {
   return (
@@ -351,6 +352,18 @@ export default function App() {
                   <PermissionRoute permission="points">
                     <DashboardLayout>
                       <Points />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users-point-transactions"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="points">
+                    <DashboardLayout>
+                      <UserPointTransaction />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>
