@@ -5,6 +5,8 @@ const Address = require('../../address/address.model');
 const UserLog = require('../../userLogs/userLogs.model');
 const PointsHistory = require("../points/pointsHistory.model");
 const sendPushNotification = require("../../../utils/sendPush");
+const sendMail = require("../../../utils/mailer");
+const accountVerificationStatusTemplate = require("../../../template/accountVerificationStatus.template");
 const UserNotification = require("../notification/userNotification.model");
 
 exports.verifyAccount = async (req, res, next) => {
@@ -56,6 +58,19 @@ exports.verifyAccount = async (req, res, next) => {
             userId: user._id,
             time: new Date()
         })
+        try {
+            await sendMail({
+                to: user.basicInfo.email,
+                subject: "Account Verification Status",
+                html: accountVerificationStatusTemplate({
+                    name: user.basicInfo.fullName,
+                    status,
+                    reason: reason || ""
+                })
+            });
+        } catch (mailErr) {
+            console.error("Failed to send verification email:", mailErr);
+        }
         res.status(200).json({ message: "Account verification updated", data: result });
     } catch (err) {
         next(err);
@@ -150,7 +165,7 @@ exports.viewAccount = async (req, res, next) => {
                     user: accountData,
                     addresses: userAddresses,
                     familyMembers: familyWithAddress,
-                    parentUser: parentUser 
+                    parentUser: parentUser
                 }
             });
         }

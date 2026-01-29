@@ -282,7 +282,7 @@ export default function ServiceRequestList() {
                         className="px-4 py-2 bg-bgGreen text-white rounded flex items-center justify-center gap-2 w-full sm:w-auto"
                         onClick={() => setShowExportDropdown((v) => !v)}
                     >
-                        Print <IoPrintOutline size={20} />
+                        Export <IoPrintOutline size={20} />
                     </button>
                     {showExportDropdown && (
                         <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-10">
