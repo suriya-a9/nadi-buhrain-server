@@ -12,6 +12,7 @@ import { BiCartAdd } from "react-icons/bi";
 import { CgUnavailable } from "react-icons/cg";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { FaWarehouse, FaClipboardUser } from "react-icons/fa6";
+import { RiAdvertisementLine } from "react-icons/ri";
 import { SlBadge } from "react-icons/sl";
 import { GiRoad } from "react-icons/gi";
 import { FiInfo } from "react-icons/fi";
@@ -180,6 +181,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             </NavLink>
                             <NavLink to="/help-support" className={linkClasses}>
                                 <IoIosHelpCircleOutline size={20} /> &nbsp;&nbsp;&nbsp;Help and Support
+                            </NavLink>
+                            <NavLink to="/advertisement" className={linkClasses}>
+                                <RiAdvertisementLine size={20} /> &nbsp;&nbsp;&nbsp;Advertisements
                             </NavLink>
                         </>
                     )}

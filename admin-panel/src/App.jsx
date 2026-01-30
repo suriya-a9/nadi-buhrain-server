@@ -49,6 +49,7 @@ import RequestPoints from "./pages/RequestPoints";
 import UserDetails from "./pages/UserDetails";
 import NotVerifiedUserDetails from "./pages/NotVerifiedUserDetails";
 import UserPointTransaction from "./pages/UserPointTransaction";
+import Advertisement from "./pages/Advertisement";
 
 export default function App() {
   return (
@@ -520,6 +521,18 @@ export default function App() {
                   <PermissionRoute permission="Settings">
                     <DashboardLayout>
                       <HelpAndSupport />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/advertisement"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <Advertisement />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>
