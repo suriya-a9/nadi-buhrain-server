@@ -100,7 +100,7 @@ export default function Dashboard() {
                                     : "/assets/admin-logo.webp"
                         }
                         alt="avatar"
-                        className="w-[50px] h-[50px] rounded-full border-2 border-white -ml-2 first:ml-0"
+                        className="w-[50px] h-[50px] rounded-full border-2 border-white -ml-2 object-cover first:ml-0"
                     />
                 ))}
                 {items.length > maxToShow && (
