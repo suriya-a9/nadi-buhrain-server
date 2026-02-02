@@ -185,6 +185,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <NavLink to="/advertisement" className={linkClasses}>
                                 <RiAdvertisementLine size={20} /> &nbsp;&nbsp;&nbsp;Advertisements
                             </NavLink>
+                            <NavLink to="/popup" className={linkClasses}>
+                                <RiAdvertisementLine size={20} /> &nbsp;&nbsp;&nbsp;PopUp
+                            </NavLink>
                         </>
                     )}
                     {permissions.includes("user-logs") && (

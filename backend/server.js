@@ -49,6 +49,7 @@ const userSpareParts = require("./modules/adminPanel/spareParts/spareParts.route
 const techNotificationRouter = require("./modules/adminPanel/notification/techNotification.routes.js");
 const pointTransactionRouter = require("./modules/adminPanel/pointTransaction/pointTransaction.routes.js");
 const advertisementRouter = require("./modules/adminPanel/advertisement/advertisement.routes.js");
+const popUpQuestionnaireRouter = require("./modules/adminPanel/popUp/popUp.routes.js");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -116,6 +117,7 @@ app.use("/api/spare", userSpareParts);
 app.use("/api/techNotifications", techNotificationRouter);
 app.use("/api/point-transaction", pointTransactionRouter);
 app.use("/api/advertisement", advertisementRouter);
+app.use("/api/popup", popUpQuestionnaireRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
