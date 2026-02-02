@@ -294,6 +294,20 @@ exports.statusChange = async (req, res, next) => {
 
 exports.listForClient = async (req, res, next) => {
     try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        const userCheck = await PopUpQuestionnaireResult.find({ userId: userId });
+        if (userCheck.length > 0) {
+            return res.status(200).json({
+                success: true,
+                data: []
+            })
+        }
         const listData = await PopUpQuestionnaire.find({ status: true }).sort({ createdAt: -1 });
         res.status(200).json({
             success: true,

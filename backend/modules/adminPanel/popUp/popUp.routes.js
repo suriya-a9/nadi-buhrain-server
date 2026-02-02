@@ -12,6 +12,6 @@ router.post('/questionnaire', questionnaire);
 router.post('/detail', questionnaireDetail);
 router.get('/list', listQuestionnaires);
 router.post('/status-change', auth, statusChange);
-router.get('/', listForClient);
+router.get('/', auth, listForClient);
 
 module.exports = router;
