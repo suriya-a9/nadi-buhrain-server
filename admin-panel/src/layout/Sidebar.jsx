@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { TbLayoutDashboard, TbLogs } from "react-icons/tb";
+import { TbLayoutDashboard, TbLogs, TbBellQuestion } from "react-icons/tb";
 import { BsThreeDotsVertical, BsPersonVideo3, BsReverseLayoutSidebarInsetReverse } from "react-icons/bs";
 import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
@@ -186,7 +186,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 <RiAdvertisementLine size={20} /> &nbsp;&nbsp;&nbsp;Advertisements
                             </NavLink>
                             <NavLink to="/popup" className={linkClasses}>
-                                <RiAdvertisementLine size={20} /> &nbsp;&nbsp;&nbsp;PopUp
+                                <TbBellQuestion size={20} /> &nbsp;&nbsp;&nbsp;PopUp
                             </NavLink>
                         </>
                     )}
