@@ -23,6 +23,10 @@ const requestSchema = new mongoose.Schema({
     reason: {
         type: String,
         default: null
+    },
+    read: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

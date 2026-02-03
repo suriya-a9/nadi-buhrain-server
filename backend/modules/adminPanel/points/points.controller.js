@@ -244,6 +244,16 @@ exports.requestList = async (req, res, next) => {
             });
         }
 
+        await Request.updateMany(
+            {
+                $or: [
+                    { senderId: userId, receiverId: peopleId },
+                    { senderId: peopleId, receiverId: userId }
+                ]
+            },
+            { $set: { read: true } }
+        );
+
         const requestList = await Request.find({
             $or: [
                 { senderId: userId, receiverId: peopleId },
@@ -503,17 +513,30 @@ exports.peopleList = async (req, res, next) => {
         });
 
         const peopleIds = new Set();
+        const unreadMap = {};
         requests.forEach(req => {
-            if (req.senderId.toString() !== userId) peopleIds.add(req.senderId.toString());
-            if (req.receiverId.toString() !== userId) peopleIds.add(req.receiverId.toString());
+            let otherId = null;
+            if (req.senderId.toString() !== userId) otherId = req.senderId.toString();
+            if (req.receiverId.toString() !== userId) otherId = req.receiverId.toString();
+            if (otherId) {
+                peopleIds.add(otherId);
+                if (req.read === false) {
+                    unreadMap[otherId] = false;
+                }
+            }
         });
 
         const people = await UserAccount.find({ _id: { $in: Array.from(peopleIds) } })
             .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points");
 
+        const data = people.map(person => ({
+            ...person.toObject(),
+            read: unreadMap[person._id.toString()] !== false
+        }));
+
         res.status(200).json({
             success: true,
-            data: people
+            data
         });
     } catch (err) {
         next(err);
