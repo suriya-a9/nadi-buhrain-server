@@ -320,22 +320,32 @@ exports.listAdminRequest = async (req, res, next) => {
 exports.listClientPointAdminRequest = async (req, res, next) => {
     try {
         const userId = req.user.id;
+
         if (!userId) {
             return res.status(401).json({
                 success: false,
                 message: "user id needed"
-            })
+            });
         }
-        await RequestPointsAdmin.findOne({ userId: userId });
-        res.status(200).json({
-            success: true,
+
+        const request = await RequestPointsAdmin.findOne({ userId });
+
+        if (!request) {
+            return res.status(200).json({
+                success: true,
+                data: []
+            });
+        }
+
+        return res.status(200).json({
             image: "/assets/mail-logo.jpg",
             name: "Nadi Bahrain"
-        })
+        });
+
     } catch (err) {
-        next(err)
+        next(err);
     }
-}
+};
 
 exports.handleAdminRequestAction = async (req, res, next) => {
     const { requestId, actionType, questionnaireId } = req.body;
