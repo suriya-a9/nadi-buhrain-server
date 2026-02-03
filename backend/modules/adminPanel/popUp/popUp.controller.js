@@ -299,21 +299,26 @@ exports.listForClient = async (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: "user id needed"
-            })
+            });
         }
-        const userCheck = await PopUpQuestionnaireResult.find({ userId: userId });
-        if (userCheck.length > 0) {
-            return res.status(200).json({
-                success: true,
-                data: []
-            })
-        }
-        const listData = await PopUpQuestionnaire.find({ status: true }).sort({ createdAt: -1 });
+
+        const answered = await PopUpQuestionnaireResult.find(
+            { userId },
+            { questionnaireId: 1, _id: 0 }
+        );
+
+        const answeredIds = answered.map(a => a.questionnaireId);
+
+        const listData = await PopUpQuestionnaire.find({
+            status: true,
+            _id: { $nin: answeredIds }
+        }).sort({ createdAt: -1 });
+
         res.status(200).json({
             success: true,
             data: listData
-        })
+        });
     } catch (err) {
-        next(err)
+        next(err);
     }
-}
+};

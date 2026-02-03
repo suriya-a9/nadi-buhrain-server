@@ -3,6 +3,7 @@ const QuestionnaireResult = require("./questionnaireResult.model");
 const mongoose = require("mongoose");
 const UserAccount = require("../../userAccount/userAccount.model");
 const UserLog = require("../../userLogs/userLogs.model");
+const QuestionnaireAssignment = require("../../adminPanel/Questionnaire/questionnaireAssignmentSchema.model");
 
 exports.addQuestionnaire = async (req, res, next) => {
     try {
@@ -163,6 +164,10 @@ exports.submitQuestionnaire = async (req, res, next) => {
             pointsEarned,
             answers: detailedAnswers
         });
+        await QuestionnaireAssignment.findOneAndUpdate(
+            { userId: userId, questionnaireId: questionnaireId },
+            { status: true }
+        );
         await UserLog.create({
             userId: req.user.id,
             log: `submitted questionnaire`,
@@ -246,3 +251,36 @@ exports.listQuestionnaires = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.listForClient = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            });
+        }
+
+        const answered = await QuestionnaireResult.find(
+            { userId },
+            { questionnaireId: 1, _id: 0 }
+        );
+
+        const answeredIds = answered.map(a => a.questionnaireId);
+
+        const listData = await QuestionnaireAssignment.find({
+            status: false,
+            _id: { $nin: answeredIds }
+        })
+            .populate("questionnaireId")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: listData
+        });
+    } catch (err) {
+        next(err);
+    }
+};

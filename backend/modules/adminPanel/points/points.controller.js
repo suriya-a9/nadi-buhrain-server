@@ -8,6 +8,7 @@ const UserNotification = require("../notification/userNotification.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const Notification = require('../../adminPanel/notification/notification.model');
 const FamilyMember = require('../../userAccount/familyMember.model');
+const QuestionnaireAssignment = require("../../adminPanel/Questionnaire/questionnaireAssignmentSchema.model");
 
 exports.addPoints = async (req, res, next) => {
     const { points, accountType } = req.body;
@@ -156,28 +157,28 @@ exports.transferPointsWithFamily = async (req, res, next) => {
 
             await PointsHistory.create({
                 userId: sender._id,
-                history: "Received points from family member",
+                history: `Received points from family member from ${receiver.basicInfo.fullName}`,
                 points: points,
                 time: new Date(),
                 status: "credit"
             });
             await PointsHistory.create({
                 userId: receiver._id,
-                history: "Transferred points to family member",
+                history: `Transferred points to family member ${sender.basicInfo.fullName}`,
                 points: points,
                 time: new Date(),
                 status: "debit"
             });
             await UserNotification.create({
                 type: 'Points Request',
-                message: `Request Accepted`,
-                userId: receiver._id,
+                message: `Request Accepted by ${receiver.basicInfo.fullName}`,
+                userId: sender._id,
                 time: new Date()
             });
             await sendPushNotification(
                 sender.fcmToken,
                 "Request Accepted",
-                `Accepted Point is ${points}`
+                `${receiver.basicInfo.fullName} accepted your request. ${points} added`
             );
 
             request.status = "accepted";
@@ -208,8 +209,8 @@ exports.transferPointsWithFamily = async (req, res, next) => {
             });
             await UserNotification.create({
                 type: 'Points Request',
-                message: `Request Rejected`,
-                userId: receiver._id,
+                message: `Request Rejected by ${receiver.basicInfo.fullName}`,
+                userId: sender._id,
                 time: new Date()
             });
             await sendPushNotification(
@@ -316,6 +317,26 @@ exports.listAdminRequest = async (req, res, next) => {
     }
 }
 
+exports.listClientPointAdminRequest = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "user id needed"
+            })
+        }
+        await RequestPointsAdmin.findOne({ userId: userId });
+        res.status(200).json({
+            success: true,
+            image: "/assets/mail-logo.jpg",
+            name: "Nadi Bahrain"
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
 exports.handleAdminRequestAction = async (req, res, next) => {
     const { requestId, actionType, questionnaireId } = req.body;
     try {
@@ -337,6 +358,17 @@ exports.handleAdminRequestAction = async (req, res, next) => {
             }
             request.status = "sent questionnaire";
             request.questionnaireId = questionnaireId;
+            const userId = request.userId;
+            const user = await UserAccount.findById(userId)
+            await sendPushNotification(
+                user.fcmToken,
+                "Points Request",
+                `Questionnaire assigned for your points request by Nadi Bahrain`
+            );
+            await QuestionnaireAssignment.create({
+                userId: request.userId,
+                questionnaireId
+            });
         }
 
         await request.save();
