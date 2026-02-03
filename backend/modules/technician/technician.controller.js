@@ -120,6 +120,7 @@ exports.servicesList = async (req, res, next) => {
                     address: address || null,
                     assignmentStatus: assignment?.status,
                     assignmentReason: assignment?.reason || null,
+                    assignmentCreatedAt: assignment?.createdAt || null,
                     technicianUserService: techUserService
                         ? {
                             ...techUserService.toObject(),
@@ -136,6 +137,11 @@ exports.servicesList = async (req, res, next) => {
                     return service.assignmentStatus === 'in-progress' || service.assignmentStatus === 'on-hold';
                 }
                 return service.assignmentStatus === status;
+            })
+            .sort((a, b) => {
+                const dateA = a.assignmentCreatedAt ? new Date(a.assignmentCreatedAt) : new Date(0);
+                const dateB = b.assignmentCreatedAt ? new Date(b.assignmentCreatedAt) : new Date(0);
+                return dateB - dateA;
             });
 
         res.status(200).json({
@@ -159,7 +165,7 @@ exports.inventory = async (req, res, next) => {
         }
         const inventoryList = await SpareParts.find({
             technicianId: req.user.id
-        }).populate("productId");
+        }).populate("productId").sort({ createdAt: -1 });
         if (!inventoryList || inventoryList.length === 0) {
             return res.status(200).json({
                 message: "no products in inventory"
@@ -515,7 +521,7 @@ exports.listNotification = async (req, res, next) => {
                 message: "user id needed"
             })
         }
-        const technicianNotificationLists = await TechNotification.find({ userId: technicianId })
+        const technicianNotificationLists = await TechNotification.find({ userId: technicianId }).sort({ time: -1 });
         res.status(200).json({
             success: true,
             data: technicianNotificationLists

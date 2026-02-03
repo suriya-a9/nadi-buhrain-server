@@ -807,7 +807,7 @@ exports.listNotification = async (req, res, next) => {
                 message: "user id needed"
             })
         };
-        const notificationList = await UserNotification.find({ userId: userId });
+        const notificationList = await UserNotification.find({ userId: userId }).sort({ time: -1 });
         res.status(200).json({
             success: true,
             data: notificationList

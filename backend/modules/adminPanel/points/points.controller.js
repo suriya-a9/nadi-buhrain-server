@@ -398,7 +398,7 @@ exports.pointsHistory = async (req, res, next) => {
                 message: "user id needed"
             })
         }
-        const userHistory = await PointsHistory.find({ userId: userId });
+        const userHistory = await PointsHistory.find({ userId: userId }).sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             data: userHistory
@@ -474,7 +474,7 @@ exports.requestedList = async (req, res, next) => {
                 { receiverId: req.user.id }
             ]
         })
-            .populate("senderId");
+            .populate("senderId").sort({ createAt: -1 });
 
         return res.status(200).json({
             data: requestList

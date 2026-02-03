@@ -180,7 +180,7 @@ exports.userServiceList = async (req, res, next) => {
 
         const services = await UserService.find({ userId })
             .populate('serviceId')
-            .populate('issuesId');
+            .populate('issuesId').sort({ createdAt: -1 });
 
         const serviceIds = services.map(s => s._id);
 

@@ -257,7 +257,7 @@ exports.listMaterialRequests = async (req, res, next) => {
     try {
         const listData = await MaterialRequest.find()
             .populate("technicianId")
-            .populate("productId").sort({createdAt: -1});
+            .populate("productId").sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             data: listData
@@ -291,7 +291,7 @@ exports.listByUser = async (req, res, next) => {
             })
         }
         const listData = await MaterialRequest.find({ technicianId }).
-            populate("productId");
+            populate("productId").sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             data: listData
