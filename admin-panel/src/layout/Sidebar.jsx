@@ -6,6 +6,7 @@ import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
 import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip, MdOutlineRequestPage } from "react-icons/md";
+import { IoChatboxOutline } from "react-icons/io5";
 import { GrTransaction } from "react-icons/gr";
 import { PiBuildingApartment } from "react-icons/pi";
 import { BiCartAdd } from "react-icons/bi";
@@ -72,6 +73,14 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             </NavLink>
                             <NavLink to="/role-manager" className={linkClasses}>
                                 <BsPersonVideo3 size={20} /> &nbsp;&nbsp;&nbsp;Role Manager
+                            </NavLink>
+                        </>
+                    )}
+                    {permissions.includes("admin-chat") && (
+                        <>
+                            <div className={sectionTitle}>Admin Chat</div>
+                            <NavLink to="/admin-chat" className={linkClasses}>
+                                <IoChatboxOutline size={20} /> &nbsp;&nbsp;&nbsp;Admin Chat
                             </NavLink>
                         </>
                     )}

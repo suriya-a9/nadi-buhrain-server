@@ -52,6 +52,7 @@ import UserPointTransaction from "./pages/UserPointTransaction";
 import Advertisement from "./pages/Advertisement";
 import PopUpQuestionnaire from "./pages/PopUpQuestionnaire";
 import PopUpQuestionnaireDetail from "./pages/PopUpQuestionnaireDetail";
+import AdminChatList from "./pages/AdminChatList";
 
 export default function App() {
   return (
@@ -163,6 +164,18 @@ export default function App() {
                   <PermissionRoute permission="admin-list">
                     <DashboardLayout>
                       <RoleManager />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin-chat"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="admin-chat">
+                    <DashboardLayout>
+                      <AdminChatList />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

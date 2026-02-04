@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
+  const [id, setId] = useState(null);
   const [name, setName] = useState(null);
   const [role, setRole] = useState(null);
   const [permissions, setPermissions] = useState([]);
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    setId(null);
     setName(null);
     setRole(null);
     setPermissions([]);
@@ -22,6 +24,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", jwtToken);
     setToken(jwtToken);
     const decoded = jwtDecode(jwtToken);
+    setId(decoded.id);
     setName(decoded.name);
     setRole(decoded.role);
     setPermissions(decoded.permissions || []);
@@ -37,24 +40,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-useEffect(() => {
-  const storedToken = localStorage.getItem("token");
-  if (storedToken) {
-    if (isTokenExpired(storedToken)) {
-      logout();
-      setLoading(false);
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      if (isTokenExpired(storedToken)) {
+        logout();
+        setLoading(false);
+      } else {
+        setToken(storedToken);
+        const decoded = jwtDecode(storedToken);
+        setId(decoded.id);
+        setName(decoded.name);
+        setRole(decoded.role);
+        setPermissions(decoded.permissions || []);
+        setLoading(false);
+      }
     } else {
-      setToken(storedToken);
-      const decoded = jwtDecode(storedToken);
-      setName(decoded.name);
-      setRole(decoded.role);
-      setPermissions(decoded.permissions || []);
       setLoading(false);
     }
-  } else {
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -71,7 +75,7 @@ useEffect(() => {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, name, role, permissions, login, logout, loading }}>
+    <AuthContext.Provider value={{ token, id, name, role, permissions, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

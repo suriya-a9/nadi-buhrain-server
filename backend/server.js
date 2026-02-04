@@ -50,6 +50,8 @@ const techNotificationRouter = require("./modules/adminPanel/notification/techNo
 const pointTransactionRouter = require("./modules/adminPanel/pointTransaction/pointTransaction.routes.js");
 const advertisementRouter = require("./modules/adminPanel/advertisement/advertisement.routes.js");
 const popUpQuestionnaireRouter = require("./modules/adminPanel/popUp/popUp.routes.js");
+const ChatMessage = require("./modules/chat/chatMessage.model");
+const chatRouter = require("./modules/chat/chatMessage.routes");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -60,7 +62,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/assets', express.static('assets'));
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: "https://nadi-bahrain.cnxhub.in",
+  credentials: true,
+}));
+
 // app.use(helmet());
 app.use(
   helmet({
@@ -118,6 +125,7 @@ app.use("/api/techNotifications", techNotificationRouter);
 app.use("/api/point-transaction", pointTransactionRouter);
 app.use("/api/advertisement", advertisementRouter);
 app.use("/api/popup", popUpQuestionnaireRouter);
+app.use("/api/chat", chatRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -129,14 +137,28 @@ app.use((err, req, res, next) => {
 const io = new Server(server, {
   path: "/socket.io",
   cors: {
-    origin: [
-      "https://srv1252888.hstgr.cloud",
-      "http://localhost:5173"
-    ],
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "https://nadi-bahrain.cnxhub.in",
+    credentials: true,
   },
-  transports: ["polling", "websocket"]
+  transports: ["polling"],
+});
+
+io.on("connection", (socket) => {
+  socket.on("join", ({ userId, role }) => {
+    socket.join(`${role}-${userId}`);
+  });
+
+  socket.on("send_message", async (data) => {
+    const chat = await ChatMessage.create(data);
+    io.to(`${data.toRole}-${data.to}`).emit("receive_message", chat);
+    socket.emit("message_sent", chat);
+  });
+
+  socket.on("mark_read", (data) => {
+    if (data && data.userId) {
+      io.to(`admin-${data.userId}`).emit("mark_read", { userId: data.userId });
+    }
+  });
 });
 
 app.set('io', io);

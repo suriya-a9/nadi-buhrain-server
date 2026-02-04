@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 const ALL_PERMISSIONS = [
     "dashboard",
     "admin-list",
+    "admin-chat",
     "service-requests",
     "services",
     "users",

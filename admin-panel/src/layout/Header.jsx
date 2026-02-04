@@ -22,7 +22,13 @@ export default function Header({ toggleSidebar }) {
     useEffect(() => {
         loadNotifications();
         if (!socketRef.current) {
-            socketRef.current = io(import.meta.env.VITE_API_URL);
+            // socketRef.current = io(import.meta.env.VITE_API_URL);
+            socketRef.current = io(import.meta.env.VITE_API_URL, {
+                path: "/socket.io",
+                transports: ["polling"],
+                withCredentials: true,
+            });
+
             socketRef.current.on('notification', (data) => {
                 setNotifications((prev) => [data, ...prev]);
             });
