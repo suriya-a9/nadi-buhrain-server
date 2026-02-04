@@ -340,7 +340,9 @@ exports.listClientPointAdminRequest = async (req, res, next) => {
 
         const request = await RequestPointsAdmin.findOne({ userId });
 
-        if (!request) {
+        const requestStatus = await QuestionnaireAssignment.findOne({ userId: request.userId, status: false });
+
+        if (!requestStatus) {
             return res.status(200).json({
                 success: true,
                 data: []
