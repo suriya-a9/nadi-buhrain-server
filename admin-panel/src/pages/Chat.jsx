@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import api from "../services/api";
+import { FaTrash } from "react-icons/fa";
 
 const socket = io(import.meta.env.VITE_API_URL);
 
@@ -7,6 +9,7 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [sending, setSending] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -55,21 +58,39 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
         setInput("");
     };
 
+    const handleDeleteMessage = async (messageId) => {
+        await api.post(`/chat/delete-one?messageId=${messageId}`);
+        setMessages(prev => prev.filter(msg => msg._id !== messageId));
+    };
+
+    const handleDeleteAll = async () => {
+        setDeleting(true);
+        await api.post("/chat/delete-all", { from: userId, to: chatWithId });
+        setMessages([]);
+        setDeleting(false);
+    };
+
     return (
         <div className="flex flex-col h-full bg-white">
-
-            <div className="flex items-center gap-3 px-6 py-4 border-b">
-                <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
-                    {chatWithName?.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                    <div className="font-medium text-gray-800">
-                        {chatWithName}
+            <div className="flex items-center gap-3 px-6 py-4 border-b justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
+                        {chatWithName?.charAt(0).toUpperCase()}
                     </div>
-                    {/* <div className="text-xs text-gray-400">
-                        {chatWithRole}
-                    </div> */}
+                    <div>
+                        <div className="font-medium text-gray-800">
+                            {chatWithName}
+                        </div>
+                    </div>
                 </div>
+                <button
+                    onClick={handleDeleteAll}
+                    className="text-red-500 flex items-center gap-1 text-xs border px-2 py-1 rounded hover:bg-red-50"
+                    disabled={deleting}
+                    title="Delete entire chat history"
+                >
+                    <FaTrash /> Clear Chat
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-gray-50 hide-scrollbar">
@@ -81,14 +102,13 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
 
                 {messages.map((msg, idx) => {
                     const isMe = msg.from === userId;
-
                     return (
                         <div
-                            key={idx}
+                            key={msg._id || idx}
                             className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                         >
                             <div
-                                className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm leading-relaxed shadow
+                                className={`relative max-w-[70%] px-4 py-2 rounded-2xl text-sm leading-relaxed shadow
                                     ${isMe
                                         ? "bg-bgGreen text-white rounded-br-md"
                                         : "bg-white text-gray-800 border rounded-bl-md"
@@ -97,11 +117,25 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
                             >
                                 {msg.message}
                                 <div className="text-[10px] opacity-50 text-right mt-1">
+                                    {new Date(msg.createdAt).toLocaleDateString([], {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "2-digit"
+                                    })}{" "}
                                     {new Date(msg.createdAt).toLocaleTimeString([], {
                                         hour: "2-digit",
                                         minute: "2-digit"
                                     })}
                                 </div>
+                                {isMe && (
+                                    <button
+                                        className="absolute top-1 right-1 text-red-400 hover:text-red-600"
+                                        title="Delete message"
+                                        onClick={() => handleDeleteMessage(msg._id)}
+                                    >
+                                        <FaTrash size={12} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     );

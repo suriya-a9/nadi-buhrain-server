@@ -19,7 +19,7 @@ export default function Services() {
         serviceImage: null,
         serviceLogo: null,
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -88,10 +88,10 @@ export default function Services() {
         s.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const totalPages = Math.ceil(filteredServices.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
     const paginatedServices = filteredServices.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -106,6 +106,19 @@ export default function Services() {
                         onChange={e => setSearch(e.target.value)}
                         className="border p-2 rounded w-48"
                     />
+
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         className="bg-bgGreen text-white px-4 py-2 rounded"
                         onClick={() => {
@@ -132,7 +145,7 @@ export default function Services() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Name", key: "name" },
                             { title: "Points", key: "points" },

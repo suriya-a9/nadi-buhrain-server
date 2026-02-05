@@ -19,7 +19,7 @@ export default function User() {
     const [roads, setRoads] = useState([]);
     const [selectedRoad, setSelectedRoad] = useState("");
     const [selectedBlock, setSelectedBlock] = useState("");
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -118,11 +118,11 @@ export default function User() {
             </span>
         ), { duration: 10000 });
     };
-    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
     const paginatedUsers = filteredUsers.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -148,6 +148,18 @@ export default function User() {
                         onChange={e => setSearch(e.target.value)}
                         className="border p-2 rounded w-full sm:w-48"
                     />
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         className="px-3 py-2 bg-bgGreen text-white rounded font-medium w-full sm:w-auto"
                         onClick={() => navigate("/add-user")}
@@ -171,7 +183,7 @@ export default function User() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Full Name", key: "basicInfo.fullName" },
                             { title: "Mobile", key: "basicInfo.mobileNumber" },

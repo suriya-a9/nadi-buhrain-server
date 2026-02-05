@@ -381,6 +381,12 @@ exports.handleAdminRequestAction = async (req, res, next) => {
             request.status = "sent questionnaire";
             request.questionnaireId = questionnaireId;
             const userId = request.userId;
+            const lastQuestionnaire = await QuestionnaireAssignment.findOne({ userId: userId, status: false })
+            if(lastQuestionnaire){
+                return res.status(400).json({
+                    message:"Another questionnaire is already assigned which is not completed by this user"
+                })
+            }
             const user = await UserAccount.findById(userId)
             await sendPushNotification(
                 user.fcmToken,

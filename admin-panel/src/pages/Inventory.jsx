@@ -22,7 +22,7 @@ export default function Inventory() {
         price: "",
         lowStock: ""
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
@@ -140,11 +140,11 @@ export default function Inventory() {
         )
     );
 
-    const totalPages = Math.ceil(filteredInventory.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredInventory.length / itemsPerPage);
 
     const paginatedInventory = filteredInventory.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -170,6 +170,18 @@ export default function Inventory() {
                         <option value="enabled">Enabled</option>
                         <option value="disabled">Disabled</option>
                     </select>
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded w-full sm:w-auto"
@@ -193,7 +205,7 @@ export default function Inventory() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Product Name", key: "productName" },
                             { title: "Quantity", key: "quantity" },

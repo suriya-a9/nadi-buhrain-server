@@ -8,7 +8,7 @@ export default function SpareParts() {
     const [spareParts, setSpareParts] = useState([]);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const loadSpareParts = async () => {
         setLoading(true);
@@ -28,10 +28,10 @@ export default function SpareParts() {
         String(s.productId.productName || "").toLowerCase().includes(search.toLowerCase()) ||
         String(s.count || "").toLowerCase().includes(search.toLowerCase())
     );
-    const totalPages = Math.ceil(filteredSpareParts.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredSpareParts.length / itemsPerPage);
     const paginatedSpareParts = filteredSpareParts.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     return (
         <div>
@@ -47,6 +47,20 @@ export default function SpareParts() {
                     />
                 </div>
             </div>
+            <select
+                value={itemsPerPage}
+                onChange={e => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                }}
+                className="border p-2 rounded w-28"
+            >
+                <option value={10}>Show 10</option>
+                <option value={50}>Show 50</option>
+                <option value={100}>Show 100</option>
+            </select>
+            <br />
+            &nbsp;
             {loading ? (
                 <div className="flex justify-center items-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
@@ -59,7 +73,7 @@ export default function SpareParts() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             {
                                 title: "Technician",

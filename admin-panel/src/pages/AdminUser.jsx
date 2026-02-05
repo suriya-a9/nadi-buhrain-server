@@ -10,6 +10,7 @@ export default function AdminUser() {
     const [admins, setAdmins] = useState([]);
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [roles, setRoles] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
@@ -21,7 +22,6 @@ export default function AdminUser() {
     });
     const [loading, setLoading] = useState(false);
 
-    const ITEMS_PER_PAGE = 5;
     const [currentPage, setCurrentPage] = useState(1);
 
     const token = localStorage.getItem("token");
@@ -115,10 +115,10 @@ export default function AdminUser() {
         return matchesSearch && matchesRole;
     });
 
-    const totalPages = Math.ceil(filteredAdmins.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage);
     const paginatedAdmins = filteredAdmins.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -145,6 +145,18 @@ export default function AdminUser() {
                             </option>
                         ))}
                     </select>
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded w-full sm:w-auto"
@@ -168,7 +180,7 @@ export default function AdminUser() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Name", key: "name" },
                             { title: "Email", key: "email" },

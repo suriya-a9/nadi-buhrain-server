@@ -10,7 +10,7 @@ export default function MaterialRequests() {
     const [loading, setLoading] = useState(false);
     const [updatingId, setUpdatingId] = useState(null);
     const [search, setSearch] = useState("");
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
     const token = localStorage.getItem("token");
@@ -52,10 +52,10 @@ export default function MaterialRequests() {
         String(s.quantity || "").toLowerCase().includes(search.toLowerCase()) ||
         String(s.status || "").toLowerCase().includes(search.toLowerCase())
     );
-    const totalPages = Math.ceil(filteredMaterialRequest.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredMaterialRequest.length / itemsPerPage);
     const paginatedRequests = filteredMaterialRequest.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -72,6 +72,18 @@ export default function MaterialRequests() {
                     />
                 </div>
             </div>
+            <select
+                value={itemsPerPage}
+                onChange={e => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                }}
+                className="border p-2 rounded w-28"
+            >
+                <option value={10}>Show 10</option>
+                <option value={50}>Show 50</option>
+                <option value={100}>Show 100</option>
+            </select>
             {loading ? (
                 <div className="flex justify-center items-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>
@@ -87,7 +99,7 @@ export default function MaterialRequests() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             {
                                 title: "Technician",

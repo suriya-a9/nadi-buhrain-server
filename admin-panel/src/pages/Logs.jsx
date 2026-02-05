@@ -16,7 +16,7 @@ export default function Logs() {
     const [search, setSearch] = useState("");
     const [searchDate, setSearchDate] = useState("");
     const [loading, setLoading] = useState(true);
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [activeTab, setActiveTab] = useState("all");
     const API_BASE = (import.meta.env.VITE_API_URL).replace(/\/$/, "");
@@ -69,11 +69,11 @@ export default function Logs() {
 
         return matchesText && matchesDate && matchesRole;
     });
-    const totalPages = Math.ceil(filteredUserLogs.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredUserLogs.length / itemsPerPage);
 
     const paginatedLogs = filteredUserLogs.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     return (
         <div>
@@ -93,6 +93,18 @@ export default function Logs() {
                         onChange={e => setSearchDate(e.target.value)}
                         className="border p-2 rounded w-40"
                     />
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                 </div>
             </div>
             {role === "Super Admin" && (
@@ -123,7 +135,7 @@ export default function Logs() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             {
                                 title: "Logo",

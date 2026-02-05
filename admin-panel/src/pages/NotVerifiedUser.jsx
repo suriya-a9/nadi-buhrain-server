@@ -21,7 +21,7 @@ export default function NotVerifiedUser() {
     const [rejecting, setRejecting] = useState(false);
     const [reason, setReason] = useState("");
     const [search, setSearch] = useState("");
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -124,10 +124,10 @@ export default function NotVerifiedUser() {
         String(s.basicInfo.email || "").toLowerCase().includes(search.toLowerCase()) ||
         String(s.accountTypeId?.name || "").toLowerCase().includes(search.toLowerCase())
     );
-    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
     const paginatedUsers = filteredUsers.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     return (
         <div>
@@ -141,6 +141,18 @@ export default function NotVerifiedUser() {
                         onChange={e => setSearch(e.target.value)}
                         className="border p-2 rounded w-48"
                     />
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                 </div>
             </div>
             {loading ? (
@@ -158,7 +170,7 @@ export default function NotVerifiedUser() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Full Name", key: "basicInfo.fullName" },
                             { title: "Mobile", key: "basicInfo.mobileNumber" },

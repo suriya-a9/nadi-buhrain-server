@@ -39,4 +39,26 @@ router.get("/unread", async (req, res) => {
     res.json(messages);
 });
 
+router.post('/delete-one', async (req, res) => {
+    const { messageId } = req.query;
+    await ChatMessage.findByIdAndDelete(messageId);
+    res.json({
+        message: "Message deleted successfully"
+    })
+});
+
+router.post('/delete-all', async (req, res) => {
+    const { from, to } = req.body;
+    if (!from || !to) {
+        return res.status(400).json({ message: "Both 'from' and 'to' are required." });
+    }
+    await ChatMessage.deleteMany({
+        $or: [
+            { from, to },
+            { from: to, to: from }
+        ]
+    });
+    res.json({ message: "Chat history deleted" });
+});
+
 module.exports = router;

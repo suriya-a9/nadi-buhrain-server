@@ -21,7 +21,7 @@ export default function PopUpQuestionnaire() {
         questions: []
     });
 
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const token = localStorage.getItem("token");
 
@@ -150,10 +150,10 @@ export default function PopUpQuestionnaire() {
         setForm({ ...form, questions: updated });
     };
 
-    const totalPages = Math.ceil(questionnaires.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(questionnaires.length / itemsPerPage);
     const paginatedData = questionnaires.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -167,6 +167,18 @@ export default function PopUpQuestionnaire() {
                     Add PopUp
                 </button>
             </div>
+            <select
+                value={itemsPerPage}
+                onChange={e => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                }}
+                className="border p-2 rounded w-28"
+            >
+                <option value={10}>Show 10</option>
+                <option value={50}>Show 50</option>
+                <option value={100}>Show 100</option>
+            </select>
             {loading ? (
                 <div className="flex justify-center items-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>

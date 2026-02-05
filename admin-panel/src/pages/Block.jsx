@@ -17,7 +17,7 @@ export default function Block() {
         name: "",
         roads: []
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
@@ -107,11 +107,11 @@ export default function Block() {
         String(s.name || "").toLowerCase().includes(search.toLowerCase())
     );
 
-    const totalPages = Math.ceil(filteredBlock.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredBlock.length / itemsPerPage);
 
     const paginatedBlock = filteredBlock.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     const getRoadNames = (roads = []) => {
         console.log("getRoadNames roads:", roads);
@@ -134,6 +134,18 @@ export default function Block() {
                         onChange={e => setSearch(e.target.value)}
                         className="border p-2 rounded w-48"
                     />
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded"
@@ -157,7 +169,7 @@ export default function Block() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Block Name", key: "name" },
                             {

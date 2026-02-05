@@ -68,7 +68,7 @@ export default function NewServiceRequestDetails() {
                     <div className="font-medium">Feedback</div>
                     <div className="text-gray-700">{request.feedback}</div>
                 </div>
-                <div>
+                {/* <div>
                     <div className="font-medium">Scheduled Date</div>
                     <div className="text-gray-700">
                         {(() => {
@@ -96,11 +96,11 @@ export default function NewServiceRequestDetails() {
                             return `${dateStr} ${timeStr}`;
                         })()}
                     </div>
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                     <div className="font-medium">Is Urgent?</div>
                     <div className="text-gray-700">{request.immediateAssistance ? "Yes" : "No"}</div>
-                </div>
+                </div> */}
                 <div>
                     <div className="font-medium">Status</div>
                     <div className="text-gray-700">{request.serviceStatus}</div>

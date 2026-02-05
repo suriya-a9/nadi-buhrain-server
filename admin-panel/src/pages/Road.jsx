@@ -15,7 +15,7 @@ export default function Road() {
     const [form, setForm] = useState({
         name: ""
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -86,11 +86,11 @@ export default function Road() {
         String(s.name || "").toLowerCase().includes(search.toLowerCase())
     );
 
-    const totalPages = Math.ceil(filteredRoad.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredRoad.length / itemsPerPage);
 
     const paginatedRoad = filteredRoad.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -105,6 +105,18 @@ export default function Road() {
                         onChange={e => setSearch(e.target.value)}
                         className="border p-2 rounded w-48"
                     />
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded"
@@ -128,7 +140,7 @@ export default function Road() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Name", key: "name" },
                             {

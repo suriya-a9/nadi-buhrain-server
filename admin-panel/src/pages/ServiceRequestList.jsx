@@ -32,6 +32,10 @@ function getLastUpdatedStatusWithTime(statusTimestamps = {}) {
 export default function ServiceRequestList() {
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
+    const serviceNames = Array.from(new Set(requests.map(r => r.serviceId?.name).filter(Boolean)));
+    const issueNames = Array.from(new Set(requests.map(r => r.issuesId?.issue).filter(Boolean)));
+    const [selectedService, setSelectedService] = useState("");
+    const [selectedIssue, setSelectedIssue] = useState("");
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
@@ -46,6 +50,8 @@ export default function ServiceRequestList() {
     const [activeTab, setActiveTab] = useState(0);
     const [scheduledDateFilter, setScheduledDateFilter] = useState("");
     const [allAssignments, setAllAssignments] = useState({});
+    const [createdFrom, setCreatedFrom] = useState("");
+    const [createdTo, setCreatedTo] = useState("");
     const rejectedRequests = requests.filter(r => r.technicianAccepted === false && r.technicianId);
     const notAssignedRequests = requests.filter(
         r => (allAssignments[r._id]?.length ?? 0) === 0
@@ -69,7 +75,7 @@ export default function ServiceRequestList() {
             assignments.every(a => a.status === "completed") &&
             r.serviceStatus === "paymentInProgress";
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -114,17 +120,36 @@ export default function ServiceRequestList() {
                 d.getDate() === filterDate.getDate();
         }
 
+        const serviceMatch = selectedService ? r.serviceId?.name === selectedService : true;
+        const issueMatch = selectedIssue ? r.issuesId?.issue === selectedIssue : true;
+
+        let createdAtMatch = true;
+        if (createdFrom) {
+            const fromDate = new Date(createdFrom);
+            const created = new Date(r.createdAt);
+            createdAtMatch = created >= fromDate;
+        }
+        if (createdTo && createdAtMatch) {
+            const toDate = new Date(createdTo);
+            toDate.setHours(23, 59, 59, 999);
+            const created = new Date(r.createdAt);
+            createdAtMatch = created <= toDate;
+        }
+
         return (
             (requestId.includes(q) ||
                 requestedBy.includes(q) ||
                 status.includes(q)) &&
-            dateMatch
+            dateMatch &&
+            serviceMatch &&
+            issueMatch &&
+            createdAtMatch
         );
     });
-    const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     const API_BASE = (import.meta.env.VITE_API_URL).replace(/\/$/, "");
     const loadRequests = async () => {
@@ -349,8 +374,63 @@ export default function ServiceRequestList() {
                 </button>
             </div>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
-                <h2 className="text-2xl font-semibold">Service Requests List</h2>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
+                    <div className="flex flex-col">
+                        <label className="text-xs font-medium mb-1">Created From</label>
+                        <input
+                            type="date"
+                            value={createdFrom}
+                            onChange={e => {
+                                setCreatedFrom(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="border px-3 py-2 rounded"
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="text-xs font-medium mb-1">Created To</label>
+                        <input
+                            type="date"
+                            value={createdTo}
+                            onChange={e => {
+                                setCreatedTo(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="border px-3 py-2 rounded"
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="text-xs font-medium mb-1">Service Name</label>
+                        <select
+                            value={selectedService}
+                            onChange={e => {
+                                setSelectedService(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="border p-2 rounded w-40"
+                        >
+                            <option value="">All</option>
+                            {serviceNames.map(name => (
+                                <option key={name} value={name}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="text-xs font-medium mb-1">Issue Name</label>
+                        <select
+                            value={selectedIssue}
+                            onChange={e => {
+                                setSelectedIssue(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="border p-2 rounded w-40"
+                        >
+                            <option value="">All</option>
+                            {issueNames.map(name => (
+                                <option key={name} value={name}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="flex flex-col">
                         <label htmlFor="search" className="text-xs font-medium mb-1">Search</label>
                         <input
@@ -372,6 +452,21 @@ export default function ServiceRequestList() {
                             onChange={e => setScheduledDateFilter(e.target.value)}
                         />
                     </div>
+                    <div className="flex flex-col">
+                        <label htmlFor="scheduled-date" className="text-xs font-medium mb-1">No of Items</label>
+                        <select
+                            value={itemsPerPage}
+                            onChange={e => {
+                                setItemsPerPage(Number(e.target.value));
+                                setCurrentPage(1);
+                            }}
+                            className="border p-2 rounded w-28"
+                        >
+                            <option value={10}>Show 10</option>
+                            <option value={50}>Show 50</option>
+                            <option value={100}>Show 100</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             {loading ? (
@@ -389,18 +484,18 @@ export default function ServiceRequestList() {
                                 title: "S.Nno",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Request ID", key: "serviceRequestID" },
                             { title: "Requested By", key: "userId.basicInfo.fullName" },
                             { title: "Service Name", key: "serviceId.name" },
                             { title: "Issue Name", key: "issuesId.issue" },
-                            {
-                                title: "Is Urgent?",
-                                dataIndex: "immediateAssistance",
-                                key: "immediateAssistance",
-                                render: (value) => (value ? "Yes" : "No"),
-                            },
+                            // {
+                            //     title: "Is Urgent?",
+                            //     dataIndex: "immediateAssistance",
+                            //     key: "immediateAssistance",
+                            //     render: (value) => (value ? "Yes" : "No"),
+                            // },
                             {
                                 title: "Status",
                                 key: "statusTimestamps",

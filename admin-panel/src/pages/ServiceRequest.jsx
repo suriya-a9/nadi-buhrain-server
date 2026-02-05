@@ -23,8 +23,14 @@ export default function ServiceRequest() {
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [scheduledDateFilter, setScheduledDateFilter] = useState("");
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const serviceNames = Array.from(new Set(requests.map(r => r.serviceId?.name).filter(Boolean)));
+    const issueNames = Array.from(new Set(requests.map(r => r.issuesId?.issue).filter(Boolean)));
+    const [selectedService, setSelectedService] = useState("");
+    const [selectedIssue, setSelectedIssue] = useState("");
+    const [createdFrom, setCreatedFrom] = useState("");
+    const [createdTo, setCreatedTo] = useState("");
     const navigate = useNavigate();
     useEffect(() => {
         setCurrentPage(1);
@@ -62,18 +68,37 @@ export default function ServiceRequest() {
                 d.getDate() === filterDate.getDate();
         }
 
+        const serviceMatch = selectedService ? r.serviceId?.name === selectedService : true;
+        const issueMatch = selectedIssue ? r.issuesId?.issue === selectedIssue : true;
+
+        let createdAtMatch = true;
+        if (createdFrom) {
+            const fromDate = new Date(createdFrom);
+            const created = new Date(r.createdAt);
+            createdAtMatch = created >= fromDate;
+        }
+        if (createdTo && createdAtMatch) {
+            const toDate = new Date(createdTo);
+            toDate.setHours(23, 59, 59, 999);
+            const created = new Date(r.createdAt);
+            createdAtMatch = created <= toDate;
+        }
+
         return (
             (requestId.includes(q) ||
                 requestedBy.includes(q) ||
                 status.includes(q)) &&
-            dateMatch
+            dateMatch &&
+            serviceMatch &&
+            issueMatch &&
+            createdAtMatch
         );
     });
-    const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
     const paginatedRequests = filteredRequests.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -85,6 +110,62 @@ export default function ServiceRequest() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 sm:items-end mb-4">
                 <div className="flex flex-col">
+                    <label className="text-xs font-medium mb-1">Created From</label>
+                    <input
+                        type="date"
+                        value={createdFrom}
+                        onChange={e => {
+                            setCreatedFrom(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="border px-3 py-2 rounded"
+                    />
+                </div>
+                <div className="flex flex-col">
+                    <label className="text-xs font-medium mb-1">Created To</label>
+                    <input
+                        type="date"
+                        value={createdTo}
+                        onChange={e => {
+                            setCreatedTo(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="border px-3 py-2 rounded"
+                    />
+                </div>
+                <div className="flex flex-col">
+                    <label className="text-xs font-medium mb-1">Service Name</label>
+                    <select
+                        value={selectedService}
+                        onChange={e => {
+                            setSelectedService(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-40"
+                    >
+                        <option value="">All</option>
+                        {serviceNames.map(name => (
+                            <option key={name} value={name}>{name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-col">
+                    <label className="text-xs font-medium mb-1">Issue Name</label>
+                    <select
+                        value={selectedIssue}
+                        onChange={e => {
+                            setSelectedIssue(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-40"
+                    >
+                        <option value="">All</option>
+                        {issueNames.map(name => (
+                            <option key={name} value={name}>{name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-col">
                     <label htmlFor="search" className="text-xs font-medium mb-1">Search</label>
                     <input
                         id="search"
@@ -95,7 +176,7 @@ export default function ServiceRequest() {
                         onChange={e => setSearch(e.target.value)}
                     />
                 </div>
-                <div className="flex flex-col">
+                {/* <div className="flex flex-col">
                     <label htmlFor="scheduled-date" className="text-xs font-medium mb-1">Scheduled Date</label>
                     <input
                         id="scheduled-date"
@@ -104,6 +185,21 @@ export default function ServiceRequest() {
                         value={scheduledDateFilter}
                         onChange={e => setScheduledDateFilter(e.target.value)}
                     />
+                </div> */}
+                <div className="flex flex-col">
+                    <label htmlFor="scheduled-date" className="text-xs font-medium mb-1">No of Items</label>
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                 </div>
             </div>
             {loading ? (
@@ -121,47 +217,47 @@ export default function ServiceRequest() {
                                 title: "S.Nno",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "Request ID", key: "serviceRequestID" },
                             { title: "Requested By", key: "userId.basicInfo.fullName" },
                             { title: "Service Name", key: "serviceId.name" },
                             { title: "Issue Name", key: "issuesId.issue" },
                             { title: "Feedback", key: "feedback" },
-                            {
-                                title: "Scheduled Date",
-                                key: "scheduleService",
-                                render: (_, row) => {
-                                    const d = new Date(row.scheduleService);
-                                    let dateStr = "-";
-                                    if (!isNaN(d)) {
-                                        const day = d.getDate().toString().padStart(2, "0");
-                                        const month = (d.getMonth() + 1).toString().padStart(2, "0");
-                                        const year = d.getFullYear();
-                                        dateStr = `${day}/${month}/${year}`;
-                                    }
-                                    let timeStr = "-";
-                                    if (row.scheduleServiceTime && row.scheduleServiceTime !== "-") {
-                                        const [h, m] = row.scheduleServiceTime.split(":");
-                                        if (!isNaN(h) && !isNaN(m)) {
-                                            let hours = parseInt(h, 10);
-                                            const minutes = m.padStart(2, "0");
-                                            const ampm = hours >= 12 ? "PM" : "AM";
-                                            hours = hours % 12 || 12;
-                                            timeStr = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
-                                        } else {
-                                            timeStr = row.scheduleServiceTime;
-                                        }
-                                    }
-                                    return `${dateStr} ${timeStr}`;
-                                },
-                            },
-                            {
-                                title: "Is Urgent?",
-                                dataIndex: "immediateAssistance",
-                                key: "immediateAssistance",
-                                render: (value) => (value ? "Yes" : "No"),
-                            },
+                            // {
+                            //     title: "Scheduled Date",
+                            //     key: "scheduleService",
+                            //     render: (_, row) => {
+                            //         const d = new Date(row.scheduleService);
+                            //         let dateStr = "-";
+                            //         if (!isNaN(d)) {
+                            //             const day = d.getDate().toString().padStart(2, "0");
+                            //             const month = (d.getMonth() + 1).toString().padStart(2, "0");
+                            //             const year = d.getFullYear();
+                            //             dateStr = `${day}/${month}/${year}`;
+                            //         }
+                            //         let timeStr = "-";
+                            //         if (row.scheduleServiceTime && row.scheduleServiceTime !== "-") {
+                            //             const [h, m] = row.scheduleServiceTime.split(":");
+                            //             if (!isNaN(h) && !isNaN(m)) {
+                            //                 let hours = parseInt(h, 10);
+                            //                 const minutes = m.padStart(2, "0");
+                            //                 const ampm = hours >= 12 ? "PM" : "AM";
+                            //                 hours = hours % 12 || 12;
+                            //                 timeStr = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+                            //             } else {
+                            //                 timeStr = row.scheduleServiceTime;
+                            //             }
+                            //         }
+                            //         return `${dateStr} ${timeStr}`;
+                            //     },
+                            // },
+                            // {
+                            //     title: "Is Urgent?",
+                            //     dataIndex: "immediateAssistance",
+                            //     key: "immediateAssistance",
+                            //     render: (value) => (value ? "Yes" : "No"),
+                            // },
                         ]}
                         data={paginatedRequests}
                         actions={(row) => (

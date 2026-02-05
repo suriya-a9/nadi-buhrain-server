@@ -24,7 +24,7 @@ export default function Technicians() {
         role: "",
         password: "",
     });
-    const ITEMS_PER_PAGE = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         setCurrentPage(1);
@@ -145,11 +145,11 @@ export default function Technicians() {
             String(s.role?.skill || "").toLowerCase().includes(search.toLowerCase())
         )
     );
-    const totalPages = Math.ceil(filteredTechnician.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredTechnician.length / itemsPerPage);
 
     const paginatedTechnicians = filteredTechnician.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     return (
         <div>
@@ -177,6 +177,18 @@ export default function Technicians() {
                             </option>
                         ))}
                     </select>
+                    <select
+                        value={itemsPerPage}
+                        onChange={e => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border p-2 rounded w-28"
+                    >
+                        <option value={10}>Show 10</option>
+                        <option value={50}>Show 50</option>
+                        <option value={100}>Show 100</option>
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded w-full sm:w-auto"
@@ -191,7 +203,7 @@ export default function Technicians() {
                 </div>
             ) : (
                 <>
-                <div className="mb-2 text-left text-sm text-gray-600">
+                    <div className="mb-2 text-left text-sm text-gray-600">
                         Total no of Technicians: {filteredTechnician.length}
                     </div>
                     <Table
@@ -200,7 +212,7 @@ export default function Technicians() {
                                 title: "S.No",
                                 key: "sno",
                                 render: (_, __, idx) =>
-                                    (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
+                                    (currentPage - 1) * itemsPerPage + idx + 1,
                             },
                             { title: "First Name", key: "firstName" },
                             { title: "Last Name", key: "lastName" },
