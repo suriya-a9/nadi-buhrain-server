@@ -343,8 +343,8 @@ exports.listClientPointAdminRequest = async (req, res, next) => {
         const requestStatus = await QuestionnaireAssignment.findOne({ userId: request.userId, status: false });
 
         if (!requestStatus) {
-            return res.status(200).json({
-                success: true,
+            return res.status(400).json({
+                success: false,
                 data: []
             });
         }
@@ -387,6 +387,12 @@ exports.handleAdminRequestAction = async (req, res, next) => {
                 "Points Request",
                 `Questionnaire assigned for your points request by Nadi Bahrain`
             );
+            await UserNotification.create({
+                type: 'Points Request',
+                message: `Questionnaire assigned for your points request by Nadi Bahrain`,
+                userId: user._id,
+                time: new Date()
+            });
             await QuestionnaireAssignment.create({
                 userId: request.userId,
                 questionnaireId

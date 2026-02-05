@@ -234,7 +234,7 @@ exports.questionnaireDetail = async (req, res, next) => {
 
 exports.listQuestionnaires = async (req, res, next) => {
     try {
-        const Questionnaires = await PopUpQuestionnaire.find();
+        const Questionnaires = await PopUpQuestionnaire.find().sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             message: "Success",

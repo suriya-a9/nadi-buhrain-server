@@ -105,16 +105,16 @@ exports.submitQuestionnaire = async (req, res, next) => {
             });
         }
 
-        const alreadySubmitted = await QuestionnaireResult.findOne({
-            userId,
-            questionnaireId
-        });
-        if (alreadySubmitted) {
-            return res.status(400).json({
-                success: false,
-                message: "Questionnaire already submitted"
-            });
-        }
+        // const alreadySubmitted = await QuestionnaireResult.findOne({
+        //     userId,
+        //     questionnaireId
+        // });
+        // if (alreadySubmitted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Questionnaire already submitted"
+        //     });
+        // }
 
         const user = await UserAccount.findById(userId);
         if (!user) {
@@ -164,9 +164,9 @@ exports.submitQuestionnaire = async (req, res, next) => {
             pointsEarned,
             answers: detailedAnswers
         });
-        await QuestionnaireAssignment.findOneAndUpdate(
+        await QuestionnaireAssignment.updateMany(
             { userId: userId, questionnaireId: questionnaireId },
-            { status: true }
+            { $set: { status: true } }
         );
         await UserLog.create({
             userId: req.user.id,
