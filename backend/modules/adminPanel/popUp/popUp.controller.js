@@ -2,6 +2,7 @@ const PopUpQuestionnaire = require("./popUp.model");
 const UserLog = require("../../userLogs/userLogs.model");
 const UserAccount = require("../../userAccount/userAccount.model");
 const PopUpQuestionnaireResult = require("../popUp/popUpResult.model");
+const PointsHistory = require("../points/pointsHistory.model");
 
 exports.addPopUp = async (req, res, next) => {
     try {
@@ -168,6 +169,13 @@ exports.submitQuestionnaire = async (req, res, next) => {
             role: "user",
             logo: "/assets/questionnaire.webp",
             time: new Date()
+        });
+        await PointsHistory.create({
+            userId: req.user.id,
+            history: `Feedback Points`,
+            points: pointsEarned,
+            time: new Date(),
+            status: "credit"
         });
         res.status(201).json({
             success: true,

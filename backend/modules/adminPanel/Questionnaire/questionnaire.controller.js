@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const UserAccount = require("../../userAccount/userAccount.model");
 const UserLog = require("../../userLogs/userLogs.model");
 const QuestionnaireAssignment = require("../../adminPanel/Questionnaire/questionnaireAssignmentSchema.model");
+const PointsHistory = require("../points/pointsHistory.model");
 
 exports.addQuestionnaire = async (req, res, next) => {
     try {
@@ -175,6 +176,13 @@ exports.submitQuestionnaire = async (req, res, next) => {
             role: "user",
             logo: "/assets/questionnaire.webp",
             time: new Date()
+        });
+        await PointsHistory.create({
+            userId: req.user.id,
+            history: `submitted questionnaire`,
+            points: pointsEarned,
+            time: new Date(),
+            status: "credit"
         });
         res.status(201).json({
             success: true,

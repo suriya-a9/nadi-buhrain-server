@@ -40,7 +40,7 @@ exports.startSignUp = async (req, res, next) => {
 exports.saveBasicInfo = async (req, res, next) => {
     const { userId, fullName, mobileNumber, email, gender, password, isVerfied } = req.body;
     try {
-        const existingUser = await UserAccount.findOne({
+        const completedUser = await UserAccount.findOne({
             _id: { $ne: userId },
             status: "completed",
             $or: [
@@ -48,15 +48,22 @@ exports.saveBasicInfo = async (req, res, next) => {
                 { "basicInfo.email": email }
             ]
         });
-
-        if (existingUser) {
+        if (completedUser) {
             return res.status(400).json({
                 message: "Account already registered"
             });
         }
-        const user = await UserAccount.findById(userId);
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const addBasicInfo = await UserAccount.findByIdAndUpdate(user, {
+
+        await UserAccount.deleteMany({
+            _id: { $ne: userId },
+            status: { $ne: "completed" },
+            $or: [
+                { "basicInfo.mobileNumber": mobileNumber },
+                { "basicInfo.email": email }
+            ]
+        });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await UserAccount.findByIdAndUpdate(userId, {
             basicInfo: {
                 fullName,
                 mobileNumber,
@@ -66,16 +73,16 @@ exports.saveBasicInfo = async (req, res, next) => {
             },
             step: 2,
             ...(isVerfied ? { isVerfied: true } : {})
-        })
+        });
         res.status(200).json({
             name: fullName,
             mobile: mobileNumber,
             email: email,
             gender: gender,
             message: "Basic info saved",
-        })
+        });
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
 
