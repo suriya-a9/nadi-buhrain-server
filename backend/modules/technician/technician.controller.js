@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const sendPushNotification = require("../../utils/sendPush");
 const UserNotification = require("../adminPanel/notification/userNotification.model");
 const TechNotification = require("../adminPanel/notification/techNotification.model");
+const UserApproval = require("./userApproval.model");
 
 exports.assignedServices = async (req, res, next) => {
     try {
@@ -198,23 +199,50 @@ exports.startWork = async (req, res, next) => {
             return res.status(404).json({ message: "Technician not found" });
         }
 
+        const userService = await UserService.findById(userServiceId);
+        if (!userService) {
+            return res.status(404).json({ message: "User service not found" });
+        }
+
+        const techUserService = await TechnicianUserService.findOne({
+            userServiceId,
+            "assignments.technicianId": technicianId
+        });
+
+        if (!techUserService) {
+            return res.status(404).json({ message: "Technician assignment not found" });
+        }
+
+        const assignment = techUserService.assignments.find(
+            a => a.technicianId.toString() === technicianId.toString()
+        );
+
+        if (!assignment?.userApproval) {
+
+            await UserApproval.create({
+                userId: userService.userId,
+                userServiceId,
+                techniciainId: technicianId,
+                status: false
+            });
+
+            return res.status(403).json({
+                message: "Get user approval before starting work"
+            });
+        }
+
         const now = new Date();
 
-        const userService = await UserService.findByIdAndUpdate(
+        await UserService.findByIdAndUpdate(
             userServiceId,
             {
                 serviceStatus: "inProgress",
                 "statusTimestamps.inProgress": now,
                 workStartedAt: now
-            },
-            { new: true }
+            }
         );
 
-        if (!userService) {
-            return res.status(404).json({ message: "User service not found" });
-        }
-
-        const techUserService = await TechnicianUserService.findOneAndUpdate(
+        await TechnicianUserService.findOneAndUpdate(
             {
                 userServiceId,
                 "assignments.technicianId": technicianId
@@ -225,13 +253,8 @@ exports.startWork = async (req, res, next) => {
                     "assignments.$.statusChangedAt": now,
                     "assignments.$.workStartedAt": now
                 }
-            },
-            { new: true }
+            }
         );
-
-        if (!techUserService) {
-            return res.status(404).json({ message: "Technician assignment not found" });
-        }
 
         const user = await UserAccount.findById(userService.userId);
 
@@ -253,8 +276,7 @@ exports.startWork = async (req, res, next) => {
         });
 
         res.status(200).json({
-            message: "Work started successfully",
-            techUserService
+            message: "Work started successfully"
         });
 
     } catch (err) {

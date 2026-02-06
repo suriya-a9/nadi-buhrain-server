@@ -322,6 +322,14 @@ exports.listForClient = async (req, res, next) => {
             _id: { $nin: answeredIds }
         }).sort({ createdAt: -1 });
 
+
+        if (listData.length === 0) {
+            return res.status(400).json({
+                success: false,
+                data: []
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: listData

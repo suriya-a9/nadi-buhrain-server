@@ -1,5 +1,5 @@
 const express = require('express');
-const { createRequest, userServiceList, ongoingRequest } = require('./userService.controller');
+const { createRequest, userServiceList, ongoingRequest, approvalList, approveWork } = require('./userService.controller');
 const router = express.Router();
 const upload = require('../../../middleware/fileUpload');
 const auth = require('../../../middleware/authMiddleware');
@@ -10,5 +10,7 @@ router.post('/create', auth, upload.fields([
 ]), createRequest);
 router.post('/ongoin', auth, ongoingRequest)
 router.post('/', auth, userServiceList);
+router.get('/approve-list', auth, approvalList);
+router.post('/approve-work', auth, approveWork);
 
 module.exports = router;

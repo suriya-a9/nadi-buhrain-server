@@ -10,6 +10,7 @@ const Technician = require("../../adminPanel/technician/technician.model")
 const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const UserNotification = require("../../adminPanel/notification/userNotification.model");
+const UserApproval = require("../../technician/userApproval.model");
 
 exports.createRequest = async (req, res, next) => {
     const { serviceId, issuesId, feedback, scheduleService, scheduleServiceTime, immediateAssistance, otherIssue } = req.body;
@@ -285,6 +286,88 @@ exports.ongoingRequest = async (req, res, next) => {
                     ? `${technician.firstName} ${technician.lastName}`
                     : null
             }
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.approvalList = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const approvalData = await UserApproval.findOne({
+            userId: userId,
+            status: false
+        });
+        if (!approvalData) {
+            return res.status(400).json({
+                success: false,
+                data: []
+            })
+        }
+        res.status(200).json({
+            success: true,
+            message: "Technician wants to start the work. Kindly approve.",
+            data: approvalData
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.approveWork = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { userServiceId, techniciainId } = req.body;
+
+        if (!userServiceId || !techniciainId) {
+            return res.status(400).json({
+                success: false,
+                message: "userServiceId and techniciainId are required"
+            });
+        }
+
+        const approval = await UserApproval.findOne({
+            userId,
+            userServiceId,
+            techniciainId,
+            status: false
+        });
+
+        if (!approval) {
+            return res.status(404).json({
+                success: false,
+                message: "No pending approval found"
+            });
+        }
+
+        approval.status = true;
+        await approval.save();
+
+        const techUserService = await TechnicianUserService.findOneAndUpdate(
+            {
+                userServiceId,
+                "assignments.technicianId": techniciainId
+            },
+            {
+                $set: {
+                    "assignments.$.userApproval": true
+                }
+            },
+            { new: true }
+        );
+
+        if (!techUserService) {
+            return res.status(404).json({
+                success: false,
+                message: "Technician assignment not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Work approved successfully"
         });
 
     } catch (err) {
