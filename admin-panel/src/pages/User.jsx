@@ -14,6 +14,7 @@ export default function User() {
     const [editMode, setEditMode] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState("");
+    const [accountTypeFilter, setAccountTypeFilter] = useState("");
     const [search, setSearch] = useState("");
     const [blocks, setBlocks] = useState([]);
     const [roads, setRoads] = useState([]);
@@ -85,6 +86,10 @@ export default function User() {
             String(s.basicInfo.mobileNumber || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.basicInfo.email || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.accountTypeId?.name || "").toLowerCase().includes(search.toLowerCase())
+        ) &&
+        (
+            accountTypeFilter === "" ||
+            String(s.accountTypeId?.name || "").toLowerCase() === accountTypeFilter.toLowerCase()
         )
     );
 
@@ -132,6 +137,15 @@ export default function User() {
                     Users
                 </h2>
                 <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+                    <select
+                        value={accountTypeFilter}
+                        onChange={e => setAccountTypeFilter(e.target.value)}
+                        className="border p-2 rounded"
+                    >
+                        <option value="">All Account Types</option>
+                        <option value="Individual Account">Individual Account</option>
+                        <option value="Family Account">Family Account</option>
+                    </select>
                     <select
                         value={statusFilter}
                         onChange={e => setStatusFilter(e.target.value)}

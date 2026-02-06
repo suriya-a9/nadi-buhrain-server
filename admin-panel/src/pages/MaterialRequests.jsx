@@ -10,6 +10,7 @@ export default function MaterialRequests() {
     const [loading, setLoading] = useState(false);
     const [updatingId, setUpdatingId] = useState(null);
     const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -47,10 +48,13 @@ export default function MaterialRequests() {
         }
     };
     const filteredMaterialRequest = requests.filter(s =>
-        String(s.technicianId?.firstName || "").toLowerCase().includes(search.toLowerCase()) ||
-        String(s.productId?.productName || "").toLowerCase().includes(search.toLowerCase()) ||
-        String(s.quantity || "").toLowerCase().includes(search.toLowerCase()) ||
-        String(s.status || "").toLowerCase().includes(search.toLowerCase())
+        (String(s.technicianId?.firstName || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.productId?.productName || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.quantity || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.status || "").toLowerCase().includes(search.toLowerCase()))
+        &&
+        (statusFilter === "" ||
+            String(s.status || "").toLowerCase() === statusFilter.toLowerCase())
     );
     const totalPages = Math.ceil(filteredMaterialRequest.length / itemsPerPage);
     const paginatedRequests = filteredMaterialRequest.slice(
@@ -63,6 +67,16 @@ export default function MaterialRequests() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">Material Requests</h2>
                 <div className="flex gap-2 flex-1 md:justify-end">
+                    <select
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value)}
+                        className="border p-2 rounded"
+                    >
+                        <option value="">All Status</option>
+                        <option value="requested">Requested</option>
+                        <option value="processed">Processed</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
                     <input
                         type="text"
                         placeholder="Search requests"

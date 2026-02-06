@@ -18,6 +18,7 @@ export default function NotVerifiedUser() {
     const [loading, setLoading] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const [accountTypeFilter, setAccountTypeFilter] = useState("");
     const [rejecting, setRejecting] = useState(false);
     const [reason, setReason] = useState("");
     const [search, setSearch] = useState("");
@@ -118,11 +119,14 @@ export default function NotVerifiedUser() {
             </div>
         );
     };
-    const filteredUsers = users.filter(s =>
+    const filteredUsers = users.filter(s => (
         String(s.basicInfo.fullName || "").toLowerCase().includes(search.toLowerCase()) ||
         String(s.basicInfo.mobileNumber || "").toLowerCase().includes(search.toLowerCase()) ||
         String(s.basicInfo.email || "").toLowerCase().includes(search.toLowerCase()) ||
-        String(s.accountTypeId?.name || "").toLowerCase().includes(search.toLowerCase())
+        String(s.accountTypeId?.name || "").toLowerCase().includes(search.toLowerCase()))
+        &&
+        (accountTypeFilter === "" ||
+            String(s.accountTypeId?.name || "").toLowerCase() === accountTypeFilter.toLowerCase())
     );
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
     const paginatedUsers = filteredUsers.slice(
@@ -134,6 +138,15 @@ export default function NotVerifiedUser() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">Not verifies users</h2>
                 <div className="flex gap-2 flex-1 md:justify-end">
+                    <select
+                        value={accountTypeFilter}
+                        onChange={e => setAccountTypeFilter(e.target.value)}
+                        className="border p-2 rounded"
+                    >
+                        <option value="">All Account Types</option>
+                        <option value="Individual Account">Individual Account</option>
+                        <option value="Family Account">Family Account</option>
+                    </select>
                     <input
                         type="text"
                         placeholder="Search users"

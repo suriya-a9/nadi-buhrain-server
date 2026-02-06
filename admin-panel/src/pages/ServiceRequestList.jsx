@@ -376,7 +376,7 @@ export default function ServiceRequestList() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full md:w-auto">
                     <div className="flex flex-col">
-                        <label className="text-xs font-medium mb-1">Created From</label>
+                        <label className="text-xs font-medium mb-1">Start Date</label>
                         <input
                             type="date"
                             value={createdFrom}
@@ -388,7 +388,7 @@ export default function ServiceRequestList() {
                         />
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-xs font-medium mb-1">Created To</label>
+                        <label className="text-xs font-medium mb-1">End Date</label>
                         <input
                             type="date"
                             value={createdTo}
@@ -525,9 +525,6 @@ export default function ServiceRequestList() {
                         onPageChange={setCurrentPage}
                     />
                 </>
-            )}
-            {paginatedData.length === 0 && (
-                <div className="text-center text-gray-500 mt-4">No requests in this category.</div>
             )}
             {detailsOpen && selected && (
                 <div className="fixed inset-0 z-50 overflow-auto">

@@ -110,7 +110,7 @@ export default function ServiceRequest() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 sm:items-end mb-4">
                 <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Created From</label>
+                    <label className="text-xs font-medium mb-1">Start Date</label>
                     <input
                         type="date"
                         value={createdFrom}
@@ -122,7 +122,7 @@ export default function ServiceRequest() {
                     />
                 </div>
                 <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Created To</label>
+                    <label className="text-xs font-medium mb-1">End Date</label>
                     <input
                         type="date"
                         value={createdTo}
