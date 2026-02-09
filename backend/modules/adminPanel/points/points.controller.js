@@ -556,7 +556,12 @@ exports.peopleList = async (req, res, next) => {
             ...person.toObject(),
             read: unreadMap[person._id.toString()] !== false
         }));
-
+        if (data.length === 0) {
+            res.status(400).json({
+                success: false,
+                data: []
+            });
+        }
         res.status(200).json({
             success: true,
             data
