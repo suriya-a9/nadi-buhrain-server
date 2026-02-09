@@ -9,6 +9,8 @@ const sendPushNotification = require("../../../utils/sendPush");
 const Notification = require('../../adminPanel/notification/notification.model');
 const FamilyMember = require('../../userAccount/familyMember.model');
 const QuestionnaireAssignment = require("../../adminPanel/Questionnaire/questionnaireAssignmentSchema.model");
+const sendMail = require("../../../utils/mailer");
+const questionnaireSendTemplate = require("../../../template/questionnaireSendTemplate");
 
 exports.addPoints = async (req, res, next) => {
     const { points, accountType } = req.body;
@@ -382,9 +384,9 @@ exports.handleAdminRequestAction = async (req, res, next) => {
             request.questionnaireId = questionnaireId;
             const userId = request.userId;
             const lastQuestionnaire = await QuestionnaireAssignment.findOne({ userId: userId, status: false })
-            if(lastQuestionnaire){
+            if (lastQuestionnaire) {
                 return res.status(400).json({
-                    message:"Another questionnaire is already assigned which is not completed by this user"
+                    message: "Another questionnaire is already assigned which is not completed by this user"
                 })
             }
             const user = await UserAccount.findById(userId)
@@ -398,6 +400,13 @@ exports.handleAdminRequestAction = async (req, res, next) => {
                 message: `Questionnaire assigned for your points request by Nadi Bahrain`,
                 userId: user._id,
                 time: new Date()
+            });
+            await sendMail({
+                to: user.basicInfo.email,
+                subject: "Points Request",
+                html: questionnaireSendTemplate({
+                    name: user.basicInfo.fullName
+                })
             });
             await QuestionnaireAssignment.create({
                 userId: request.userId,

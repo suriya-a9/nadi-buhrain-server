@@ -13,6 +13,8 @@ const TechNotification = require("../../adminPanel/notification/techNotification
 const sendEmail = require('../../../utils/mailer');
 const serviceStatusUpdateTemplate = require('../../../template/serviceStatusUpdate');
 const Logger = require("../../../logger");
+const serviceRequestActionTemplate = require("../../../template/serviceRequestActionTemplate");
+const technicianRequestAssignTemplate = require("../../../template/technicianRequestAssignTemplate");
 
 exports.newUserServiceRequest = async (req, res, next) => {
     try {
@@ -115,16 +117,32 @@ exports.updateServiceStatus = async (req, res, next) => {
             userId: user._id,
             time: new Date()
         });
-        const html = serviceStatusUpdateTemplate({
-            name: user.basicInfo.fullName,
-            status: serviceStatus
-        });
+        if (serviceStatus === "accepted" || serviceStatus === "rejected") {
+            try {
+                await sendEmail({
+                    to: user.basicInfo.email,
+                    subject: "Service Request Status Update",
+                    html: serviceRequestActionTemplate({
+                        name: user.basicInfo.fullName,
+                        status: serviceStatus,
+                        reason: reason || ""
+                    })
+                });
+            } catch (mailErr) {
+                console.error("Failed to send service request action email:", mailErr);
+            }
+        } else {
+            const html = serviceStatusUpdateTemplate({
+                name: user.basicInfo.fullName,
+                status: serviceStatus
+            });
 
-        await sendEmail({
-            to: user.basicInfo.email,
-            subject: "Service Request Status Updated",
-            html
-        });
+            await sendEmail({
+                to: user.basicInfo.email,
+                subject: "Service Request Status Updated",
+                html
+            });
+        }
 
         res.status(200).json({
             message: "Status updated",
@@ -173,7 +191,7 @@ exports.assignTechnician = async (req, res, next) => {
         });
         const technicians = await require("../technician/technician.model").find(
             { _id: { $in: technicianIds } },
-            { fcmToken: 1, firstName: 1 }
+            { fcmToken: 1, firstName: 1, email: 1 }
         );
 
         for (const tech of technicians) {
@@ -191,6 +209,22 @@ exports.assignTechnician = async (req, res, next) => {
                 userId: tech._id,
                 time: new Date()
             });
+
+            if (tech.email) {
+                try {
+                    await sendEmail({
+                        to: tech.email,
+                        subject: "Service Request Status Update",
+                        html: technicianRequestAssignTemplate({
+                            name: tech.firstName,
+                        })
+                    });
+                } catch (mailErr) {
+                    console.error("Failed to send service request action email:", mailErr);
+                }
+            } else {
+                console.error("Technician missing email, cannot send assignment mail:", tech._id);
+            }
         }
         res.status(200).json({
             message: "Technician assignments created",

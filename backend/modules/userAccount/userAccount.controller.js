@@ -16,6 +16,7 @@ const sendMail = require("../../utils/mailer");
 const userResetPasswordTemplate = require("../../template/userResetPasswordTemplate");
 const Points = require("../adminPanel/points/points.model");
 const PointsHistory = require("../adminPanel/points/pointsHistory.model");
+const accountRegisterTemplate = require("../../template/accountRegisterTemplate");
 
 exports.startSignUp = async (req, res, next) => {
     const { accountTypeId } = req.body;
@@ -398,6 +399,21 @@ exports.completeSignUp = async (req, res, next) => {
             "Account Registration",
             `Your account has been created successfully. `
         );
+        const html = accountRegisterTemplate({
+            name: user.basicInfo.fullName
+        });
+
+        try {
+            await sendMail({
+                to: user.basicInfo.email,
+                subject: "Account Register",
+                html: accountRegisterTemplate({
+                    name: user.basicInfo.fullName
+                })
+            });
+        } catch (mailErr) {
+            console.error("Failed to send verification email:", mailErr);
+        }
         res.status(200).json({
             message: 'user registered successfully',
             data: user,

@@ -6,6 +6,8 @@ const Technician = require("../../adminPanel/technician/technician.model");
 const Notification = require("../notification/notification.model");
 const sendPushNotificationStaff = require("../../../utils/sendPushStaff");
 const TechNotification = require("../../adminPanel/notification/techNotification.model");
+const sendMail = require("../../../utils/mailer");
+const technicianMaterialRequestActionTemplate = require("../../../template/technicianMaterialRequestActionTemplate");
 
 exports.singleRequest = async (req, res, next) => {
     const { productId, quantity, notes } = req.body;
@@ -208,6 +210,14 @@ exports.responseMaterialRequest = async (req, res, next) => {
                 userId: technician._id,
                 time: new Date()
             });
+            await sendMail({
+                to: technician.email,
+                subject: "Material Request Approved",
+                html: technicianMaterialRequestActionTemplate({
+                    name: technician.firstName,
+                    status: "approved"
+                })
+            });
             return res.status(200).json({
                 message: "Request processed, inventory and spare parts updated",
                 data: request
@@ -225,6 +235,14 @@ exports.responseMaterialRequest = async (req, res, next) => {
                 type: "Matrial Request",
                 userId: technician._id,
                 time: new Date()
+            });
+            await sendMail({
+                to: technician.email,
+                subject: "Material Request Rejected",
+                html: technicianMaterialRequestActionTemplate({
+                    name: technician.firstName,
+                    status: "rejected"
+                })
             });
             return res.status(200).json({
                 message: "Request status updated",

@@ -5,6 +5,8 @@ const UserAccount = require("../../userAccount/userAccount.model");
 const UserLog = require("../../userLogs/userLogs.model");
 const QuestionnaireAssignment = require("../../adminPanel/Questionnaire/questionnaireAssignmentSchema.model");
 const PointsHistory = require("../points/pointsHistory.model");
+const sendMail = require("../../../utils/mailer");
+const questionnaireSubmitTemplate = require("../../../template/questionnaireSubmitTemplate");
 
 exports.addQuestionnaire = async (req, res, next) => {
     try {
@@ -183,6 +185,13 @@ exports.submitQuestionnaire = async (req, res, next) => {
             points: pointsEarned,
             time: new Date(),
             status: "credit"
+        });
+        await sendMail({
+            to: user.basicInfo.email,
+            subject: "Points Request",
+            html: questionnaireSubmitTemplate({
+                name: user.basicInfo.fullName
+            })
         });
         res.status(201).json({
             success: true,
