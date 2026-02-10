@@ -103,8 +103,10 @@ export default function PopUpQuestionnaire() {
                 ...form.questions,
                 {
                     question: "",
+                    type: "choose",
                     options: ["", ""],
-                    correctAnswer: 0
+                    correctAnswer: 0,
+                    inputAnswer: ""
                 }
             ]
         });
@@ -123,6 +125,18 @@ export default function PopUpQuestionnaire() {
     const updateQuestion = (index, field, value) => {
         const updated = [...form.questions];
         updated[index][field] = value;
+
+        if (field === "type") {
+            if (value === "choose") {
+                updated[index].options = ["", ""];
+                updated[index].correctAnswer = 0;
+                delete updated[index].inputAnswer;
+            } else if (value === "input") {
+                updated[index].inputAnswer = "";
+                delete updated[index].options;
+                delete updated[index].correctAnswer;
+            }
+        }
         setForm({ ...form, questions: updated });
     };
 
@@ -293,52 +307,56 @@ export default function PopUpQuestionnaire() {
                                     Remove
                                 </button>
                             </div>
-
+                            <select
+                                value={q.type || "choose"}
+                                onChange={e => updateQuestion(qIndex, "type", e.target.value)}
+                                className="border p-2 rounded mb-2"
+                                required
+                            >
+                                <option value="choose">Choose</option>
+                                <option value="input">Input</option>
+                            </select>
                             <input
                                 value={q.question}
-                                onChange={(e) =>
-                                    updateQuestion(qIndex, "question", e.target.value)
-                                }
+                                onChange={e => updateQuestion(qIndex, "question", e.target.value)}
                                 className="w-full border p-2 rounded"
                                 placeholder="Question text"
                                 required
                             />
-
-                            {q.options.map((opt, oIndex) => (
-                                <div key={oIndex} className="flex gap-2">
-                                    <input
-                                        value={opt}
-                                        onChange={(e) =>
-                                            updateOption(qIndex, oIndex, e.target.value)
-                                        }
-                                        className="flex-1 border p-2 rounded"
-                                        placeholder={`Option ${oIndex + 1}`}
-                                        required
-                                    />
-                                    <input
-                                        type="radio"
-                                        checked={q.correctAnswer === oIndex}
-                                        onChange={() =>
-                                            updateQuestion(qIndex, "correctAnswer", oIndex)
-                                        }
-                                    />
+                            {q.type === "choose" ? (
+                                <>
+                                    {q.options && q.options.map((opt, oIndex) => (
+                                        <div key={oIndex} className="flex gap-2">
+                                            <input
+                                                value={opt}
+                                                onChange={e => updateOption(qIndex, oIndex, e.target.value)}
+                                                className="flex-1 border p-2 rounded"
+                                                placeholder={`Option ${oIndex + 1}`}
+                                                required
+                                            />
+                                            <input
+                                                type="radio"
+                                                checked={q.correctAnswer === oIndex}
+                                                onChange={() => updateQuestion(qIndex, "correctAnswer", oIndex)}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeOption(qIndex, oIndex)}
+                                                className="text-red-500"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
                                     <button
                                         type="button"
-                                        onClick={() => removeOption(qIndex, oIndex)}
-                                        className="text-red-500"
+                                        onClick={() => addOption(qIndex)}
+                                        className="text-blue-600 text-sm"
                                     >
-                                        ✕
+                                        + Add Option
                                     </button>
-                                </div>
-                            ))}
-
-                            <button
-                                type="button"
-                                onClick={() => addOption(qIndex)}
-                                className="text-blue-600 text-sm"
-                            >
-                                + Add Option
-                            </button>
+                                </>
+                            ) : null}
                         </div>
                     ))}
 

@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const questionSchema = new mongoose.Schema({
     question: String,
     options: [String],
-    correctAnswer: Number 
+    correctAnswer: Number,
+    type: { type: String, enum: ["choose", "input"], default: "choose" },
+    inputAnswer: String
 });
 
 const questionnaireSchema = new mongoose.Schema({

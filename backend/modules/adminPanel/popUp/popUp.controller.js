@@ -129,16 +129,24 @@ exports.submitQuestionnaire = async (req, res, next) => {
             const question = questionnaire.questions[ans.questionIndex];
             if (!question) return;
 
-            const isCorrect =
-                question.correctAnswer === ans.selectedOption;
+            let isCorrect = false;
+            let answerObj = {
+                questionIndex: ans.questionIndex,
+                isCorrect
+            };
 
+            if (question.type === "choose") {
+                isCorrect = question.correctAnswer === ans.selectedOption;
+                answerObj.selectedOption = ans.selectedOption;
+            } else if (question.type === "input") {
+                isCorrect = true;
+                answerObj.inputValue = ans.inputValue;
+            }
+
+            answerObj.isCorrect = isCorrect;
             if (isCorrect) correctCount++;
 
-            detailedAnswers.push({
-                questionIndex: ans.questionIndex,
-                selectedOption: ans.selectedOption,
-                isCorrect
-            });
+            detailedAnswers.push(answerObj);
         });
 
         const totalQuestions = questionnaire.questions.length;
