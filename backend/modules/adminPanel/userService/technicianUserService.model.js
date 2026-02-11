@@ -29,7 +29,8 @@ const technicianAssignmentSchema = new mongoose.Schema({
             total: Number
         }
     ],
-    paymentRaised: { type: Boolean, default: false }
+    paymentRaised: { type: Boolean, default: false },
+    adminNotified: { type: Boolean, default: false }
 }, { timestamps: true });
 
 technicianAssignmentSchema.pre('save', function (next) {

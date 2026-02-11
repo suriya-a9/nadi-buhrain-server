@@ -165,37 +165,59 @@ app.set('io', io);
 
 cron.schedule('*/5 * * * * *', async () => {
   const now = new Date();
-  const inProgressTechServices = await TechnicianUserService.find({
+
+  const techServices = await TechnicianUserService.find({
     "assignments.status": "in-progress",
     "assignments.adminNotified": { $ne: true }
   });
 
-  for (const techService of inProgressTechServices) {
-    let updated = false;
+  for (const techService of techServices) {
     for (const assignment of techService.assignments) {
       if (
         assignment.status === "in-progress" &&
         !assignment.adminNotified
       ) {
         let totalSeconds = assignment.workDuration || 0;
+
         if (assignment.workStartedAt) {
           totalSeconds += Math.floor((now - assignment.workStartedAt) / 1000);
         }
+
         if (totalSeconds >= 7200) {
-          const userService = await UserService.findById(techService.userServiceId);
-          await Notification.create({
-            title: "Technician work exceeded 2 hours",
-            message: `Service request ${userService?.serviceRequestID || techService.userServiceId} has exceeded 2 hours.`,
-            type: "work_overdue",
-            permissions: ['services']
-          });
-          assignment.adminNotified = true;
-          updated = true;
+          logger.info(`Trying to update assignment ${assignment._id} for techService ${techService._id}`);
+
+          const result = await TechnicianUserService.updateOne(
+            {
+              _id: techService._id,
+              "assignments._id": assignment._id,
+              "assignments.adminNotified": { $ne: true }
+            },
+            {
+              $set: { "assignments.$.adminNotified": true }
+            }
+          );
+
+          logger.info('Update result:', result);
+
+          if (result.modifiedCount > 0) {
+            const userService = await UserService.findById(techService.userServiceId);
+
+            try {
+              await Notification.create({
+                title: "Technician work exceeded 2 hours",
+                message: `Service request ${userService?.serviceRequestID || techService.userServiceId
+                  } has exceeded 2 hours.`,
+                type: "work_overdue",
+                permissions: ['services'],
+                time: new Date(),
+              });
+              logger.info('Notification created!');
+            } catch (err) {
+              logger.error('Notification creation failed:', err);
+            }
+          }
         }
       }
-    }
-    if (updated) {
-      await techService.save();
     }
   }
 });
