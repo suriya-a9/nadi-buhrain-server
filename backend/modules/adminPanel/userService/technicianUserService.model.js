@@ -36,7 +36,7 @@ technicianAssignmentSchema.pre('save', function (next) {
     if (this.isModified('status')) {
         this.statusChangedAt = new Date();
     }
-    next();
+    // next();
 });
 
 const technicianUserService = new mongoose.Schema({

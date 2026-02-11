@@ -294,7 +294,8 @@ exports.requestToAdmin = async (req, res, next) => {
             message: `${points} points requested by ${user.basicInfo.fullName}`,
             userId: user._id,
             time: new Date(),
-            read: false
+            read: false,
+            permissions: ['points']
         });
         const io = req.app.get('io');
         io.emit('notification', notification);

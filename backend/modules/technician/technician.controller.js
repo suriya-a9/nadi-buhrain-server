@@ -218,13 +218,21 @@ exports.startWork = async (req, res, next) => {
         );
 
         if (!assignment?.userApproval) {
-
-            await UserApproval.create({
+            const existingApproval = await UserApproval.findOne({
                 userId: userService.userId,
                 userServiceId,
                 techniciainId: technicianId,
                 status: false
             });
+
+            if (!existingApproval) {
+                await UserApproval.create({
+                    userId: userService.userId,
+                    userServiceId,
+                    techniciainId: technicianId,
+                    status: false
+                });
+            }
 
             return res.status(403).json({
                 message: "Get user approval before starting work"
@@ -514,7 +522,10 @@ exports.paymentRaise = async (req, res, next) => {
         await Notification.create({
             message: notificationMsg,
             type: "payment_raised",
-            time: new Date()
+            time: new Date(),
+            userId: req.user.id,
+            read: false,
+            permissions: ['services']
         });
         await UserLog.create({
             userId: req.user.id,

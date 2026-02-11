@@ -61,7 +61,8 @@ exports.singleRequest = async (req, res, next) => {
             message: `${product.productName} has been requested for ${quantity} quantity by ${technician.firstName}`,
             userId: technicianId,
             time: new Date(),
-            read: false
+            read: false,
+            permissions: ['inventory']
         });
         const io = req.app.get('io');
         io.emit('notification', notification);
@@ -137,7 +138,8 @@ exports.bulkRequest = async (req, res, next) => {
             message: `Bulk products requested by ${technician.firstName}`,
             userId: technicianId,
             time: new Date(),
-            read: false
+            read: false,
+            permissions: ['inventory']
         });
         const io = req.app.get('io');
         io.emit('notification', notification);

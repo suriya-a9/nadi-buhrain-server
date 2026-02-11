@@ -377,7 +377,8 @@ exports.completeSignUp = async (req, res, next) => {
             message: `New user registered: ${user.basicInfo.fullName}`,
             userId: user._id,
             time: new Date(),
-            read: false
+            read: false,
+            permissions: ['users']
         });
         await UserLog.create({
             userId: user._id,

@@ -7,7 +7,7 @@ import { RxCross2 } from "react-icons/rx";
 import api from "../services/api";
 
 export default function Header({ toggleSidebar }) {
-    const { logout, name, role } = useAuth();
+    const { logout, name, role, permissions: userPermissions } = useAuth();
     const [openMenu, setOpenMenu] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -40,7 +40,11 @@ export default function Header({ toggleSidebar }) {
             }
         };
     }, []);
-
+    const filteredNotifications = notifications.filter(n =>
+        !n.permissions || n.permissions.length === 0 ||
+        n.permissions.some(p => userPermissions.includes(p))
+    );
+    const unreadCount = filteredNotifications.filter(n => !n.read).length;
     const markAsRead = async (id) => {
         await api.post(`/notifications/mark-read/${id}`);
         setNotifications((prev) =>
@@ -106,9 +110,9 @@ export default function Header({ toggleSidebar }) {
                     className="relative p-2 rounded-full bg-white"
                 >
                     <span className="material-icons"><IoIosNotificationsOutline size={25} /></span>
-                    {notifications.filter(n => !n.read).length > 0 && (
+                    {unreadCount > 0 && (
                         <span className="absolute top-0 right-0 bg-[#B1B1B1] text-white rounded-full pl-2 pr-2 pt-1 pb-1 text-[8px]">
-                            {notifications.filter(n => !n.read).length}
+                            {unreadCount}
                         </span>
                     )}
                 </button>
@@ -124,10 +128,10 @@ export default function Header({ toggleSidebar }) {
                             </button>
                         </div>
                         <ul>
-                            {notifications.length === 0 ? (
+                            {filteredNotifications.length === 0 ? (
                                 <li className="px-4 py-2 text-gray-500">No notifications</li>
                             ) : (
-                                notifications.map((n, idx) => (
+                                filteredNotifications.map((n, idx) => (
                                     <li
                                         key={n._id || idx}
                                         className={`flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 ${n.read ? "text-gray-400" : ""}`}

@@ -166,23 +166,35 @@ app.set('io', io);
 cron.schedule('*/5 * * * * *', async () => {
   const now = new Date();
   const inProgressTechServices = await TechnicianUserService.find({
-    status: "in-progress",
-    adminNotified: { $ne: true }
+    "assignments.status": "in-progress",
+    "assignments.adminNotified": { $ne: true }
   });
 
   for (const techService of inProgressTechServices) {
-    let totalSeconds = techService.workDuration || 0;
-    if (techService.workStartedAt) {
-      totalSeconds += Math.floor((now - techService.workStartedAt) / 1000);
+    let updated = false;
+    for (const assignment of techService.assignments) {
+      if (
+        assignment.status === "in-progress" &&
+        !assignment.adminNotified
+      ) {
+        let totalSeconds = assignment.workDuration || 0;
+        if (assignment.workStartedAt) {
+          totalSeconds += Math.floor((now - assignment.workStartedAt) / 1000);
+        }
+        if (totalSeconds >= 7200) {
+          const userService = await UserService.findById(techService.userServiceId);
+          await Notification.create({
+            title: "Technician work exceeded 2 hours",
+            message: `Service request ${userService?.serviceRequestID || techService.userServiceId} has exceeded 2 hours.`,
+            type: "work_overdue",
+            permissions: ['services']
+          });
+          assignment.adminNotified = true;
+          updated = true;
+        }
+      }
     }
-    if (totalSeconds >= 7200) {
-      const userService = await UserService.findById(techService.userServiceId);
-      await Notification.create({
-        title: "Technician work exceeded 2 hours",
-        message: `Service request ${userService?.serviceRequestID || techService.userServiceId} has exceeded 2 hours.`,
-        type: "work_overdue"
-      });
-      techService.adminNotified = true;
+    if (updated) {
       await techService.save();
     }
   }

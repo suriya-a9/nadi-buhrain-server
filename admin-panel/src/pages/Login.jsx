@@ -3,7 +3,20 @@ import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-
+const PERMISSION_ROUTE_MAP = {
+    "dashboard": "/",
+    "admin-list": "/admin-list",
+    "admin-chat": "/admin-chat",
+    "service-requests": "/service-requests",
+    "services": "/services",
+    "users": "/users",
+    "technicians": "/technicians",
+    "address": "/road",
+    "points": "/points",
+    "inventory": "/inventory",
+    "Settings": "/splash-screen",
+    "user-logs": "/user-logs"
+};
 export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [remember, setRemember] = useState(false);
@@ -23,7 +36,19 @@ export default function Login() {
                 sessionStorage.setItem("token", res.data.token);
             }
             login(res.data.token);
-            navigate("/");
+
+            const decoded = JSON.parse(atob(res.data.token.split('.')[1]));
+            const permissions = decoded.permissions || [];
+
+            let redirectPath = "/";
+            for (const perm of permissions) {
+                if (PERMISSION_ROUTE_MAP[perm]) {
+                    redirectPath = PERMISSION_ROUTE_MAP[perm];
+                    break;
+                }
+            }
+
+            navigate(redirectPath);
             toast.success(res.data.message, {
                 duration: 2000
             });

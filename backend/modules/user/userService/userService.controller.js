@@ -81,7 +81,8 @@ exports.createRequest = async (req, res, next) => {
             message: `New service request submitted by ${user.basicInfo.fullName}`,
             userId: user._id,
             time: new Date(),
-            read: false
+            read: false,
+            permissions: ['services']
         });
         const io = req.app.get('io');
         io.emit('notification', notification);
