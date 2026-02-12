@@ -278,9 +278,10 @@ exports.listMaterialRequests = async (req, res, next) => {
         const listData = await MaterialRequest.find()
             .populate("technicianId")
             .populate("productId").sort({ createdAt: -1 });
+        const filteredData = listData.filter(item => item.technicianId);
         res.status(200).json({
             success: true,
-            data: listData
+            data: filteredData
         })
     } catch (err) {
         next(err)
@@ -292,9 +293,10 @@ exports.listSpareParts = async (req, res, next) => {
         const listData = await SpareParts.find()
             .populate("technicianId")
             .populate("productId");
+        const filteredData = listData.filter(item => item.technicianId);
         res.status(200).json({
             success: true,
-            data: listData
+            data: filteredData
         })
     } catch (err) {
         next(err)

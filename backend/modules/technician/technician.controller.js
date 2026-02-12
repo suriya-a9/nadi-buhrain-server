@@ -274,9 +274,11 @@ exports.startWork = async (req, res, next) => {
             );
         }
 
+        const service = await UserService.findById(userServiceId);
+
         await UserLog.create({
             userId: technicianId,
-            log: `Work started for service ${userServiceId}`,
+            log: `Work started for service ${service.serviceRequestID}`,
             status: "Started",
             role: "technician",
             logo: "/assets/technician.webp",
@@ -395,7 +397,7 @@ exports.updateServiceStatus = async (req, res, next) => {
 
         await UserLog.create({
             userId: req.user.id,
-            log: `Updated status for work ${userServiceId}`,
+            log: `Updated status for work ${userService.serviceRequestID}`,
             status: "Updated",
             role: "technician",
             logo: "/assets/technician.webp",
@@ -433,7 +435,7 @@ exports.paymentRaise = async (req, res, next) => {
         if (!userServiceId) {
             return res.status(400).json({ message: "userServiceId is required" });
         }
-
+        const technician = await Technician.findById(technicianId);
         let totalSparePartsCost = 0;
         let usedPartsDetails = [];
 
@@ -527,9 +529,10 @@ exports.paymentRaise = async (req, res, next) => {
             read: false,
             permissions: ['services']
         });
+        const service = UserService.findById(userServiceId);
         await UserLog.create({
             userId: req.user.id,
-            log: `${userServiceId} - work completed`,
+            log: `${technician.firstName} ${technician.lastName} - completed work`,
             status: "Updated",
             role: "technician",
             logo: "/assets/technician.webp",

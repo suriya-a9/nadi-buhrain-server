@@ -98,9 +98,10 @@ exports.updateServiceStatus = async (req, res, next) => {
             { $set: update },
             { new: true }
         );
+        const service = await UserService.findById(id);
         await UserLog.create({
             userId: req.user.id,
-            log: `Service request ${updated._id} updated to status: ${serviceStatus}`,
+            log: `Service request ${service.serviceRequestID} updated to status: ${serviceStatus}`,
             status: "Updated",
             role: "admin",
             logo: "/assets/service request.webp",
@@ -181,9 +182,11 @@ exports.assignTechnician = async (req, res, next) => {
             { $addToSet: { technicianIds: { $each: technicianIds } } }
         );
 
+        const service = await UserService.findById(serviceId);
+
         await UserLog.create({
             userId: req.user.id,
-            log: `Requested technician for server id ${serviceId}`,
+            log: `Requested technician for service ${service.serviceRequestID}`,
             status: "Requested",
             role: "admin",
             logo: "/assets/service request.webp",
@@ -240,7 +243,8 @@ exports.removeTechnicianAssignment = async (req, res, next) => {
         if (!serviceId || !technicianId) {
             return res.status(400).json({ message: "serviceId and technicianId are required" });
         }
-
+        const technician = await Technician.findById(technicianId);
+        const service = await UserService.findById(serviceId);
         const techUserService = await require('./technicianUserService.model').findOneAndUpdate(
             { userServiceId: serviceId },
             { $pull: { assignments: { technicianId } } },
@@ -254,7 +258,7 @@ exports.removeTechnicianAssignment = async (req, res, next) => {
 
         await require("../../userLogs/userLogs.model").create({
             userId: req.user.id,
-            log: `Removed technician ${technicianId} from service ${serviceId}`,
+            log: `Removed technician ${technician.fullName} from service ${service.serviceRequestID}`,
             status: "Removed",
             role: "admin",
             logo: "/assets/service request.webp",
