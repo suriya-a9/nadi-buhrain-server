@@ -82,6 +82,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <NavLink to="/admin-chat" className={linkClasses}>
                                 <IoChatboxOutline size={20} /> &nbsp;&nbsp;&nbsp;Admin Chat
                             </NavLink>
+                            <NavLink to="/user-chat" className={linkClasses}>
+                                <IoChatboxOutline size={20} /> &nbsp;&nbsp;&nbsp;User Chat
+                            </NavLink>
                         </>
                     )}
                     {permissions.includes("service-requests") && (

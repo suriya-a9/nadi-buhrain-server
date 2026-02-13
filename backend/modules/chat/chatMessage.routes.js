@@ -2,8 +2,8 @@ const express = require("express");
 const ChatMessage = require("./chatMessage.model");
 const router = express.Router();
 
-router.get("/history", async (req, res) => {
-    const { user1, user2 } = req.query;
+router.post("/history", async (req, res) => {
+    const { user1, user2 } = req.body;
     const messages = await ChatMessage.find({
         $or: [
             { from: user1, to: user2 },

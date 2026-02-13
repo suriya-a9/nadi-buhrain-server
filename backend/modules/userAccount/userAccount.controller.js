@@ -17,6 +17,8 @@ const userResetPasswordTemplate = require("../../template/userResetPasswordTempl
 const Points = require("../adminPanel/points/points.model");
 const PointsHistory = require("../adminPanel/points/pointsHistory.model");
 const accountRegisterTemplate = require("../../template/accountRegisterTemplate");
+const ChatMessage = require("../chat/chatMessage.model");
+const Admin = require("../../modules/admin/admin.model");
 
 exports.startSignUp = async (req, res, next) => {
     const { accountTypeId } = req.body;
@@ -870,6 +872,45 @@ exports.logout = async (req, res, next) => {
             message: "Logged out successfully"
         });
 
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.listAdminsWithLastMessage = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "userId is required" });
+        }
+
+        const admins = await Admin.find()
+            .populate({
+                path: "role",
+                match: { name: { $in: ["admin", "Super Admin"] } }
+            })
+            .select("-password");
+
+        const filteredAdmins = admins.filter(a => a.role);
+
+        const result = await Promise.all(filteredAdmins.map(async (admin) => {
+            const lastMsg = await ChatMessage.findOne({
+                $or: [
+                    { from: userId, to: admin._id },
+                    { from: admin._id, to: userId }
+                ]
+            }).sort({ createdAt: -1 });
+
+            return {
+                ...admin.toObject(),
+                lastMessage: lastMsg
+            };
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
     } catch (err) {
         next(err);
     }

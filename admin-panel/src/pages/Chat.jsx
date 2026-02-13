@@ -19,11 +19,10 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
     useEffect(() => {
         socket.emit("join", { userId, role });
 
-        fetch(
-            `${import.meta.env.VITE_API_URL}/api/chat/history?user1=${userId}&user2=${chatWithId}`
-        )
-            .then(res => res.json())
-            .then(setMessages);
+        api.post("/chat/history", {
+            user1: userId,
+            user2: chatWithId
+        }).then(res => setMessages(res.data));
 
         socket.on("receive_message", (msg) => {
             if (

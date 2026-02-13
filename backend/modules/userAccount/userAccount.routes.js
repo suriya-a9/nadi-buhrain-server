@@ -41,4 +41,6 @@ router.post('/notification', auth, controller.listNotification);
 
 router.post('/logout', auth, controller.logout);
 
+router.get("/list-with-last-message", auth, controller.listAdminsWithLastMessage);
+
 module.exports = router;

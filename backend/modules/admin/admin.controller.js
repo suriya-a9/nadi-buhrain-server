@@ -84,6 +84,26 @@ exports.listAdmins = async (req, res, next) => {
     }
 };
 
+exports.listAdminUsers = async (req, res, next) => {
+    try {
+        const admins = await Admin.find()
+            .populate({
+                path: "role",
+                match: { name: { $in: ["admin", "Super Admin"] } }
+            });
+
+        const filteredAdmins = admins.filter(user => user.role !== null);
+
+        res.status(200).json({
+            success: true,
+            data: filteredAdmins
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.updateAdmin = async (req, res, next) => {
     try {
         const { id } = req.params;

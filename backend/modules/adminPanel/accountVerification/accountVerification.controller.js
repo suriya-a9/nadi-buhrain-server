@@ -78,6 +78,20 @@ exports.verifyAccount = async (req, res, next) => {
     }
 }
 
+exports.usersLists = async (req, res, next) => {
+    try {
+        const userList = await UserAccount.find({ singnUpCompleted: true, status: "completed", });
+        const count = userList.length;
+        res.status(200).json({
+            success: true,
+            data: userList,
+            count: count
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
 exports.verificaionAccountList = async (req, res, next) => {
     try {
         const users = await UserAccount.find({
