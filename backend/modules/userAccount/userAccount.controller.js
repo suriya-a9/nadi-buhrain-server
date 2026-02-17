@@ -19,6 +19,7 @@ const PointsHistory = require("../adminPanel/points/pointsHistory.model");
 const accountRegisterTemplate = require("../../template/accountRegisterTemplate");
 const ChatMessage = require("../chat/chatMessage.model");
 const Admin = require("../../modules/admin/admin.model");
+const DeletedAccounts = require("../adminPanel/deletedAccounts/deletedAccounts.model");
 
 exports.startSignUp = async (req, res, next) => {
     const { accountTypeId } = req.body;
@@ -911,6 +912,48 @@ exports.listAdminsWithLastMessage = async (req, res, next) => {
             success: true,
             data: result
         });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.setUserStatus = async (req, res, next) => {
+    try {
+        const { reasonId } = req.body;
+        if (!reasonId) {
+            return res.status(400).json({
+                success: false,
+                message: "Reason required"
+            })
+        }
+        const userId = req.user.id;
+
+        const userData = await UserAccount.findById(userId);
+        if (!userData) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        await UserLog.create({
+            userId: userId,
+            log: `${userData.basicInfo.fullName} - Deleted their account`,
+            status: "Account Deleted",
+            role: "user",
+            logo: "/assets/disabled.webp",
+            time: new Date()
+        });
+
+        await UserAccount.findByIdAndDelete(userId);
+        await DeletedAccounts.create({
+            reasonId: reasonId,
+            role: "User",
+            name: userData.basicInfo.fullName,
+            email: userData.basicInfo.email
+        });
+
+        res.status(200).json({
+            message: "User deleted successfully"
+        });
+
     } catch (err) {
         next(err);
     }

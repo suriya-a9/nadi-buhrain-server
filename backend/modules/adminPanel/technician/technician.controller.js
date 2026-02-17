@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const sendMail = require("../../../utils/mailer");
 const technicianResetPasswordTemplate = require("../../../template/technicianResetPassword.template")
 const sendPushNotification = require("../../../utils/sendPush");
+const DeletedAccounts = require("../deletedAccounts/deletedAccounts.model");
 
 exports.registerTechnician = async (req, res, next) => {
     const { firstName, lastName, email, mobile, gender, password, role } = req.body;
@@ -403,6 +404,41 @@ exports.logout = async (req, res, next) => {
             message: "Logged out successfully"
         });
 
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.deleteTechnicianThemself = async (req, res, next) => {
+    try {
+        const { reasonId } = req.body;
+        if (!reasonId) {
+            return res.status(400).json({
+                success: false,
+                message: "Reason required"
+            })
+        }
+        const userId = req.user.id;
+        const userData = await Technician.findById(userId);
+        await UserLog.create({
+            userId: userId,
+            log: `${userData.firstName} - Deleted their account`,
+            status: "Account Deleted",
+            role: "technician",
+            logo: "/assets/disabled.webp",
+            time: new Date()
+        });
+        await Technician.findByIdAndDelete(userId);
+        await DeletedAccounts.create({
+            reasonId: reasonId,
+            role: "Technician",
+            name: `${userData.firstName} ${userData.lastName}`,
+            email: userData.email
+        });
+        res.status(200).json({
+            success: true,
+            message: "Deleted successfully"
+        })
     } catch (err) {
         next(err)
     }

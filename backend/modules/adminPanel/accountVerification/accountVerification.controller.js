@@ -225,6 +225,15 @@ exports.setUserStatus = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: "user not found" });
         }
+        const userData = await UserAccount.findById(id);
+        await UserLog.create({
+            userId: req.user.id,
+            log: ` ${userData.basicInfo.fullName} - Account Disabled`,
+            status: "Account Disabling",
+            role: "admin",
+            logo: "/assets/disabled.webp",
+            time: new Date()
+        })
         res.status(200).json({
             message: "user status updated",
             data: user

@@ -54,6 +54,8 @@ import PopUpQuestionnaire from "./pages/PopUpQuestionnaire";
 import PopUpQuestionnaireDetail from "./pages/PopUpQuestionnaireDetail";
 import AdminChatList from "./pages/AdminChatList";
 import UserChatList from "./pages/UserChatList";
+import DeletedAccounts from "./pages/DeletedAccounts";
+import DeletedReasons from "./pages/DeletedReasons";
 
 export default function App() {
   return (
@@ -573,6 +575,31 @@ export default function App() {
                   <PermissionRoute permission="Settings">
                     <DashboardLayout>
                       <PopUpQuestionnaire />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/deleted-account"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <DeletedAccounts />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/deleted-reasons"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <DeletedReasons />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

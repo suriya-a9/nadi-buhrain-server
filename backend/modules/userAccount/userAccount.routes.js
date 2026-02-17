@@ -43,4 +43,6 @@ router.post('/logout', auth, controller.logout);
 
 router.get("/list-with-last-message", auth, controller.listAdminsWithLastMessage);
 
+router.post("/delete", auth, controller.setUserStatus);
+
 module.exports = router;

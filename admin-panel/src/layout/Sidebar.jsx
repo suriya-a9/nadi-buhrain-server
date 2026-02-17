@@ -6,6 +6,8 @@ import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
 import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip, MdOutlineRequestPage } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
+import { AiOutlineUserDelete } from "react-icons/ai";
 import { IoChatboxOutline } from "react-icons/io5";
 import { GrTransaction } from "react-icons/gr";
 import { PiBuildingApartment } from "react-icons/pi";
@@ -199,6 +201,12 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             </NavLink>
                             <NavLink to="/popup" className={linkClasses}>
                                 <TbBellQuestion size={20} /> &nbsp;&nbsp;&nbsp;PopUp
+                            </NavLink>
+                            <NavLink to="/deleted-account" className={linkClasses}>
+                                <AiOutlineUserDelete size={20} /> &nbsp;&nbsp;&nbsp;Deleted Account
+                            </NavLink>
+                            <NavLink to="/deleted-reasons" className={linkClasses}>
+                                <MdDeleteOutline size={20} /> &nbsp;&nbsp;&nbsp;Deleted Reason
                             </NavLink>
                         </>
                     )}
