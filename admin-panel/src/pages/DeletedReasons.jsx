@@ -12,7 +12,8 @@ export default function DeletedReasons() {
     const [editData, setEditData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
-        reason: ""
+        reason_en: "",
+        reason_ar: ""
     });
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,14 +31,15 @@ export default function DeletedReasons() {
         loadReasons();
     }, []);
     const openCreate = () => {
-        setForm({ reason: "" });
+        setForm({ reason_en: "", reason_ar: "" });
         setEditData(null);
         setOpenCanvas(true);
     };
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            reason: item.reason,
+            reason_en: item.reason_en,
+            reason_ar: item.reason_ar,
         });
         setOpenCanvas(true);
     };
@@ -112,7 +114,8 @@ export default function DeletedReasons() {
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
                             },
-                            { title: "Reason", key: "reason" },
+                            { title: "Reason (EN)", key: "reason_en" },
+                            { title: "Reason (AR)", key: "reason_ar" },
                             {
                                 title: "Date & Time",
                                 key: "updatedAt",
@@ -153,11 +156,21 @@ export default function DeletedReasons() {
             >
                 <form onSubmit={saveReason} className="space-y-4">
                     <div>
-                        <label className="block mb-1 font-medium">Reason</label>
+                        <label className="block mb-1 font-medium">Reason (English)</label>
                         <input
                             type="text"
-                            value={form.reason}
-                            onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                            value={form.reason_en}
+                            onChange={(e) => setForm({ ...form, reason_en: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Reason (Arabic)</label>
+                        <input
+                            type="text"
+                            value={form.reason_ar}
+                            onChange={(e) => setForm({ ...form, reason_ar: e.target.value })}
                             className="w-full border p-2 rounded"
                             required
                         />

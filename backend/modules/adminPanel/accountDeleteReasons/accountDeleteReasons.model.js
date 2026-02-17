@@ -6,7 +6,10 @@ const accountDeleteReasonsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: Admin
     },
-    reason: {
+    reason_en: {
+        type: String
+    },
+    reason_ar: {
         type: String
     }
 }, { timestamps: true });

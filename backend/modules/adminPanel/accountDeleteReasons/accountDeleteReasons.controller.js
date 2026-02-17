@@ -2,10 +2,11 @@ const AccountDeleteReason = require("./accountDeleteReasons.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.add = async (req, res, next) => {
-    const { reason } = req.body;
+    const { reason_en, reason_ar } = req.body;
     try {
         await AccountDeleteReason.create({
-            reason
+            reason_en,
+            reason_ar
         })
         await UserLog.create({
             userId: req.user.id,
@@ -79,5 +80,30 @@ exports.deleteReason = async (req, res, next) => {
         })
     } catch (err) {
         next(err)
+    }
+}
+
+exports.listForUser = async (req, res, next) => {
+    try {
+        const lang = req.query.lang || "en";
+        const listData = await AccountDeleteReason.find();
+        let data;
+        if (lang === "ar") {
+            data = listData.map(item => ({
+                _id: item._id,
+                reason: item.reason_ar
+            }));
+        } else {
+            data = listData.map(item => ({
+                _id: item._id,
+                reason: item.reason_en
+            }));
+        }
+        res.status(200).json({
+            success: true,
+            data
+        });
+    } catch (err) {
+        next(err);
     }
 }
