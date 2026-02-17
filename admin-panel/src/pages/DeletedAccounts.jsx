@@ -13,7 +13,7 @@ export default function DeletedAccounts() {
     const loadAccounts = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/deleted-accounts/");
+            const res = await api.get("/deleted-accounts");
             setAccounts(res.data.data || []);
         } catch {
             setAccounts([]);
