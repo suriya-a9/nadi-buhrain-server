@@ -30,6 +30,7 @@ function Chat({ userId, role, chatWithId, chatWithRole, chatWithName }) {
                 (msg.from === chatWithId && msg.to === userId)
             ) {
                 setMessages(prev => [...prev, msg]);
+                console.log("receive")
             }
         });
 

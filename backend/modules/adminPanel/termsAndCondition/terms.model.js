@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const termsSchema = new mongoose.Schema({
-    content: {
+    content_en: {
+        type: String,
+        required: true,
+    },
+    content_ar: {
         type: String,
         required: true,
     },

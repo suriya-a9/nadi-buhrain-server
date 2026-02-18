@@ -12,7 +12,8 @@ export default function About() {
 
     const [form, setForm] = useState({
         title: "",
-        content: [""],
+        content_en: [""],
+        content_ar: [""],
         link: "",
         version: "",
         media: null
@@ -41,12 +42,12 @@ export default function About() {
         setCurrentPage(1);
     }, [aboutList]);
 
-
     const openCreate = () => {
         setEditData(null);
         setForm({
             title: "",
-            content: [""],
+            content_en: [""],
+            content_ar: [""],
             link: "",
             version: "",
             media: null
@@ -58,8 +59,11 @@ export default function About() {
         setEditData(item);
         setForm({
             title: item.title,
-            content: Array.isArray(item.content) && item.content.length
-                ? item.content
+            content_en: Array.isArray(item.content_en) && item.content_en.length
+                ? item.content_en
+                : [""],
+            content_ar: Array.isArray(item.content_ar) && item.content_ar.length
+                ? item.content_ar
                 : [""],
             link: item.link || "",
             version: item.version || "",
@@ -68,19 +72,19 @@ export default function About() {
         setOpenCanvas(true);
     };
 
-    const updateContent = (index, value) => {
-        const updated = [...form.content];
+    const updateContent = (lang, value, index) => {
+        const updated = [...form[lang]];
         updated[index] = value;
-        setForm({ ...form, content: updated });
+        setForm({ ...form, [lang]: updated });
     };
 
-    const addContent = () => {
-        setForm({ ...form, content: [...form.content, ""] });
+    const addContent = (lang) => {
+        setForm({ ...form, [lang]: [...form[lang], ""] });
     };
 
-    const removeContent = (index) => {
-        const updated = form.content.filter((_, i) => i !== index);
-        setForm({ ...form, content: updated.length ? updated : [""] });
+    const removeContent = (lang, index) => {
+        const updated = form[lang].filter((_, i) => i !== index);
+        setForm({ ...form, [lang]: updated });
     };
 
 
@@ -92,8 +96,11 @@ export default function About() {
         formData.append("link", form.link);
         formData.append("version", form.version);
 
-        form.content.forEach((value, index) => {
-            formData.append(`content[${index}]`, value);
+        form.content_en.forEach((value, index) => {
+            formData.append(`content_en[${index}]`, value);
+        });
+        form.content_ar.forEach((value, index) => {
+            formData.append(`content_ar[${index}]`, value);
         });
 
         if (form.media) {
@@ -188,10 +195,23 @@ export default function About() {
                             {item.isActive ? "Active" : "Disabled"}
                         </span>
 
-                        <div className="whitespace-pre-line text-gray-700">
-                            {Array.isArray(item.content)
-                                ? item.content.join("\n\n")
-                                : item.content}
+                        <div className="space-y-2">
+                            <div>
+                                <strong>English:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_en?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Arabic:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_ar?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         {item.link && (
@@ -295,22 +315,23 @@ export default function About() {
                     />
 
                     <div>
-                        <label className="font-medium">Content Sections</label>
-                        {form.content.map((value, index) => (
+                        <label className="font-medium">English Content</label>
+                        {form.content_en.map((value, index) => (
                             <div key={index} className="mt-2">
                                 <textarea
                                     className="w-full border p-2 rounded"
                                     rows={4}
                                     value={value}
                                     onChange={(e) =>
-                                        updateContent(index, e.target.value)
+                                        updateContent("content_en", e.target.value, index)
                                     }
+                                    required
                                 />
-                                {form.content.length > 1 && (
+                                {form.content_en.length > 1 && (
                                     <button
                                         type="button"
                                         className="text-red-600 text-sm"
-                                        onClick={() => removeContent(index)}
+                                        onClick={() => removeContent("content_en", index)}
                                     >
                                         Remove
                                     </button>
@@ -320,9 +341,41 @@ export default function About() {
                         <button
                             type="button"
                             className="text-bgGreen text-sm mt-2"
-                            onClick={addContent}
+                            onClick={() => addContent("content_en")}
                         >
-                            + Add More Content
+                            + Add More English Content
+                        </button>
+                    </div>
+
+                    <div>
+                        <label className="font-medium">Arabic Content</label>
+                        {form.content_ar.map((value, index) => (
+                            <div key={index} className="mt-2">
+                                <textarea
+                                    className="w-full border p-2 rounded"
+                                    rows={4}
+                                    value={value}
+                                    onChange={(e) =>
+                                        updateContent("content_ar", e.target.value, index)
+                                    }
+                                />
+                                {form.content_ar.length > 1 && (
+                                    <button
+                                        type="button"
+                                        className="text-red-600 text-sm"
+                                        onClick={() => removeContent("content_ar", index)}
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            className="text-bgGreen text-sm mt-2"
+                            onClick={() => addContent("content_ar")}
+                        >
+                            + Add More Arabic Content
                         </button>
                     </div>
 

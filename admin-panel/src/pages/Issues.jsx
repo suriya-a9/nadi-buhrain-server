@@ -9,11 +9,14 @@ import { formatDateTime } from "../utils/dateUtils";
 export default function Issues() {
     const [issuesList, setIssuesList] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
+    const [services, setServices] = useState([]);
     const [editData, setEditData] = useState(null);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
-        issue: ""
+        serviceId: "",
+        issue_en: "",
+        issue_ar: ""
     });
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +30,7 @@ export default function Issues() {
     const loadIssues = async () => {
         try {
             setLoading(true);
-            const res = await api.get("/issue/");
+            const res = await api.get("/issue/list");
             setIssuesList(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -37,10 +40,19 @@ export default function Issues() {
 
     useEffect(() => {
         loadIssues();
+        const fetchServices = async () => {
+            try {
+                const res = await api.get("/service?lang=en");
+                setServices(res.data.data);
+            } catch (err) {
+                toast.error("Failed to load services");
+            }
+        };
+        fetchServices();
     }, []);
 
     const openCreate = () => {
-        setForm({ issue: "" });
+        setForm({ serviceId: "", issue_en: "", issue_ar: "" });
         setEditData(null);
         setOpenCanvas(true);
     };
@@ -48,7 +60,9 @@ export default function Issues() {
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            issue: item.issue,
+            serviceId: item.serviceId || "",
+            issue_en: item.issue_en,
+            issue_ar: item.issue_ar,
         });
         setOpenCanvas(true);
     };
@@ -85,7 +99,9 @@ export default function Issues() {
         }
     };
     const filteredIssues = issuesList.filter(s =>
-        s.issue.toLowerCase().includes(search.toLowerCase())
+        (s.issue_en || "").toLowerCase().includes(search.toLowerCase()) ||
+        (s.issue_ar || "").toLowerCase().includes(search.toLowerCase()) ||
+        (s.serviceName || "").toLowerCase().includes(search.toLowerCase())
     );
     const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
 
@@ -144,7 +160,9 @@ export default function Issues() {
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * itemsPerPage + idx + 1,
                             },
-                            { title: "Issue", key: "issue" },
+                            { title: "Service", key: "serviceName" },
+                            { title: "Issue (EN)", key: "issue_en" },
+                            { title: "Issue (AR)", key: "issue_ar" },
                             {
                                 title: "Date & Time",
                                 key: "updatedAt",
@@ -185,11 +203,33 @@ export default function Issues() {
             >
                 <form onSubmit={saveIssue} className="space-y-4">
                     <div>
-                        <label className="block mb-1 font-medium">Issue</label>
+                        <label className="block mb-1 font-medium">Service</label>
+                        <select
+                            value={form.serviceId}
+                            onChange={e => setForm({ ...form, serviceId: e.target.value })}
+                            required
+                            className="w-full border p-2 rounded"
+                        >
+                            <option value="">Select Service</option>
+                            {services.map(s => (
+                                <option key={s._id} value={s._id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                        <label className="block mb-1 font-medium">Issue (EN)</label>
                         <input
                             type="text"
-                            value={form.issue}
-                            onChange={(e) => setForm({ ...form, issue: e.target.value })}
+                            value={form.issue_en}
+                            onChange={(e) => setForm({ ...form, issue_en: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                        <label className="block mb-1 font-medium">Issue (AR)</label>
+                        <input
+                            type="text"
+                            value={form.issue_ar}
+                            onChange={(e) => setForm({ ...form, issue_ar: e.target.value })}
                             className="w-full border p-2 rounded"
                             required
                         />

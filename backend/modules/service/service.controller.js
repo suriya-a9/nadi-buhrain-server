@@ -2,12 +2,13 @@ const Service = require('./service.model');
 const UserLog = require("../userLogs/userLogs.model");
 
 exports.createService = async (req, res, next) => {
-    const { name, points } = req.body;
+    const { name_en, name_ar, points } = req.body;
     try {
         const serviceImage = req.files?.serviceImage?.[0]?.filename;
         const serviceLogo = req.files?.serviceLogo?.[0]?.filename;
         const serviceCreate = await Service.create({
-            name,
+            name_en,
+            name_ar,
             points,
             serviceImage,
             serviceLogo
@@ -44,7 +45,7 @@ exports.updateService = async (req, res, next) => {
         );
         await UserLog.create({
             userId: req.user.id,
-            log: `Updated ${serviceUpdate.name} service to list`,
+            log: `Updated ${serviceUpdate.name_en} service to list`,
             status: "Updated",
             role: "admin",
             logo: "/assets/service request.webp",
@@ -59,6 +60,25 @@ exports.updateService = async (req, res, next) => {
 };
 
 exports.listService = async (req, res, next) => {
+    try {
+        const lang = req.query.lang || "en";
+        const serviceList = await Service.find();
+        const data = serviceList.map(item => {
+            const obj = item.toObject();
+            obj.name = lang === "ar" ? obj.name_ar : obj.name_en;
+            delete obj.name_en;
+            delete obj.name_ar;
+            return obj;
+        });
+        res.status(200).json({
+            data
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.listServiceForAdmin = async (req, res, next) => {
     try {
         const serviceList = await Service.find();
         res.status(200).json({
@@ -75,7 +95,7 @@ exports.deleteService = async (req, res, next) => {
         const serviceDelete = await Service.findByIdAndDelete(id);
         await UserLog.create({
             userId: req.user.id,
-            log: `Deleted ${serviceDelete.name} service to list`,
+            log: `Deleted ${serviceDelete.name_en} service to list`,
             status: "Deleted",
             role: "admin",
             logo: "/assets/service request.webp",

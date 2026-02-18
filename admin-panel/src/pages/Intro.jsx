@@ -8,7 +8,8 @@ export default function Intro() {
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
         id: "",
-        content: [""]
+        content_en: [""],
+        content_ar: [""],
     });
 
     const token = localStorage.getItem("token");
@@ -28,27 +29,30 @@ export default function Intro() {
         loadIntro();
     }, []);
 
-    const handleContentChange = (value, index) => {
-        const updated = [...form.content];
+    const handleContentChange = (lang, value, index) => {
+        const updated = [...form[lang]];
         updated[index] = value;
-        setForm({ ...form, content: updated });
+        setForm({ ...form, [lang]: updated });
     };
 
-    const addContentField = () => {
-        setForm({ ...form, content: [...form.content, ""] });
+    const addContentField = (lang) => {
+        setForm({ ...form, [lang]: [...form[lang], ""] });
     };
 
-    const removeContentField = (index) => {
-        const updated = form.content.filter((_, i) => i !== index);
-        setForm({ ...form, content: updated });
+    const removeContentField = (lang, index) => {
+        const updated = form[lang].filter((_, i) => i !== index);
+        setForm({ ...form, [lang]: updated });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const body = {
             id: form.id,
-            content: form.content
+            content_en: form.content_en,
+            content_ar: form.content_ar
         };
+
         try {
             if (!form.id) {
                 const res = await api.post("/intro/add", body, {
@@ -61,6 +65,7 @@ export default function Intro() {
                 });
                 toast.success(res.data.message);
             }
+
             setOpen(false);
             loadIntro();
         } catch (err) {
@@ -71,7 +76,8 @@ export default function Intro() {
     const editIntro = (intro) => {
         setForm({
             id: intro._id,
-            content: intro.content
+            content_en: intro.content_en || [""],
+            content_ar: intro.content_ar || [""]
         });
         setOpen(true);
     };
@@ -111,7 +117,11 @@ export default function Intro() {
                 <button
                     className="bg-bgGreen text-white px-4 py-2 rounded"
                     onClick={() => {
-                        setForm({ id: "", content: [""] });
+                        setForm({
+                            id: "",
+                            content_en: [""],
+                            content_ar: [""]
+                        });
                         setOpen(true);
                     }}
                 >
@@ -130,11 +140,25 @@ export default function Intro() {
                                 {intro.status ? "Enabled" : "Disabled"}
                             </span>
                         </div>
-                        <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                            {intro.content.map((v, i) => (
-                                <li key={i}>{v}</li>
-                            ))}
-                        </ul>
+                        <div className="space-y-2">
+                            <div>
+                                <strong>English:</strong>
+                                <ul className="list-disc pl-5">
+                                    {intro.content_en?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <strong>Arabic:</strong>
+                                <ul className="list-disc pl-5">
+                                    {intro.content_ar?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
                         <div className="flex justify-end mt-4 space-x-2">
                             <button
                                 className={`px-3 py-1 rounded ${intro.status ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white`}
@@ -163,37 +187,73 @@ export default function Intro() {
                 onClose={() => setOpen(false)}
                 title={form.id ? "Edit Intro" : "Add Intro"}
             >
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {form.content.map((val, i) => (
-                        <div key={i}>
-                            <label className="text-sm font-semibold block mb-1">
-                                Content #{i + 1}
-                            </label>
-                            <textarea
-                                value={val}
-                                onChange={(e) => handleContentChange(e.target.value, i)}
-                                className="border p-2 rounded w-full"
-                                rows={3}
-                                required
-                            />
-                            {form.content.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeContentField(i)}
-                                    className="text-red-600 text-sm mt-1"
-                                >
-                                    Remove
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addContentField}
-                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded"
-                    >
-                        + Add More
-                    </button>
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                    <div>
+                        <h3 className="font-bold text-lg mb-2">English Content</h3>
+                        {form.content_en.map((val, i) => (
+                            <div key={i} className="mb-3">
+                                <textarea
+                                    value={val}
+                                    onChange={(e) =>
+                                        handleContentChange("content_en", e.target.value, i)
+                                    }
+                                    className="border p-2 rounded w-full"
+                                    rows={3}
+                                    required
+                                />
+                                {form.content_en.length > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeContentField("content_en", i)}
+                                        className="text-red-600 text-sm mt-1"
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => addContentField("content_en")}
+                            className="bg-gray-200 px-3 py-1 rounded"
+                        >
+                            + Add English
+                        </button>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold text-lg mb-2">Arabic Content</h3>
+                        {form.content_ar.map((val, i) => (
+                            <div key={i} className="mb-3">
+                                <textarea
+                                    value={val}
+                                    onChange={(e) =>
+                                        handleContentChange("content_ar", e.target.value, i)
+                                    }
+                                    className="border p-2 rounded w-full"
+                                    rows={3}
+                                />
+                                {form.content_ar.length > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeContentField("content_ar", i)}
+                                        className="text-red-600 text-sm mt-1"
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => addContentField("content_ar")}
+                            className="bg-gray-200 px-3 py-1 rounded"
+                        >
+                            + Add Arabic
+                        </button>
+                    </div>
+
                     <button
                         type="submit"
                         className="bg-bgGreen w-full text-white py-2 rounded"

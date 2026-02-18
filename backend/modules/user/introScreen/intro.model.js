@@ -2,9 +2,12 @@ const mongoose = require("mongoose");
 
 const introSchema = new mongoose.Schema(
   {
-    content: {
+    content_en: {
       type: [String],
       required: true,
+    },
+    content_ar: {
+      type: [String]
     },
     status: {
       type: Boolean,

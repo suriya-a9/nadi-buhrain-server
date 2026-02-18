@@ -5,9 +5,12 @@ const issueSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Service"
     },
-    issue: {
+    issue_en: {
         type: String,
         required: true
+    },
+    issue_ar: {
+        type: String
     }
 }, { timestamps: true });
 

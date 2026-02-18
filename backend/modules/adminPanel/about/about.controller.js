@@ -2,7 +2,7 @@ const About = require("./about.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addAbout = async (req, res, next) => {
-    const { title, content, link, version, isActive = false } = req.body;
+    const { title, content_en, content_ar, link, version, isActive = false } = req.body;
     try {
         const userId = req.user.id
         if (!userId) {
@@ -14,7 +14,8 @@ exports.addAbout = async (req, res, next) => {
         const media = req.files?.media?.[0]?.filename;
         const aboutData = await About.create({
             title,
-            content,
+            content_en,
+            content_ar,
             link,
             version,
             media,
@@ -52,11 +53,19 @@ exports.listAbout = async (req, res, next) => {
 
 exports.listToUser = async (req, res, next) => {
     try {
+        const lang = req.query.lang || "en";
         const aboutData = await About.find({ isActive: true });
+        const data = aboutData.map(item => {
+            const obj = item.toObject();
+            obj.content = lang === "ar" ? obj.content_ar : obj.content_en;
+            delete obj.content_en;
+            delete obj.content_ar;
+            return obj;
+        });
         res.status(200).json({
             success: true,
             message: "Success",
-            data: aboutData
+            data
         })
     } catch (err) {
         next(err)

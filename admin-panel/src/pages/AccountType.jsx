@@ -10,7 +10,8 @@ export default function AccountType() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [form, setForm] = useState({
-        name: "",
+        name_ar: "",
+        name_en: "",
         type: ""
     });
     const ITEMS_PER_PAGE = 10;
@@ -34,7 +35,7 @@ export default function AccountType() {
     }, []);
 
     const openCreate = () => {
-        setForm({ name: "", type: "" });
+        setForm({ name_ar: "", name_en: "", type: "" });
         setEditData(null);
         setOpenCanvas(true);
     };
@@ -42,7 +43,8 @@ export default function AccountType() {
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            name: item.name,
+            name_ar: item.name_ar,
+            name_en: item.name_en,
             type: item.type
         });
         setOpenCanvas(true);
@@ -101,7 +103,8 @@ export default function AccountType() {
                         render: (_, __, idx) =>
                             (currentPage - 1) * ITEMS_PER_PAGE + idx + 1,
                     },
-                    { title: "Name", key: "name" },
+                    { title: "Name (EN)", key: "name_en" },
+                    { title: "Name (AR)", key: "name_ar" },
                     { title: "Type", key: "type" },
                 ]}
                 data={paginatedAccountType}
@@ -136,11 +139,19 @@ export default function AccountType() {
             >
                 <form onSubmit={saveAccountType} className="space-y-4">
                     <div>
-                        <label className="block mb-1 font-medium">Name</label>
+                        <label className="block mb-1 font-medium">Name (en)</label>
                         <input
                             type="text"
-                            value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            value={form.name_en}
+                            onChange={(e) => setForm({ ...form, name_en: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                        <label className="block mb-1 font-medium">Name (ar)</label>
+                        <input
+                            type="text"
+                            value={form.name_ar}
+                            onChange={(e) => setForm({ ...form, name_ar: e.target.value })}
                             className="w-full border p-2 rounded"
                             required
                         />

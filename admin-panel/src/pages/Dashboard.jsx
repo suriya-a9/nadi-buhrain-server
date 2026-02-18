@@ -70,7 +70,7 @@ export default function Dashboard() {
             .then(res => setServiceRequests(res.data.data || []))
             .catch(() => setServiceRequests([]));
 
-        api.get("/inventory/product-list")
+        api.get("/inventory")
             .then(res => {
                 setInventory(res.data.data || []);
                 const lowStock = (res.data.data || []).filter(item => {
@@ -127,7 +127,7 @@ export default function Dashboard() {
                     <ul className="list-disc pl-5 text-red-800 text-sm">
                         {lowStockProducts.map(product => (
                             <li key={product._id}>
-                                <span className="font-medium">{product.productName}</span> — Quantity: <span className="font-bold">{product.quantity}</span>
+                                <span className="font-medium">{product.productName_en}</span> — Quantity: <span className="font-bold">{product.quantity}</span>
                             </li>
                         ))}
                     </ul>

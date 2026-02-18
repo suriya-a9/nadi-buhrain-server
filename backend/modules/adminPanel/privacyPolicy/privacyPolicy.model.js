@@ -4,7 +4,10 @@ const privacyPolicySchema = new mongoose.Schema({
     title: {
         type: String
     },
-    content: {
+    content_en: {
+        type: [String]
+    },
+    content_ar: {
         type: [String]
     },
     link: {

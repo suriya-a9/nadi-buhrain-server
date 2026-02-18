@@ -10,7 +10,8 @@ export default function TermsAndCondition() {
     const [editData, setEditData] = useState(null);
     const [form, setForm] = useState({
         id: "",
-        content: ""
+        content_en: "",
+        content_ar: ""
     });
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -31,7 +32,8 @@ export default function TermsAndCondition() {
     }, []);
     const openCreate = () => {
         setForm({
-            content: "",
+            content_en: "",
+            content_ar: "",
         });
         setEditData(null);
         setOpenCanvas(true);
@@ -40,7 +42,8 @@ export default function TermsAndCondition() {
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            content: item.content,
+            content_en: item.content_en,
+            content_ar: item.content_ar,
         });
         setOpenCanvas(true);
     };
@@ -117,7 +120,10 @@ export default function TermsAndCondition() {
                     >
                         <h3 className="text-lg font-bold mb-2">Content</h3>
                         <div className="text-gray-700 whitespace-pre-line break-words">
-                            {item.content}
+                            {item.content_en}
+                        </div>
+                        <div className="text-gray-700 whitespace-pre-line break-words">
+                            {item.content_ar}
                         </div>
                         <div className="flex justify-end mt-4 space-x-2">
                             <button
@@ -159,9 +165,18 @@ export default function TermsAndCondition() {
                 <form onSubmit={saveTermsAndCondition} className="space-y-4">
                     <div>
                         <label className="block mb-1 font-medium">Terms and Condition</label>
+                        <label className="block mb-1 font-medium">English</label>
                         <textarea
-                            value={form.content}
-                            onChange={(e) => setForm({ ...form, content: e.target.value })}
+                            value={form.content_en}
+                            onChange={(e) => setForm({ ...form, content_en: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            rows={5}
+                            required
+                        />
+                        <label className="block mb-1 font-medium">Arabic</label>
+                        <textarea
+                            value={form.content_ar}
+                            onChange={(e) => setForm({ ...form, content_ar: e.target.value })}
                             className="w-full border p-2 rounded"
                             rows={5}
                             required

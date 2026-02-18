@@ -7,7 +7,8 @@ const accountDeleteReasonsSchema = new mongoose.Schema({
         ref: Admin
     },
     reason_en: {
-        type: String
+        type: String,
+        required: true
     },
     reason_ar: {
         type: String

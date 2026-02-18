@@ -2,7 +2,7 @@ const PrivacyPolicy = require("./privacyPolicy.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addPolicy = async (req, res, next) => {
-    const { title, content, link, subs, isActive = false } = req.body;
+    const { title, content_en, content_ar, link, subs, isActive = false } = req.body;
     try {
         const userId = req.user.id
         if (!userId) {
@@ -14,7 +14,8 @@ exports.addPolicy = async (req, res, next) => {
         const media = req.files?.media?.[0]?.filename;
         const privacyData = await PrivacyPolicy.create({
             title,
-            content,
+            content_en,
+            content_ar,
             link,
             subs,
             isActive,
@@ -52,11 +53,19 @@ exports.listPrivacy = async (req, res, next) => {
 
 exports.listUserPrivacy = async (req, res, next) => {
     try {
+        const lang = req.query.lang || "en";
         const privacyData = await PrivacyPolicy.find({ isActive: true });
+        const data = privacyData.map(item => {
+            const obj = item.toObject();
+            obj.content = lang === "ar" ? obj.content_ar : obj.content_en;
+            delete obj.content_en;
+            delete obj.content_ar;
+            return obj;
+        });
         res.status(200).json({
             success: true,
             message: "Success",
-            data: privacyData
+            data
         })
     } catch (err) {
         next(err)

@@ -14,7 +14,8 @@ export default function Services() {
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         id: "",
-        name: "",
+        name_ar: "",
+        name_en: "",
         points: "",
         serviceImage: null,
         serviceLogo: null,
@@ -26,7 +27,7 @@ export default function Services() {
     }, [services]);
     const loadServices = async () => {
         setLoading(true);
-        const res = await api.get("/service");
+        const res = await api.get("/service/list");
         setServices(res.data.data);
         setLoading(false);
     };
@@ -47,7 +48,8 @@ export default function Services() {
         e.preventDefault();
 
         const fd = new FormData();
-        fd.append("name", form.name);
+        fd.append("name_en", form.name_en);
+        fd.append("name_ar", form.name_ar);
         fd.append("points", form.points);
         if (form.serviceImage) fd.append("serviceImage", form.serviceImage);
         if (form.serviceLogo) fd.append("serviceLogo", form.serviceLogo);
@@ -58,7 +60,7 @@ export default function Services() {
             toast.success(res.data.message);
             loadServices();
             setOpenCanvas(false);
-            setForm({ id: "", name: "", points: "", serviceImage: null, serviceLogo: null });
+            setForm({ id: "", name_ar: "", name_en: "", points: "", serviceImage: null, serviceLogo: null });
         } catch (err) {
             toast.error(err.response?.data?.message);
         }
@@ -67,7 +69,8 @@ export default function Services() {
     const editService = (s) => {
         setForm({
             id: s._id,
-            name: s.name,
+            name_ar: s.name_ar,
+            name_en: s.name_en,
             points: s.points,
             serviceImage: null,
             serviceLogo: null,
@@ -85,7 +88,8 @@ export default function Services() {
         }
     };
     const filteredServices = services.filter(s =>
-        s.name.toLowerCase().includes(search.toLowerCase())
+        (s.name_en || "").toLowerCase().includes(search.toLowerCase()) ||
+        (s.name_ar || "").toLowerCase().includes(search.toLowerCase())
     );
 
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
@@ -122,7 +126,7 @@ export default function Services() {
                     <button
                         className="bg-bgGreen text-white px-4 py-2 rounded"
                         onClick={() => {
-                            setForm({ id: "", name: "", serviceImage: null, serviceLogo: null });
+                            setForm({ id: "", name_en: "", name_ar: "", serviceImage: null, serviceLogo: null });
                             setOpenCanvas(true);
                         }}
                     >
@@ -147,7 +151,8 @@ export default function Services() {
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * itemsPerPage + idx + 1,
                             },
-                            { title: "Name", key: "name" },
+                            { title: "Name (En)", key: "name_en" },
+                            { title: "Name (Ar)", key: "name_ar" },
                             { title: "Points", key: "points" },
                             {
                                 title: "Image",
@@ -215,11 +220,21 @@ export default function Services() {
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     <div className="flex flex-col gap-1">
-                        <label className="block mb-1 font-medium">Service Name</label>
+                        <label className="block mb-1 font-medium">Service Name (En)</label>
                         <input
                             type="text"
-                            name="name"
-                            value={form.name}
+                            name="name_en"
+                            value={form.name_en}
+                            onChange={handleChange}
+                            placeholder="Enter Service Name"
+                            required
+                            className="border p-2 rounded w-full"
+                        />
+                        <label className="block mb-1 font-medium">Service Name (Ar)</label>
+                        <input
+                            type="text"
+                            name="name_ar"
+                            value={form.name_ar}
                             onChange={handleChange}
                             placeholder="Enter Service Name"
                             required

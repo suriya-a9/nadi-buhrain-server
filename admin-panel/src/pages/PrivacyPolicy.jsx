@@ -12,7 +12,8 @@ export default function PrivacyPolicy() {
 
     const [form, setForm] = useState({
         title: "",
-        content: [""],
+        content_en: [""],
+        content_ar: [""],
         subs: [""],
         link: "",
         media: null
@@ -43,7 +44,8 @@ export default function PrivacyPolicy() {
         setEditData(null);
         setForm({
             title: "",
-            content: [""],
+            content_en: [""],
+            content_ar: [""],
             subs: [""],
             link: "",
             media: null
@@ -55,27 +57,32 @@ export default function PrivacyPolicy() {
         setEditData(item);
         setForm({
             title: item.title,
-            content: item.content?.length ? item.content : [""],
+            content_en: Array.isArray(item.content_en) && item.content_en.length
+                ? item.content_en
+                : [""],
+            content_ar: Array.isArray(item.content_ar) && item.content_ar.length
+                ? item.content_ar
+                : [""],
             subs: item.subs?.length ? item.subs : [""],
             link: item.link || "",
             media: null
         });
         setOpenCanvas(true);
     };
-
+    
     const updateArray = (key, index, value) => {
         const updated = [...form[key]];
         updated[index] = value;
         setForm({ ...form, [key]: updated });
     };
 
-    const addArrayItem = (key) => {
-        setForm({ ...form, [key]: [...form[key], ""] });
+    const addArrayItem = (lang) => {
+        setForm({ ...form, [lang]: [...form[lang], ""] });
     };
 
-    const removeArrayItem = (key, index) => {
-        const updated = form[key].filter((_, i) => i !== index);
-        setForm({ ...form, [key]: updated.length ? updated : [""] });
+    const removeArrayItem = (lang, index) => {
+        const updated = form[lang].filter((_, i) => i !== index);
+        setForm({ ...form, [lang]: updated.length ? updated : [""] });
     };
 
     const savePrivacy = async (e) => {
@@ -85,9 +92,12 @@ export default function PrivacyPolicy() {
         formData.append("title", form.title);
         formData.append("link", form.link);
 
-        form.content.forEach((v, i) =>
-            formData.append(`content[${i}]`, v)
-        );
+        form.content_en.forEach((value, index) => {
+            formData.append(`content_en[${index}]`, value);
+        });
+        form.content_ar.forEach((value, index) => {
+            formData.append(`content_ar[${index}]`, value);
+        });
         form.subs.forEach((v, i) =>
             formData.append(`subs[${i}]`, v)
         );
@@ -169,15 +179,30 @@ export default function PrivacyPolicy() {
 
                         <span
                             className={`px-2 py-1 text-xs rounded ${item.isActive
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
                                 }`}
                         >
                             {item.isActive ? "Active" : "Disabled"}
                         </span>
 
-                        <div className="whitespace-pre-line">
-                            {item.content?.join("\n\n")}
+                        <div className="space-y-2">
+                            <div>
+                                <strong>English:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_en?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Arabic:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_ar?.map((v, i) => (
+                                        <li key={i}>{v}</li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         {item.subs?.length > 0 && (
@@ -277,23 +302,23 @@ export default function PrivacyPolicy() {
                     />
 
                     <div>
-                        <label className="font-medium">Content</label>
-                        {form.content.map((v, i) => (
-                            <div key={i}>
+                        <label className="font-medium">English Content</label>
+                        {form.content_en.map((value, index) => (
+                            <div key={index} className="mt-2">
                                 <textarea
-                                    className="w-full border p-2 rounded mt-2"
-                                    value={v}
+                                    className="w-full border p-2 rounded"
+                                    rows={4}
+                                    value={value}
                                     onChange={(e) =>
-                                        updateArray("content", i, e.target.value)
+                                        updateArray("content_en", index, e.target.value)
                                     }
+                                    required
                                 />
-                                {form.content.length > 1 && (
+                                {form.content_en.length > 1 && (
                                     <button
                                         type="button"
                                         className="text-red-600 text-sm"
-                                        onClick={() =>
-                                            removeArrayItem("content", i)
-                                        }
+                                        onClick={() => removeArrayItem("content_en", index)}
                                     >
                                         Remove
                                     </button>
@@ -302,10 +327,42 @@ export default function PrivacyPolicy() {
                         ))}
                         <button
                             type="button"
-                            className="text-bgGreen text-sm"
-                            onClick={() => addArrayItem("content")}
+                            className="text-bgGreen text-sm mt-2"
+                            onClick={() => addArrayItem("content_en")}
                         >
-                            + Add Content
+                            + Add More English Content
+                        </button>
+                    </div>
+
+                    <div>
+                        <label className="font-medium">Arabic Content</label>
+                        {form.content_ar.map((value, index) => (
+                            <div key={index} className="mt-2">
+                                <textarea
+                                    className="w-full border p-2 rounded"
+                                    rows={4}
+                                    value={value}
+                                    onChange={(e) =>
+                                        updateArray("content_ar", index, e.target.value)
+                                    }
+                                />
+                                {form.content_ar.length > 1 && (
+                                    <button
+                                        type="button"
+                                        className="text-red-600 text-sm"
+                                        onClick={() => removeArrayItem("content_ar", index)}
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            className="text-bgGreen text-sm mt-2"
+                            onClick={() => addArrayItem("content_ar")}
+                        >
+                            + Add More Arabic Content
                         </button>
                     </div>
 

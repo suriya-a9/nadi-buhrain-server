@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 const helpSupportSchema = new mongoose.Schema({
-    content: {
+    content_en: {
+        type: String
+    },
+    content_ar: {
         type: String
     },
     link: {

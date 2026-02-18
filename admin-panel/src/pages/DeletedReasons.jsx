@@ -23,7 +23,7 @@ export default function DeletedReasons() {
     const token = localStorage.getItem("token");
     const loadReasons = async () => {
         setLoading(true);
-        const res = await api.get("/delete-Reasons/");
+        const res = await api.get("/delete-Reasons/list");
         setReasons(res.data.data);
         setLoading(false);
     };
@@ -92,7 +92,7 @@ export default function DeletedReasons() {
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-[25px] font-bold mb-6 text-textGreen">Roles List</h2>
+                <h2 className="text-[25px] font-bold mb-6 text-textGreen">Reasons List</h2>
                 <button
                     onClick={openCreate}
                     className="bg-bgGreen text-white px-4 py-2 rounded"

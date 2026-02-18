@@ -9,7 +9,8 @@ export default function HelpAndSupport() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [form, setForm] = useState({
-        content: "",
+        content_en: "",
+        content_ar: "",
         link: ""
     });
     const ITEMS_PER_PAGE = 10;
@@ -32,7 +33,8 @@ export default function HelpAndSupport() {
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            content: item.content,
+            content_en: item.content_en,
+            content_ar: item.content_ar,
             link: item.link || ""
         });
         setOpenCanvas(true);
@@ -41,7 +43,8 @@ export default function HelpAndSupport() {
         e.preventDefault();
 
         const payload = {
-            content: form.content,
+            content_en: form.content_en,
+            content_ar: form.content_ar,
             link: form.link
         };
 
@@ -100,7 +103,7 @@ export default function HelpAndSupport() {
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-[25px] font-bold text-textGreen">Privacy Policy</h2>
+                <h2 className="text-[25px] font-bold text-textGreen">Help and Support</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {paginatedHelp.map((item) => (
@@ -119,8 +122,27 @@ export default function HelpAndSupport() {
                             {item.isActive ? "Active" : "Disabled"}
                         </span>
 
-                        <div className="whitespace-pre-line text-gray-700">
-                            {item.content}
+                        <div className="space-y-2">
+                            <div>
+                                <strong>English:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_en
+                                        ? item.content_en.split('\n').map((v, i) => (
+                                            <li key={i}>{v}</li>
+                                        ))
+                                        : null}
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Arabic:</strong>
+                                <ul className="list-disc pl-5">
+                                    {item.content_ar
+                                        ? item.content_ar.split('\n').map((v, i) => (
+                                            <li key={i}>{v}</li>
+                                        ))
+                                        : null}
+                                </ul>
+                            </div>
                         </div>
 
                         {item.link && (
@@ -181,9 +203,18 @@ export default function HelpAndSupport() {
                         className="w-full border p-2 rounded resize-none"
                         placeholder="Content"
                         rows={6}
-                        value={form.content}
+                        value={form.content_en}
                         onChange={(e) =>
-                            setForm({ ...form, content: e.target.value })
+                            setForm({ ...form, content_en: e.target.value })
+                        }
+                    />
+                    <textarea
+                        className="w-full border p-2 rounded resize-none"
+                        placeholder="Content"
+                        rows={6}
+                        value={form.content_ar}
+                        onChange={(e) =>
+                            setForm({ ...form, content_ar: e.target.value })
                         }
                     />
                     <input

@@ -2,7 +2,7 @@ const HelpSupport = require("./helpAndSupport.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addHelp = async (req, res, next) => {
-    const { content, link } = req.body;
+    const { content_en, content_ar, link } = req.body;
     try {
         const userId = req.user.id;
         if (!userId) {
@@ -12,7 +12,8 @@ exports.addHelp = async (req, res, next) => {
             })
         }
         await HelpSupport.create({
-            content,
+            content_en,
+            content_ar,
             link
         })
         await UserLog.create({
@@ -34,10 +35,18 @@ exports.addHelp = async (req, res, next) => {
 
 exports.userList = async (req, res, next) => {
     try {
+        const lang = req.query.lang || "en";
         const helpData = await HelpSupport.find({ isActive: true });
+        const data = helpData.map(item => {
+            const obj = item.toObject();
+            obj.content = lang === "ar" ? obj.content_ar : obj.content_en;
+            delete obj.content_en;
+            delete obj.content_ar;
+            return obj;
+        });
         res.status(200).json({
             success: true,
-            data: helpData
+            data
         })
     } catch (err) {
         next(err)
@@ -100,7 +109,7 @@ exports.toggleStatus = async (req, res, next) => {
         }
         await HelpSupport.findByIdAndUpdate(
             id,
-            {isActive},
+            { isActive },
             { new: true }
         )
         await UserLog.create({

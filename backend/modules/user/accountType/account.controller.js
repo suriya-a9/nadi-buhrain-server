@@ -2,12 +2,12 @@ const Account = require("./account.model");
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addAccountType = async (req, res, next) => {
-  const { name, type } = req.body;
+  const { name_ar, name_en, type } = req.body;
   try {
-    const accountTypeData = await Account.create({ name, type });
+    const accountTypeData = await Account.create({ name_ar, name_en, type });
     await UserLog.create({
       userId: req.user.id,
-      log: `Account type - ${accountTypeData.name} added`,
+      log: `Account type added`,
       status: "Created",
       role: "admin",
       logo: "/assets/account-type.webp",
@@ -32,7 +32,7 @@ exports.updateAccountType = async (req, res, next) => {
     )
     await UserLog.create({
       userId: req.user.id,
-      log: `Account type - ${updateAccount.name} Updated`,
+      log: `Account type - ${updateAccount.name_en} Updated`,
       status: "Updated",
       role: "admin",
       logo: "/assets/account-type.webp",

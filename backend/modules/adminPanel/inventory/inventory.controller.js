@@ -2,10 +2,11 @@ const Inventory = require('./inventory.model');
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addInventory = async (req, res, next) => {
-    const { productName, quantity, stock, price, lowStock } = req.body;
+    const { productName_ar, productName_en, quantity, stock, price, lowStock } = req.body;
     try {
         await Inventory.create({
-            productName,
+            productName_ar,
+            productName_en,
             quantity,
             price,
             stock: true,
@@ -13,7 +14,7 @@ exports.addInventory = async (req, res, next) => {
         });
         await UserLog.create({
             userId: req.user.id,
-            log: `${productName} product added to inventory`,
+            log: `${productName_en} product added to inventory`,
             status: "Added",
             role: "admin",
             logo: "/assets/product-added.webp",
@@ -28,6 +29,25 @@ exports.addInventory = async (req, res, next) => {
 }
 
 exports.listInventory = async (req, res, next) => {
+    try {
+        const lang = req.query.lang || "en";
+        const productList = await Inventory.find();
+        const data = productList.map(item => {
+            const obj = item.toObject();
+            obj.productName = lang === "ar" ? obj.productName_ar : obj.productName_en;
+            delete obj.productName_en;
+            delete obj.productName_ar;
+            return obj;
+        });
+        res.status(200).json({
+            data
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.listInventoryForAdmin = async (req, res, next) => {
     try {
         const productList = await Inventory.find();
         res.status(200).json({
@@ -48,7 +68,7 @@ exports.updateInventory = async (req, res, next) => {
         )
         await UserLog.create({
             userId: req.user.id,
-            log: `${updatedProduct.productName} product details updated`,
+            log: `${updatedProduct.productName_en} product details updated`,
             status: "Updated",
             role: "admin",
             logo: "/assets/product-added.webp",
@@ -68,7 +88,7 @@ exports.deleteInventory = async (req, res, next) => {
         const deletedProduct = await Inventory.findByIdAndDelete(id);
         await UserLog.create({
             userId: req.user.id,
-            log: `${deletedProduct.productName} product has been removed from inventory`,
+            log: `${deletedProduct.productName_en} product has been removed from inventory`,
             status: "Deleted",
             role: "admin",
             logo: "/assets/product-added.webp",
@@ -92,7 +112,7 @@ exports.stockUpdate = async (req, res, next) => {
         );
         await UserLog.create({
             userId: req.user.id,
-            log: `${updatedProduct.productName} product stock details updated`,
+            log: `${updatedProduct.productName_en} product stock details updated`,
             status: "Updated",
             role: "admin",
             logo: "/assets/product-added.webp",

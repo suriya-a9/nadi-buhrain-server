@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const accountSchema = new mongoose.Schema(
   {
-    name: {
+    name_ar: {
+      type: String,
+      required: true,
+    },
+    name_en: {
       type: String,
       required: true,
     },

@@ -2,10 +2,11 @@ const Terms = require('./terms.model');
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addTerms = async (req, res, next) => {
-    const { content } = req.body;
+    const { content_en, content_ar } = req.body;
     try {
         const termsContent = await Terms.create({
-            content
+            content_en,
+            content_ar
         })
         await UserLog.create({
             userId: req.user.id,
@@ -26,9 +27,17 @@ exports.addTerms = async (req, res, next) => {
 
 exports.listTerms = async (req, res, next) => {
     try {
+        const lang = req.query.lang || "en";
         const termsList = await Terms.find({ enabled: true });
+        const data = termsList.map(item => {
+            const obj = item.toObject();
+            obj.content = lang === "ar" ? obj.content_ar : obj.content_en;
+            delete obj.content_en;
+            delete obj.content_ar;
+            return obj;
+        });
         res.status(200).json({
-            data: termsList
+            data
         })
     } catch (err) {
         next(err);

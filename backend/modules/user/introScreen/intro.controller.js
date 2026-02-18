@@ -3,11 +3,12 @@ const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addIntro = async (req, res, next) => {
     try {
-        const { content, status } = req.body;
-        if (!content || !Array.isArray(content)) {
-            return res.status(400).json({ message: "content must be an array of strings" });
+        const { content_en, content_ar, status } = req.body;
+        if (!content_en || !Array.isArray(content_en)) {
+            return res.status(400).json({ message: "content_en must be an array of strings" });
         }
-        const intro = await Intro.create({ content, status });
+
+        const intro = await Intro.create({ content_en, content_ar, status });
         await UserLog.create({
             userId: req.user.id,
             log: "Intro content added",
@@ -46,6 +47,7 @@ exports.addIntro = async (req, res, next) => {
 
 exports.getIntro = async (req, res, next) => {
     try {
+        const lang = req.query.lang || "en";
         const intro = await Intro.findOne({ status: true });
 
         if (!intro) {
@@ -53,11 +55,9 @@ exports.getIntro = async (req, res, next) => {
         }
 
         const introObj = intro.toObject();
-
-        introObj.content = introObj.content.map((item, index) => ({
-            [index]: item
-        }));
-
+        introObj.content = lang === "ar" ? introObj.content_ar : introObj.content_en;
+        delete introObj.content_en;
+        delete introObj.content_ar;
         delete introObj.status;
 
         res.status(200).json({

@@ -16,7 +16,8 @@ export default function Inventory() {
     const [statusFilter, setStatusFilter] = useState("");
     const navigate = useNavigate();
     const [form, setForm] = useState({
-        productName: "",
+        productName_en: "",
+        productName_ar: "",
         quantity: "",
         stock: true,
         price: "",
@@ -34,7 +35,7 @@ export default function Inventory() {
     const loadInventory = async () => {
         try {
             setLoading(true);
-            const res = await api.get("/inventory/product-list");
+            const res = await api.get("/inventory");
             setInventory(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -48,7 +49,8 @@ export default function Inventory() {
 
     const openCreate = () => {
         setForm({
-            productName: "",
+            productName_en: "",
+            productName_ar: "",
             quantity: "",
             stock: true,
             price: "",
@@ -61,7 +63,8 @@ export default function Inventory() {
     const openEdit = (item) => {
         setEditData(item);
         setForm({
-            productName: item.productName,
+            productName_en: item.productName_en,
+            productName_ar: item.productName_ar,
             quantity: item.quantity,
             stock: !!item.stock,
             price: item.price,
@@ -124,7 +127,7 @@ export default function Inventory() {
         });
         if (lowStockProducts.length > 0) {
             toast.error(
-                `Alert: ${lowStockProducts.map(p => p.productName).join(", ")} ${lowStockProducts.length > 1 ? "have" : "has"
+                `Alert: ${lowStockProducts.map(p => p.productName_en).join(", ")} ${lowStockProducts.length > 1 ? "have" : "has"
                 } low stock`
             );
         }
@@ -133,7 +136,8 @@ export default function Inventory() {
     const filteredInventory = inventory.filter(s =>
         (statusFilter === "" || (statusFilter === "enabled" && s.stock) || (statusFilter === "disabled" && !s.stock)) &&
         (
-            String(s.productName || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.productName_en || "").toLowerCase().includes(search.toLowerCase()) ||
+            String(s.productName_ar || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.quantity || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.price || "").toLowerCase().includes(search.toLowerCase()) ||
             String(s.lowStock || "").toLowerCase().includes(search.toLowerCase())
@@ -207,7 +211,8 @@ export default function Inventory() {
                                 render: (_, __, idx) =>
                                     (currentPage - 1) * itemsPerPage + idx + 1,
                             },
-                            { title: "Product Name", key: "productName" },
+                            { title: "Product Name (EN)", key: "productName_en" },
+                            { title: "Product Name (AR)", key: "productName_ar" },
                             { title: "Quantity", key: "quantity" },
                             { title: "Price", key: "price" },
                             { title: "Low Stock", key: "lowStock" },
@@ -269,11 +274,21 @@ export default function Inventory() {
             >
                 <form onSubmit={saveInventory} className="space-y-4">
                     <div>
-                        <label className="block mb-1 font-medium">Product Name</label>
+                        <label className="block mb-1 font-medium">Product Name (EN)</label>
                         <input
                             type="text"
-                            value={form.productName}
-                            onChange={(e) => setForm({ ...form, productName: e.target.value })}
+                            value={form.productName_en}
+                            onChange={(e) => setForm({ ...form, productName_en: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Product Name (AR)</label>
+                        <input
+                            type="text"
+                            value={form.productName_ar}
+                            onChange={(e) => setForm({ ...form, productName_ar: e.target.value })}
                             className="w-full border p-2 rounded"
                             required
                         />
