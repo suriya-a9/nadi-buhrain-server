@@ -411,7 +411,8 @@ exports.handleAdminRequestAction = async (req, res, next) => {
             });
             await QuestionnaireAssignment.create({
                 userId: request.userId,
-                questionnaireId
+                questionnaireId,
+                requestedPoints: request.points
             });
         }
 

@@ -11,7 +11,11 @@ const questionnaireAssignmentSchema = new mongoose.Schema({
         ref: "Questionnaire",
         required: true
     },
-    status:{
+    requestedPoints: { 
+        type: Number,
+        required: true
+    },
+    status: {
         type: Boolean,
         default: false
     },

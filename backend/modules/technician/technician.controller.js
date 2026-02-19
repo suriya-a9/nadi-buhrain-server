@@ -164,6 +164,7 @@ exports.inventory = async (req, res, next) => {
                 message: "user id required"
             })
         }
+        const lang = req.query.lang || "en"
         const inventoryList = await SpareParts.find({
             technicianId: req.user.id
         }).populate("productId").sort({ createdAt: -1 });
@@ -172,10 +173,23 @@ exports.inventory = async (req, res, next) => {
                 message: "no products in inventory"
             });
         }
+        const data = inventoryList.map(item => {
+            const obj = item.toObject();
+            if (obj.productId) {
+                obj.productId.productName = lang === "ar"
+                    ? obj.productId.productName_ar
+                    : obj.productId.productName_en;
+                delete obj.productId.productName_en;
+                delete obj.productId.productName_ar;
+            }
+            if (obj.productName) delete obj.productName;
+            return obj;
+        });
+
         res.status(200).json({
             message: "inventory list retrieved",
-            data: inventoryList
-        })
+            data
+        });
     } catch (err) {
         next(err);
     }

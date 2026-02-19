@@ -10,7 +10,7 @@ const questionSchema = new mongoose.Schema({
 
 const questionnaireSchema = new mongoose.Schema({
     title: String,
-    totalPoints: Number,
+    // totalPoints: Number,
     questions: [questionSchema],
     createdAt: {
         type: Date,

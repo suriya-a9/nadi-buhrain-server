@@ -108,17 +108,6 @@ exports.submitQuestionnaire = async (req, res, next) => {
             });
         }
 
-        // const alreadySubmitted = await QuestionnaireResult.findOne({
-        //     userId,
-        //     questionnaireId
-        // });
-        // if (alreadySubmitted) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "Questionnaire already submitted"
-        //     });
-        // }
-
         const user = await UserAccount.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -126,6 +115,18 @@ exports.submitQuestionnaire = async (req, res, next) => {
                 message: "User not found"
             });
         }
+
+        const assignment = await QuestionnaireAssignment.findOne({
+            userId,
+            questionnaireId
+        });
+        if (!assignment) {
+            return res.status(400).json({
+                success: false,
+                message: "Assignment not found"
+            });
+        }
+        const requestedPoints = assignment.requestedPoints;
 
         let correctCount = 0;
         const detailedAnswers = [];
@@ -157,7 +158,7 @@ exports.submitQuestionnaire = async (req, res, next) => {
         const totalQuestions = questionnaire.questions.length;
         const percentage = (correctCount / totalQuestions) * 100;
         const pointsEarned = Math.round(
-            (percentage / 100) * questionnaire.totalPoints
+            (correctCount / totalQuestions) * requestedPoints
         );
 
         const updatedUser = await UserAccount.findByIdAndUpdate(

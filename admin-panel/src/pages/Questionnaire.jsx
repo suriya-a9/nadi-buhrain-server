@@ -16,7 +16,6 @@ export default function Questionnaire() {
 
     const [form, setForm] = useState({
         title: "",
-        totalPoints: "",
         questions: []
     });
 
@@ -45,7 +44,6 @@ export default function Questionnaire() {
         setEditData(null);
         setForm({
             title: "",
-            totalPoints: "",
             questions: []
         });
         setOpenCanvas(true);
@@ -55,7 +53,6 @@ export default function Questionnaire() {
         setEditData(item);
         setForm({
             title: item.title,
-            totalPoints: item.totalPoints,
             questions: item.questions
         });
         setOpenCanvas(true);
@@ -195,7 +192,6 @@ export default function Questionnaire() {
                         columns={[
                             { title: "S.No", render: (_, __, idx) => idx + 1 },
                             { title: "Title", key: "title" },
-                            { title: "Total Points", key: "totalPoints" },
                             {
                                 title: "Date & Time",
                                 key: "createdAt",
@@ -256,18 +252,6 @@ export default function Questionnaire() {
                         />
                     </div>
 
-                    <div>
-                        <label className="font-medium">Total Points</label>
-                        <input
-                            type="number"
-                            value={form.totalPoints}
-                            onChange={(e) =>
-                                setForm({ ...form, totalPoints: e.target.value })
-                            }
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
 
                     <hr />
 
