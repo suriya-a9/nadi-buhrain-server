@@ -485,7 +485,10 @@ exports.signIn = async (req, res, next) => {
         }
         const accountType = await Account.findById(user.accountTypeId);
         if (fcmToken) {
-            await UserAccount.updateOne(user._id, { fcmToken });
+            await UserAccount.updateOne(
+                { _id: user._id },
+                { $set: { fcmToken } }
+            );
         }
         const token = jwt.sign(
             { id: user._id },
@@ -857,7 +860,7 @@ exports.logout = async (req, res, next) => {
 
         await UserAccount.findByIdAndUpdate(
             userId,
-            { $set: { fcmToken: "" } },
+            { $set: { fcmToken: null } },
             { new: true }
         );
         await UserLog.create({

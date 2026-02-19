@@ -8,6 +8,7 @@ const sendPushNotificationStaff = require("../../../utils/sendPushStaff");
 const TechNotification = require("../../adminPanel/notification/techNotification.model");
 const sendMail = require("../../../utils/mailer");
 const technicianMaterialRequestActionTemplate = require("../../../template/technicianMaterialRequestActionTemplate");
+const logger = require("../../../logger");
 
 exports.singleRequest = async (req, res, next) => {
     const { productId, quantity, notes } = req.body;
@@ -227,6 +228,7 @@ exports.responseMaterialRequest = async (req, res, next) => {
         } else {
             request.status = status;
             await request.save();
+            logger.info("About to send push notification to technician:", technician.fcmToken);
             await sendPushNotificationStaff(
                 technician.fcmToken,
                 "Matrial Request",

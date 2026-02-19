@@ -69,6 +69,13 @@ exports.loginTechnician = async (req, res, next) => {
             email: email.toLowerCase()
         });
 
+        if (!fcmToken) {
+            return res.status(400).json({
+                success: false,
+                message: "no fcm token"
+            })
+        }
+
         if (!technician) {
             return res.status(401).json({
                 message: 'Invalid email or password'

@@ -26,8 +26,9 @@ const sendPushNotificationStaff = async (token, title, body) => {
     };
 
     try {
-        await admin.messaging().send(message);
-        console.log("Push notification sent");
+        console.log("Sending push notification to:", token, "with title:", title, "and body:", body);
+        const response = await admin.messaging().send(message);
+        console.log("Push notification sent, response:", response);
     } catch (err) {
         console.error("FCM Error:", err);
     }
