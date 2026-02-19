@@ -306,6 +306,7 @@ exports.listSpareParts = async (req, res, next) => {
 exports.listByUser = async (req, res, next) => {
     try {
         const technicianId = req.user.id;
+        const lang = req.query.lang || "en";
         if (!technicianId) {
             return res.status(403).json({
                 success: false,
@@ -314,9 +315,21 @@ exports.listByUser = async (req, res, next) => {
         }
         const listData = await MaterialRequest.find({ technicianId }).
             populate("productId").sort({ createdAt: -1 });
+        const data = listData.map(item => {
+            const obj = item.toObject();
+            if (obj.productId) {
+                obj.productId.productName = lang === "ar"
+                    ? obj.productId.productName_ar
+                    : obj.productId.productName_en;
+                delete obj.productId.productName_en;
+                delete obj.productId.productName_ar;
+            }
+            if (obj.productName) delete obj.productName;
+            return obj;
+        });
         res.status(200).json({
             success: true,
-            data: listData
+            data
         })
     } catch (err) {
         next(err)
