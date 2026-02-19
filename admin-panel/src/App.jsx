@@ -56,6 +56,7 @@ import AdminChatList from "./pages/AdminChatList";
 import UserChatList from "./pages/UserChatList";
 import DeletedAccounts from "./pages/DeletedAccounts";
 import DeletedReasons from "./pages/DeletedReasons";
+import Enquiry from "./pages/Enquiry";
 
 export default function App() {
   return (
@@ -600,6 +601,18 @@ export default function App() {
                   <PermissionRoute permission="Settings">
                     <DashboardLayout>
                       <DeletedReasons />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/enquiry"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="Settings">
+                    <DashboardLayout>
+                      <Enquiry />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

@@ -6,6 +6,7 @@ import { FaRegFileImage, FaUsers, FaTasks } from "react-icons/fa";
 import { LuFileTerminal } from "react-icons/lu";
 import { VscGitPullRequestGoToChanges, VscRequestChanges } from "react-icons/vsc";
 import { MdMiscellaneousServices, MdVerifiedUser, MdOutlineProductionQuantityLimits, MdOutlineAccountBox, MdErrorOutline, MdOutlinePrivacyTip, MdOutlineRequestPage } from "react-icons/md";
+import { FaWpforms } from "react-icons/fa6";
 import { MdDeleteOutline } from "react-icons/md";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { IoChatboxOutline } from "react-icons/io5";
@@ -207,6 +208,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             </NavLink>
                             <NavLink to="/deleted-reasons" className={linkClasses}>
                                 <MdDeleteOutline size={20} /> &nbsp;&nbsp;&nbsp;Deleted Reason
+                            </NavLink>
+                            <NavLink to="/enquiry" className={linkClasses}>
+                                <FaWpforms size={20} /> &nbsp;&nbsp;&nbsp;Enquiry List
                             </NavLink>
                         </>
                     )}

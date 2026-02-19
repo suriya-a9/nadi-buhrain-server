@@ -15,7 +15,7 @@ exports.userDashboardDetails = async (req, res, next) => {
         const dashboardData = {
             name: userData.basicInfo.fullName,
             points: userData.points ? userData.points : "0",
-            account: userData.accountTypeId.name,
+            account: userData.accountTypeId.name_en,
             image: userData.basicInfo.image,
         }
         res.status(200).json({
