@@ -57,6 +57,7 @@ import UserChatList from "./pages/UserChatList";
 import DeletedAccounts from "./pages/DeletedAccounts";
 import DeletedReasons from "./pages/DeletedReasons";
 import Enquiry from "./pages/Enquiry";
+import SparePartsUsage from "./pages/SparePartsUsage";
 
 export default function App() {
   return (
@@ -480,6 +481,18 @@ export default function App() {
                   <PermissionRoute permission="inventory">
                     <DashboardLayout>
                       <SpareParts />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/spare-parts-usage"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="inventory">
+                    <DashboardLayout>
+                      <SparePartsUsage />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

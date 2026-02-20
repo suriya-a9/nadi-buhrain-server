@@ -174,6 +174,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             <NavLink to="/spare-parts" className={linkClasses}>
                                 <BiCartAdd size={20} /> &nbsp;&nbsp;&nbsp;Spare Parts
                             </NavLink>
+                            <NavLink to="/spare-parts-usage" className={linkClasses}>
+                                <BiCartAdd size={20} /> &nbsp;&nbsp;&nbsp;Spare Parts Usage
+                            </NavLink>
                         </>
                     )}
                     {permissions.includes("Settings") && (
