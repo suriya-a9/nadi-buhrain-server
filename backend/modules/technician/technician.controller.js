@@ -231,6 +231,17 @@ exports.startWork = async (req, res, next) => {
             a => a.technicianId.toString() === technicianId.toString()
         );
 
+        const existingWork = await TechnicianUserService.findOne({
+            "assignments.technicianId": technicianId,
+            "assignments.status": "in-progress"
+        })
+        if (existingWork) {
+            return res.status(400).json({
+                success: false,
+                message: "Another work is already in progress"
+            })
+        }
+
         if (!assignment?.userApproval) {
             const existingApproval = await UserApproval.findOne({
                 userId: userService.userId,
