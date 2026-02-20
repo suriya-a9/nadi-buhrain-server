@@ -107,11 +107,13 @@ exports.updateServiceStatus = async (req, res, next) => {
             logo: "/assets/service request.webp",
             time: new Date()
         });
-        await sendPushNotification(
-            user.fcmToken,
-            "Service Request",
-            `Service request ${serviceStatus}`
-        );
+        if (user.notification) {
+            await sendPushNotification(
+                user.fcmToken,
+                "Service Request",
+                `Service request ${serviceStatus}`
+            );
+        }
         await UserNotification.create({
             message: `Service request ${serviceStatus}`,
             type: "Service request",
@@ -198,7 +200,7 @@ exports.assignTechnician = async (req, res, next) => {
         );
 
         for (const tech of technicians) {
-            if (tech.fcmToken) {
+            if (tech.fcmToken && tech.notification) {
                 await sendPushNotificationStaff(
                     tech.fcmToken,
                     "New Service Assignment",
@@ -334,11 +336,13 @@ exports.technicianRespond = async (req, res, next) => {
             });
             const io = req.app.get('io');
             io.emit('notification', notification);
-            await sendPushNotification(
-                user.fcmToken,
-                "Service Request",
-                `${technician.firstName} has been assigned for your request`
-            );
+            if (user.notification) {
+                await sendPushNotification(
+                    user.fcmToken,
+                    "Service Request",
+                    `${technician.firstName} has been assigned for your request`
+                );
+            }
             await UserNotification({
                 message: `${technician.firstName} has been assigned for your request`,
                 type: "Service Request",

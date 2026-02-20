@@ -10,6 +10,10 @@ const userAccountSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    notification: {
+        type: Boolean,
+        default: true
+    },
     step: {
         type: Number,
         default: 1
@@ -24,7 +28,7 @@ const userAccountSchema = new mongoose.Schema({
         email: {
             type: String
         },
-        image:{
+        image: {
             type: String,
             default: null
         },

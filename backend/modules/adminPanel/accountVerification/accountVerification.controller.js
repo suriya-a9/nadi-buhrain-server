@@ -48,11 +48,13 @@ exports.verifyAccount = async (req, res, next) => {
             logo: "/assets/verification.webp",
             time: new Date()
         })
-        await sendPushNotification(
-            user.fcmToken,
-            "Account verification",
-            `Your account has been verified.`
-        );
+        if (user.notification) {
+            await sendPushNotification(
+                user.fcmToken,
+                "Account verification",
+                `Your account has been verified.`
+            );
+        }
         await UserNotification({
             message: "Account verified",
             type: "Verification",

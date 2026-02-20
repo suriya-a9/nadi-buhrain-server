@@ -45,4 +45,8 @@ router.get("/list-with-last-message", auth, controller.listAdminsWithLastMessage
 
 router.post("/delete", auth, controller.setUserStatus);
 
+router.post("/notification-status", auth, controller.notificationStatus);
+
+router.post("/status", auth, controller.notificationStatusSet);
+
 module.exports = router;

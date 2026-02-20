@@ -111,11 +111,13 @@ exports.requestPointsToFamily = async (req, res, next) => {
             logo: "/assets/badge.webp",
             time: new Date()
         });
-        await sendPushNotification(
-            receiver.fcmToken,
-            "Points Request",
-            `New request for points ${points} by ${sender.basicInfo.fullName}`
-        );
+        if (receiver.notification) {
+            await sendPushNotification(
+                receiver.fcmToken,
+                "Points Request",
+                `New request for points ${points} by ${sender.basicInfo.fullName}`
+            );
+        }
         res.status(201).json({
             message: "Request sent"
         });
@@ -177,11 +179,13 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 userId: sender._id,
                 time: new Date()
             });
-            await sendPushNotification(
-                sender.fcmToken,
-                "Request Accepted",
-                `${receiver.basicInfo.fullName} accepted your request. ${points} added`
-            );
+            if (sender.notification) {
+                await sendPushNotification(
+                    sender.fcmToken,
+                    "Request Accepted",
+                    `${receiver.basicInfo.fullName} accepted your request. ${points} added`
+                );
+            }
 
             request.status = "accepted";
             await request.save();
@@ -215,11 +219,13 @@ exports.transferPointsWithFamily = async (req, res, next) => {
                 userId: sender._id,
                 time: new Date()
             });
-            await sendPushNotification(
-                sender.fcmToken,
-                "Request Rejected",
-                `Your points request rejected`
-            );
+            if (sender.notification) {
+                await sendPushNotification(
+                    sender.fcmToken,
+                    "Request Rejected",
+                    `Your points request rejected`
+                );
+            }
             return res.status(200).json({ message: "Request rejected" });
         } else {
             return res.status(400).json({ message: 'Invalid action' });
@@ -391,11 +397,13 @@ exports.handleAdminRequestAction = async (req, res, next) => {
                 })
             }
             const user = await UserAccount.findById(userId)
-            await sendPushNotification(
-                user.fcmToken,
-                "Points Request",
-                `Questionnaire assigned for your points request by Nadi Bahrain`
-            );
+            if (user.notification) {
+                await sendPushNotification(
+                    user.fcmToken,
+                    "Points Request",
+                    `Questionnaire assigned for your points request by Nadi Bahrain`
+                );
+            }
             await UserNotification.create({
                 type: 'Points Request',
                 message: `Questionnaire assigned for your points request by Nadi Bahrain`,
@@ -612,11 +620,13 @@ exports.requestWithOutMobileNumber = async (req, res, next) => {
             logo: "/assets/badge.webp",
             time: new Date()
         });
-        await sendPushNotification(
-            receiver.fcmToken,
-            "Points Request",
-            `New request for points ${points} by ${sender.basicInfo.fullName}`
-        );
+        if (receiver.notification) {
+            await sendPushNotification(
+                receiver.fcmToken,
+                "Points Request",
+                `New request for points ${points} by ${sender.basicInfo.fullName}`
+            );
+        }
         res.status(201).json({
             message: "Request sent"
         });

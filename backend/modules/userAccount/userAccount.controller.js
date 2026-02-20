@@ -961,3 +961,37 @@ exports.setUserStatus = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.notificationStatus = async (req, res, next) => {
+    const { status } = req.body;
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(403).json({
+                success: false,
+                message: "User ID needed"
+            })
+        }
+        await UserAccount.findByIdAndUpdate(userId, { notification: status }, { new: true })
+        res.status(200).json({
+            success: true,
+            message: "Notification settings updated"
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.notificationStatusSet = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const userData = await UserAccount.findById(userId);
+        const status = userData.notification;
+        res.status(200).json({
+            success: true,
+            data: status
+        })
+    } catch (err) {
+        next(err)
+    }
+}

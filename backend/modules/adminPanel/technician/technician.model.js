@@ -9,6 +9,10 @@ const technicianSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    notification: {
+        type: Boolean,
+        default: true
+    },
     firstName: {
         type: String
     },

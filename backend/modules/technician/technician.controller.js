@@ -291,14 +291,13 @@ exports.startWork = async (req, res, next) => {
 
         const user = await UserAccount.findById(userService.userId);
 
-        if (user?.fcmToken) {
+        if (user.notification) {
             await sendPushNotification(
                 user.fcmToken,
                 "Work Started",
                 `${technician.firstName} has started working on your request`
             );
         }
-
         const service = await UserService.findById(userServiceId);
 
         await UserLog.create({
@@ -428,11 +427,13 @@ exports.updateServiceStatus = async (req, res, next) => {
             logo: "/assets/technician.webp",
             time: new Date()
         });
-        await sendPushNotification(
-            user.fcmToken,
-            "Service Update",
-            "The technician has finished the work"
-        );
+        if (user.notification) {
+            await sendPushNotification(
+                user.fcmToken,
+                "Service Update",
+                "The technician has finished the work"
+            );
+        }
 
         await UserNotification.create({
             message: "Service finished by technician",

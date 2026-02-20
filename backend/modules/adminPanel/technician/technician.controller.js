@@ -443,3 +443,34 @@ exports.deleteTechnicianThemself = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.notificationStatus = async (req, res, next) => {
+    const { status } = req.body;
+    try {
+        const userId = req.user.id;
+        await Technician.findByIdAndUpdate(userId,
+            { notification: status },
+            { new: true }
+        )
+        res.status(200).json({
+            success: true,
+            message: "Notification settings updated"
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.notificationStatusSet = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const userData = await Technician.findById(userId);
+        const status = userData.notification;
+        res.status(200).json({
+            success: true,
+            data: status
+        })
+    } catch (err) {
+        next(err)
+    }
+}

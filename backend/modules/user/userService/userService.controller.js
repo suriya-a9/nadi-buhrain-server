@@ -101,11 +101,13 @@ exports.createRequest = async (req, res, next) => {
             time: new Date(),
             status: "debit"
         });
-        await sendPushNotification(
-            user.fcmToken,
-            "Service Request",
-            `Your service request has been submitted. Kindly wait till we process`
-        );
+        if (user.notification) {
+            await sendPushNotification(
+                user.fcmToken,
+                "Service Request",
+                `Your service request has been submitted. Kindly wait till we process`
+            );
+        }
         await UserNotification({
             message: "Account Created Successfully",
             type: "Created",

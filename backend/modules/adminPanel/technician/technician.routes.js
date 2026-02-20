@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerTechnician, loginTechnician, updateTechnician, deleteTechnician, profile, technicianList, setUserStatus, forgotPassword, resetPassword, adminUpdateTechnician, logout, deleteTechnicianThemself } = require('./technician.controller');
+const { registerTechnician, loginTechnician, updateTechnician, deleteTechnician, profile, technicianList, setUserStatus, forgotPassword, resetPassword, adminUpdateTechnician, logout, deleteTechnicianThemself, notificationStatus, notificationStatusSet } = require('./technician.controller');
 const upload = require('../../../middleware/fileUpload');
 const router = express.Router();
 const auth = require('../../../middleware/authMiddleware');
@@ -22,5 +22,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.post("/logout", auth, logout);
 router.post("/delete-tech", auth, deleteTechnicianThemself);
+router.post("/notification-status", auth, notificationStatus);
+router.post("/status", auth, notificationStatusSet);
 
 module.exports = router;
