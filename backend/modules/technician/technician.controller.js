@@ -366,6 +366,52 @@ exports.onHoldService = async (req, res, next) => {
     }
 }
 
+exports.getServiceTimer = async (req, res, next) => {
+    try {
+        const { userServiceId } = req.body;
+        const technicianId = req.user.id;
+
+        const techUserService = await TechnicianUserService.findOne({
+            userServiceId,
+            "assignments.technicianId": technicianId
+        });
+
+        if (!techUserService) {
+            return res.status(404).json({ message: "Assignment not found" });
+        }
+
+        const assignment = techUserService.assignments.find(
+            a => a.technicianId.toString() === technicianId.toString()
+        );
+
+        if (!assignment) {
+            return res.status(404).json({ message: "Assignment not found" });
+        }
+
+        const now = new Date();
+        let totalDuration = assignment.workDuration || 0;
+
+        let isRunning = false;
+
+        if (assignment.workStartedAt) {
+            const elapsed = Math.floor(
+                (now - assignment.workStartedAt) / 1000
+            );
+            totalDuration += elapsed;
+            isRunning = true;
+        }
+
+        res.status(200).json({
+            totalSeconds: totalDuration,
+            isRunning,
+            status: assignment.status
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.updateServiceStatus = async (req, res, next) => {
     try {
         const { userServiceId, notes } = req.body;
