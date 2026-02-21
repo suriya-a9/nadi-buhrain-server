@@ -8,6 +8,7 @@ const sendMail = require("../../../utils/mailer");
 const technicianResetPasswordTemplate = require("../../../template/technicianResetPassword.template")
 const sendPushNotification = require("../../../utils/sendPush");
 const DeletedAccounts = require("../deletedAccounts/deletedAccounts.model");
+const TechnicianUserService = require("../userService/technicianUserService.model");
 
 exports.registerTechnician = async (req, res, next) => {
     const { firstName, lastName, email, mobile, gender, password, role } = req.body;
@@ -92,6 +93,16 @@ exports.loginTechnician = async (req, res, next) => {
             await Technician.findByIdAndUpdate(technician._id, { fcmToken });
         }
 
+        const inProgressAssignment = await TechnicianUserService.findOne({
+            "assignments.technicianId": technician._id,
+            "assignments.status": "in-progress"
+        });
+
+        let userServiceId = null;
+        if (inProgressAssignment) {
+            userServiceId = inProgressAssignment.userServiceId;
+        }
+
         const token = jwt.sign(
             { id: technician._id, role: technician.role },
             config.jwt,
@@ -109,7 +120,8 @@ exports.loginTechnician = async (req, res, next) => {
 
         res.status(200).json({
             message: 'Logged in successfully',
-            token
+            token,
+            userServiceId
         });
     } catch (err) {
         next(err);

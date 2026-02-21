@@ -330,26 +330,34 @@ exports.onHoldService = async (req, res, next) => {
         }
 
         const now = new Date();
-        const userService = await UserService.findById(userServiceId);
-        if (userService && userService.workStartedAt) {
-            const elapsed = Math.floor((now - userService.workStartedAt) / 1000);
-            userService.workDuration = (userService.workDuration || 0) + elapsed;
-            userService.workStartedAt = null;
-            await userService.save();
+        const techUserService = await TechnicianUserService.findOne({
+            userServiceId,
+            "assignments.technicianId": technicianId
+        });
+        if (!techUserService) {
+            return res.status(404).json({ message: "Technician assignment not found" });
         }
-        const techUserService = await TechnicianUserService.findOneAndUpdate(
+        const assignment = techUserService.assignments.find(
+            a => a.technicianId.toString() === technicianId
+        );
+        let elapsed = 0;
+        if (assignment && assignment.workStartedAt) {
+            elapsed = Math.floor((now - assignment.workStartedAt) / 1000);
+        }
+        let newWorkDuration = (assignment?.workDuration || 0) + elapsed;
+
+        await TechnicianUserService.findOneAndUpdate(
             { userServiceId, "assignments.technicianId": technicianId },
             {
                 $set: {
                     "assignments.$.status": "on-hold",
-                    "assignments.$.statusChangedAt": now
+                    "assignments.$.statusChangedAt": now,
+                    "assignments.$.workDuration": newWorkDuration,
+                    "assignments.$.workStartedAt": null
                 }
             },
             { new: true }
         );
-        if (!techUserService) {
-            return res.status(404).json({ message: "Technician assignment not found" });
-        }
         await UserLog.create({
             userId: technicianId,
             log: `Work ${userServiceId} on hold`,
