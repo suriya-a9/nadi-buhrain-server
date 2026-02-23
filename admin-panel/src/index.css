@@ -17,11 +17,17 @@ aside::-webkit-scrollbar {
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.str-chat__channel .str-chat__container{
+.str-chat__channel .str-chat__container {
     display: block !important;
+}
+
+.str-chat__list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

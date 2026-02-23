@@ -13,8 +13,6 @@ router.post('/token', async (req, res) => {
     });
     const token = streamClient.createToken(userId);
     res.json({ token });
-    logger.info("upserting userid", userId);
-    logger.info("token", token)
 });
 
 module.exports = router;
