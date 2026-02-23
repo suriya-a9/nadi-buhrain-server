@@ -375,14 +375,26 @@ exports.handleAdminRequestAction = async (req, res, next) => {
         if (!request) {
             return res.status(404).json({ message: "Request not found" });
         }
-        if (!["raise_payment", "send_questionnaire"].includes(actionType)) {
+        if (!["approve", "send_questionnaire"].includes(actionType)) {
             return res.status(400).json({ message: "Invalid actionType" });
         }
 
         request.actionType = actionType;
 
-        if (actionType === "raise_payment") {
-            request.status = "payment requested";
+        if (actionType === "approve") {
+            request.status = "approved";
+            const user = await UserAccount.findById(request.userId);
+            if (user) {
+                user.points = (user.points || 0) + (request.points || 0);
+                await user.save();
+                await PointsHistory.create({
+                    userId: user._id,
+                    history: `Points approved by admin`,
+                    points: request.points,
+                    time: new Date(),
+                    status: "credit"
+                });
+            }
         } else if (actionType === "send_questionnaire") {
             if (!questionnaireId) {
                 return res.status(400).json({ message: "questionnaireId required" });

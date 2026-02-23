@@ -22,6 +22,15 @@ const userAccountSchema = new mongoose.Schema({
         fullName: {
             type: String,
         },
+        secondName: {
+            type: String,
+        },
+        thirdName: {
+            type: String,
+        },
+        fourthName: {
+            type: String,
+        },
         mobileNumber: {
             type: Number
         },

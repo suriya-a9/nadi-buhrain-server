@@ -42,7 +42,7 @@ exports.startSignUp = async (req, res, next) => {
 }
 
 exports.saveBasicInfo = async (req, res, next) => {
-    const { userId, fullName, mobileNumber, email, gender, password, isVerfied } = req.body;
+    const { userId, fullName, secondName, thirdName, fourthName, mobileNumber, email, gender, password, isVerfied } = req.body;
     try {
         const completedUser = await UserAccount.findOne({
             _id: { $ne: userId },
@@ -70,6 +70,9 @@ exports.saveBasicInfo = async (req, res, next) => {
         await UserAccount.findByIdAndUpdate(userId, {
             basicInfo: {
                 fullName,
+                secondName,
+                thirdName,
+                fourthName,
                 mobileNumber,
                 email,
                 gender,
@@ -305,9 +308,9 @@ exports.completeSignUp = async (req, res, next) => {
         if (!user.isVerfied) {
             return res.status(400).json({ message: "OTP not verified" });
         }
-        if (!user.idProofUrl) {
-            return res.status(400).json({ message: "Upload ID proof first" });
-        }
+        // if (!user.idProofUrl) {
+        //     return res.status(400).json({ message: "Upload ID proof first" });
+        // }
         const account = await Account.findById(user.accountTypeId);
         if (!account) {
             return res.status(400).json({ message: "Invalid account type" });

@@ -94,6 +94,12 @@ export default function AccountType() {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">Account Types List</h2>
+                <button
+                    onClick={openCreate}
+                    className="bg-bgGreen text-white px-4 py-2 rounded"
+                >
+                    Add Account Type
+                </button>
             </div>
             <Table
                 columns={[

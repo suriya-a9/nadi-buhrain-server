@@ -14,11 +14,11 @@ const RequestPointsAdminSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["requested", "sent questionnaire", "payment requested", "submitted"]
+        enum: ["requested", "sent questionnaire", "approved", "submitted"]
     },
     actionType: {
         type: String,
-        enum: ["raise_payment", "send_questionnaire", null],
+        enum: ["approve", "send_questionnaire", null],
         default: null
     },
     questionnaireId: {

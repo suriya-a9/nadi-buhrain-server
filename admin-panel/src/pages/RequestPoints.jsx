@@ -105,10 +105,10 @@ export default function RequestPoints() {
                                         <div className="flex gap-2">
                                             <button
                                                 className="bg-blue-500 text-white px-2 py-1 rounded"
-                                                onClick={() => handleAction(row._id, "raise_payment")}
+                                                onClick={() => handleAction(row._id, "approve")}
                                                 disabled={actionTaken}
                                             >
-                                                Raise Payment
+                                                Approve
                                             </button>
                                             <select
                                                 className="border px-2 py-1 rounded"
