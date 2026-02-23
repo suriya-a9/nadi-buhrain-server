@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import Chat from "./Chat";
+import { StreamChat } from "stream-chat";
+import { Chat, Channel, MessageList, MessageInput } from "stream-chat-react";
+import "stream-chat-react/css/v2/index.css";
 import { useAuth } from "../context/AuthContext";
-import { io } from "socket.io-client";
-const socket = io(import.meta.env.VITE_API_URL);
+
+const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 export default function AdminChatList() {
     const { id } = useAuth();
     const [admins, setAdmins] = useState([]);
     const [selectedAdmin, setSelectedAdmin] = useState(null);
-    const [unreadMap, setUnreadMap] = useState({});
+    const [chatClient, setChatClient] = useState(null);
+    const [channel, setChannel] = useState(null);
     const [showSidebar, setShowSidebar] = useState(false);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         if (!id) return;
@@ -18,44 +22,53 @@ export default function AdminChatList() {
             setAdmins(res.data.data.filter(a => a._id !== id));
         });
     }, [id]);
+
+    useEffect(() => {
+        if (!id) return;
+        async function initStream() {
+            const currentAdmin = admins.find(a => a._id === id) || {};
+            const res = await api.post("/stream-chat/token", {
+                userId: id,
+                name: currentAdmin.name,
+                email: currentAdmin.email
+            });
+            const { token } = res.data;
+            const client = StreamChat.getInstance(STREAM_API_KEY);
+            await client.connectUser({ id }, token);
+            setChatClient(client);
+        }
+        initStream();
+        return () => chatClient && chatClient.disconnectUser();
+    }, [id, admins]);
+
+    useEffect(() => {
+        if (!chatClient || !selectedAdmin) return;
+        async function setupChannel() {
+            await api.post("/stream-chat/token", {
+                userId: selectedAdmin._id,
+                name: selectedAdmin.name,
+                email: selectedAdmin.email
+            });
+            const channel = chatClient.channel("messaging", {
+                members: [id, selectedAdmin._id]
+            });
+            await channel.watch();
+            setChannel(channel);
+        }
+        setupChannel();
+    }, [chatClient, selectedAdmin, id]);
 
     if (!id) return null;
 
-    useEffect(() => {
-        socket.on("receive_message", (msg) => {
-            if (msg.to !== id) return;
-            if (selectedAdmin?._id !== msg.from) {
-                setUnreadMap(prev => ({
-                    ...prev,
-                    [msg.from]: true
-                }));
-            }
-        });
-        return () => {
-            socket.off("receive_message");
-        };
-    }, [id, selectedAdmin]);
-
-    useEffect(() => {
-        if (!id) return;
-        api.get("/admin/list").then(res => {
-            setAdmins(res.data.data.filter(a => a._id !== id));
-        });
-        api.get(`/chat/unread?userId=${id}`).then(res => {
-            const unread = {};
-            res.data.forEach(msg => {
-                unread[msg.from] = true;
-            });
-            setUnreadMap(unread);
-        });
-    }, [id]);
-
     return (
         <div className="h-screen bg-gray-50 flex flex-col md:flex-row">
-            <div className={`
-                fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden
-                ${showSidebar ? "block" : "hidden"}
-            `} onClick={() => setShowSidebar(false)} />
+            <div
+                className={`
+                    fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden
+                    ${showSidebar ? "block" : "hidden"}
+                `}
+                onClick={() => setShowSidebar(false)}
+            />
             <aside className={`
                 w-80 bg-white flex flex-col border-r z-50
                 fixed top-0 left-0 h-full transition-transform duration-300
@@ -78,51 +91,53 @@ export default function AdminChatList() {
                         <svg width="24" height="24" fill="none" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2">
-                    {admins.map(admin => {
-                        const isActive = selectedAdmin?._id === admin._id;
-                        return (
-                            <button
-                                key={admin._id}
-                                onClick={async () => {
-                                    setSelectedAdmin(admin);
-                                    setShowSidebar(false);
-                                    setUnreadMap(prev => ({
-                                        ...prev,
-                                        [admin._id]: false
-                                    }));
-                                    await api.post("/chat/mark-read", {
-                                        from: admin._id,
-                                        to: id
-                                    });
-                                    socket.emit("mark_read", { userId: id });
-                                }}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition
-                                    ${isActive
-                                        ? "bg-bgGreen/10 border border-bgGreen/30"
-                                        : "hover:bg-gray-100"
-                                    }
-                                `}
-                            >
-                                <div className="relative">
-                                    <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
-                                        {admin.name?.charAt(0).toUpperCase()}
+                <div className="px-4 py-2 border-b">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Search admins..."
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-bgGreen text-sm"
+                    />
+                </div>
+                <div className="flex-1 overflow-y-auto p-2 hide-scrollbar">
+                    {admins
+                        .filter(admin =>
+                            admin.name?.toLowerCase().includes(search.toLowerCase()) ||
+                            admin.email?.toLowerCase().includes(search.toLowerCase())
+                        )
+                        .map(admin => {
+                            const isActive = selectedAdmin?._id === admin._id;
+                            return (
+                                <button
+                                    key={admin._id}
+                                    onClick={() => {
+                                        setSelectedAdmin(admin);
+                                        setShowSidebar(false);
+                                    }}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition
+                                        ${isActive
+                                            ? "bg-bgGreen/10 border border-bgGreen/30"
+                                            : "hover:bg-gray-100"
+                                        }
+                                    `}
+                                >
+                                    <div className="relative">
+                                        <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
+                                            {admin.name?.charAt(0).toUpperCase()}
+                                        </div>
                                     </div>
-                                    {unreadMap[admin._id] && (
-                                        <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-bgGreen ring-2 ring-white" />
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium text-gray-800 truncate">
-                                        {admin.name}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-gray-800 truncate">
+                                            {admin.name}
+                                        </div>
+                                        <div className="text-xs text-gray-400 truncate">
+                                            {admin.email}
+                                        </div>
                                     </div>
-                                    <div className="text-xs text-gray-400 truncate">
-                                        {admin.email}
-                                    </div>
-                                </div>
-                            </button>
-                        );
-                    })}
+                                </button>
+                            );
+                        })}
                 </div>
             </aside>
             <main className="flex-1 flex flex-col h-full">
@@ -135,16 +150,34 @@ export default function AdminChatList() {
                     </button>
                     <span className="font-semibold text-lg">Admin Chat</span>
                 </div>
-                {selectedAdmin ? (
-                    <Chat
-                        userId={id}
-                        role="admin"
-                        chatWithId={selectedAdmin._id}
-                        chatWithRole="admin"
-                        chatWithName={selectedAdmin.name}
-                    />
+                {channel ? (
+                    <div className="flex flex-col h-full bg-white shadow-md min-h-0">
+                        <div className="border-b px-6 py-4 flex items-center gap-3 bg-bgGreen/10">
+                            <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-bold text-bgGreen text-lg">
+                                {selectedAdmin?.name?.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div className="text-lg font-semibold text-gray-800">{selectedAdmin?.name}</div>
+                                <div className="text-xs text-gray-500">{selectedAdmin?.email}</div>
+                            </div>
+                        </div>
+                        <div className="flex-1 flex flex-col min-h-0 hide-scrollbar">
+                            <Chat client={chatClient} theme="messaging light">
+                                <Channel channel={channel}>
+                                    <div className="flex flex-col h-full min-h-0">
+                                        <div className="flex-1 overflow-y-auto px-6 py-4 hide-scrollbar min-h-0">
+                                            <MessageList />
+                                        </div>
+                                        <div className="border-t px-6 py-4 bg-gray-50">
+                                            <MessageInput />
+                                        </div>
+                                    </div>
+                                </Channel>
+                            </Chat>
+                        </div>
+                    </div>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-400">
+                    <div className="flex-1 flex items-center justify-center text-gray-400 text-lg font-medium">
                         Select an admin to start chatting
                     </div>
                 )}

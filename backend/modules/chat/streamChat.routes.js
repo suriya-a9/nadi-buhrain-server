@@ -6,9 +6,10 @@ const logger = require("../../logger");
 const streamClient = StreamChat.getInstance(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET);
 
 router.post('/token', async (req, res) => {
-    const { userId } = req.body;
+    const { userId, name } = req.body;
     await streamClient.upsertUser({
-        id: userId
+        id: userId,
+        name: name || "",
     });
     const token = streamClient.createToken(userId);
     res.json({ token });
