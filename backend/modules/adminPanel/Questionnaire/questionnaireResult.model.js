@@ -1,5 +1,17 @@
 const mongoose = require("mongoose");
 
+const answerSchema = new mongoose.Schema({
+    questionIndex: Number,
+    question: String,
+    type: String,
+    options: [String],
+    correctAnswer: Number,
+    selectedOption: Number,
+    inputValue: String,
+    inputAnswer: String,
+    isCorrect: Boolean
+}, { _id: false });
+
 const questionnaireResultSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,13 +27,7 @@ const questionnaireResultSchema = new mongoose.Schema({
     correctAnswers: Number,
     percentage: Number,
     pointsEarned: Number,
-    answers: [
-        {
-            questionIndex: Number,
-            selectedOption: Number,
-            isCorrect: Boolean
-        }
-    ],
+    answers: [answerSchema],
     submittedAt: {
         type: Date,
         default: Date.now

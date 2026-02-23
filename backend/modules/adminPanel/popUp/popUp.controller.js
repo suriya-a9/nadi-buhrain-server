@@ -132,6 +132,10 @@ exports.submitQuestionnaire = async (req, res, next) => {
             let isCorrect = false;
             let answerObj = {
                 questionIndex: ans.questionIndex,
+                question: question.question,
+                type: question.type,
+                options: question.options,
+                correctAnswer: question.correctAnswer,
                 isCorrect
             };
 
@@ -139,8 +143,11 @@ exports.submitQuestionnaire = async (req, res, next) => {
                 isCorrect = question.correctAnswer === ans.selectedOption;
                 answerObj.selectedOption = ans.selectedOption;
             } else if (question.type === "input") {
+                // Accept both inputValue and selectedOption for input type
+                const userInput = ans.inputValue ?? ans.selectedOption ?? "";
                 isCorrect = true;
-                answerObj.inputValue = ans.inputValue;
+                answerObj.inputValue = userInput;
+                answerObj.inputAnswer = question.inputAnswer;
             }
 
             answerObj.isCorrect = isCorrect;

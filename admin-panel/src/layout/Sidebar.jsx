@@ -242,7 +242,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                 </NavLink>
                             )}
                             {filterBySearch("Questionnaires List") && (
-                                <NavLink to="/Material Requests" className={linkClasses}>
+                                <NavLink to="/Material-Requests" className={linkClasses}>
                                     <MdOutlineProductionQuantityLimits size={20} /> &nbsp;&nbsp;&nbsp;Material Requests
                                 </NavLink>
                             )}
