@@ -126,6 +126,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                                     <IoChatboxOutline size={20} /> &nbsp;&nbsp;&nbsp;User Chat
                                 </NavLink>
                             )}
+                            {filterBySearch("Technician Chat") && (
+                                <NavLink to="/technician-chat" className={linkClasses}>
+                                    <IoChatboxOutline size={20} /> &nbsp;&nbsp;&nbsp;Technician Chat
+                                </NavLink>
+                            )}
                         </>
                     )}
                     {permissions.includes("service-requests") && (

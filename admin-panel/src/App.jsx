@@ -58,6 +58,7 @@ import DeletedAccounts from "./pages/DeletedAccounts";
 import DeletedReasons from "./pages/DeletedReasons";
 import Enquiry from "./pages/Enquiry";
 import SparePartsUsage from "./pages/SparePartsUsage";
+import TechnicianChatList from "./pages/TechnicianChatList";
 
 export default function App() {
   return (
@@ -193,6 +194,18 @@ export default function App() {
                   <PermissionRoute permission="admin-chat">
                     <DashboardLayout>
                       <UserChatList />
+                    </DashboardLayout>
+                  </PermissionRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/technician-chat"
+              element={
+                <PrivateRoute>
+                  <PermissionRoute permission="admin-chat">
+                    <DashboardLayout>
+                      <TechnicianChatList />
                     </DashboardLayout>
                   </PermissionRoute>
                 </PrivateRoute>

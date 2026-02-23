@@ -121,7 +121,8 @@ exports.loginTechnician = async (req, res, next) => {
         res.status(200).json({
             message: 'Logged in successfully',
             token,
-            userServiceId
+            userServiceId,
+            id: technician._id
         });
     } catch (err) {
         next(err);
