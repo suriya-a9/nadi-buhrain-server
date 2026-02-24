@@ -110,12 +110,28 @@ export default function Login() {
                     </form>
                 </div>
             </div>
-            <div className="hidden lg:flex lg:w-1/2 bg-bgGreen items-center justify-center">
+            <div className="hidden lg:flex lg:w-1/2 bg-bgGreen items-center justify-center relative">
                 <img
                     src="/assets/logo.webp"
                     alt="logo"
                     className="w-3/4"
                 />
+                <div className="absolute right-8 bottom-8 flex gap-5">
+                    <img
+                        src="/assets/text.webp"
+                        width="50"
+                        alt="logo"
+                        className="w-[150px]"
+                        style={{ objectFit: "contain" }}
+                    />
+                    <img
+                        src="/assets/authyear.webp"
+                        width="50"
+                        alt="logo"
+                        className="w-[80px]"
+                        style={{ objectFit: "contain" }}
+                    />
+                </div>
             </div>
         </div>
     );

@@ -56,7 +56,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     `}
             >
                 <div className="p-4 flex items-center gap-3">
-                    <img src="/assets/Favicon.webp" className="w-10" />
+                    <img src="/assets/admin-panel-logo.png" className="w-[175px]" />
                     {/* <h2 className="text-[25px] font-bold text-textGreen">Nadi Bahrain</h2> */}
                     <button
                         onClick={toggleSidebar}
