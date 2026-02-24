@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function Inventory() {
     const [inventory, setInventory] = useState([]);
+    const [services, setServices] = useState([]);
+    const [selectedService, setSelectedService] = useState("");
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [search, setSearch] = useState("");
@@ -26,6 +28,19 @@ export default function Inventory() {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
+    const loadServices = async () => {
+        try {
+            const res = await api.get("/service/list");
+            setServices(res.data.data);
+        } catch (err) {
+            toast.error("Failed to load services");
+        }
+    }
+
+    useEffect(() => {
+        loadServices();
+    }, []);
+
     useEffect(() => {
         setCurrentPage(1);
     }, [inventory]);
@@ -35,7 +50,11 @@ export default function Inventory() {
     const loadInventory = async () => {
         try {
             setLoading(true);
-            const res = await api.get("/inventory");
+            let url = "/inventory";
+            if (selectedService) {
+                url = `/inventory/products-by-service?serviceId=${selectedService}`;
+            }
+            const res = await api.get(url);
             setInventory(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -45,7 +64,7 @@ export default function Inventory() {
 
     useEffect(() => {
         loadInventory();
-    }, []);
+    }, [selectedService]);
 
     const openCreate = () => {
         setForm({
@@ -54,7 +73,8 @@ export default function Inventory() {
             quantity: "",
             stock: true,
             price: "",
-            lowStock: ""
+            lowStock: "",
+            serviceId: ""
         });
         setEditData(null);
         setOpenCanvas(true);
@@ -68,7 +88,8 @@ export default function Inventory() {
             quantity: item.quantity,
             stock: !!item.stock,
             price: item.price,
-            lowStock: item.lowStock
+            lowStock: item.lowStock,
+            serviceId: item.serviceId?._id || item.serviceId || ""
         });
         setOpenCanvas(true);
     };
@@ -186,6 +207,18 @@ export default function Inventory() {
                         <option value={50}>Show 50</option>
                         <option value={100}>Show 100</option>
                     </select>
+                    <select
+                        value={selectedService}
+                        onChange={e => setSelectedService(e.target.value)}
+                        className="border p-2 rounded w-48"
+                    >
+                        <option value="">All Services</option>
+                        {services.map(service => (
+                            <option key={service._id} value={service._id}>
+                                {service.name_en}
+                            </option>
+                        ))}
+                    </select>
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded w-full sm:w-auto"
@@ -213,6 +246,7 @@ export default function Inventory() {
                             },
                             { title: "Product Name (EN)", key: "productName_en" },
                             { title: "Product Name (AR)", key: "productName_ar" },
+                            { title: "Service", key: "serviceId", render: (serviceId) => serviceId?.name_en || "-" },
                             { title: "Quantity", key: "quantity" },
                             { title: "Price", key: "price" },
                             { title: "Low Stock", key: "lowStock" },
@@ -273,6 +307,22 @@ export default function Inventory() {
                 title={editData ? "Edit Product" : "Add Product"}
             >
                 <form onSubmit={saveInventory} className="space-y-4">
+                    <div>
+                        <label className="block mb-1 font-medium">Service (Category)</label>
+                        <select
+                            value={form.serviceId || ""}
+                            onChange={e => setForm({ ...form, serviceId: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        >
+                            <option value="">Select Service</option>
+                            {services.map(service => (
+                                <option key={service._id} value={service._id}>
+                                    {service.name_en}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div>
                         <label className="block mb-1 font-medium">Product Name (EN)</label>
                         <input

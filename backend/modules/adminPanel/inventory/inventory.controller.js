@@ -2,7 +2,7 @@ const Inventory = require('./inventory.model');
 const UserLog = require("../../userLogs/userLogs.model");
 
 exports.addInventory = async (req, res, next) => {
-    const { productName_ar, productName_en, quantity, stock, price, lowStock } = req.body;
+    const { productName_ar, productName_en, quantity, stock, price, lowStock, serviceId } = req.body;
     try {
         await Inventory.create({
             productName_ar,
@@ -10,7 +10,8 @@ exports.addInventory = async (req, res, next) => {
             quantity,
             price,
             stock: true,
-            lowStock
+            lowStock,
+            serviceId
         });
         await UserLog.create({
             userId: req.user.id,
@@ -23,6 +24,16 @@ exports.addInventory = async (req, res, next) => {
         res.status(201).json({
             message: "Product created successfully"
         });
+    } catch (err) {
+        next(err);
+    }
+}
+
+exports.listProductsByService = async (req, res, next) => {
+    const { serviceId } = req.query;
+    try {
+        const products = await Inventory.find({ serviceId });
+        res.status(200).json({ data: products });
     } catch (err) {
         next(err);
     }
@@ -49,7 +60,7 @@ exports.listInventory = async (req, res, next) => {
 
 exports.listInventoryForAdmin = async (req, res, next) => {
     try {
-        const productList = await Inventory.find();
+        const productList = await Inventory.find().populate('serviceId', 'name_en name_ar');
         res.status(200).json({
             data: productList
         })

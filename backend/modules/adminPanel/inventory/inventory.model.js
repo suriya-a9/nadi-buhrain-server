@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const inventorySchema = new mongoose.Schema({
+    serviceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service"
+    },
     productName_en: {
         type: String,
         required: true

@@ -1,4 +1,4 @@
-const { addInventory, listInventory, updateInventory, deleteInventory, stockUpdate, listInventoryForAdmin } = require('./inventory.controller');
+const { addInventory, listInventory, updateInventory, deleteInventory, stockUpdate, listInventoryForAdmin, listProductsByService } = require('./inventory.controller');
 const auth = require('../../../middleware/authMiddleware');
 
 const express = require('express');
@@ -10,4 +10,5 @@ router.get('/', listInventoryForAdmin);
 router.post('/update-products', auth, updateInventory);
 router.post('/delete-products', auth, deleteInventory);
 router.post('/stock-update', auth, stockUpdate);
+router.get('/products-by-service', listProductsByService);
 module.exports = router;
