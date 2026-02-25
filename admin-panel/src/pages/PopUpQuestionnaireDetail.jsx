@@ -11,6 +11,10 @@ export default function PopUpQuestionnaireDetail() {
     const [results, setResults] = useState([]);
     const [selectedResult, setSelectedResult] = useState(null);
     const token = localStorage.getItem("token");
+    const [accountTypes, setAccountTypes] = useState([]);
+    useEffect(() => {
+        api.get("/account-type/").then(res => setAccountTypes(res.data.data));
+    }, []);
     const loadDetail = async () => {
         try {
             const res = await api.post(
@@ -31,6 +35,17 @@ export default function PopUpQuestionnaireDetail() {
 
     if (!questionnaire) return <p>Loading...</p>;
 
+    const getAccountTypeNames = () => {
+        if (!questionnaire.allowedAccountTypes || questionnaire.allowedAccountTypes.length === 0)
+            return "All";
+        return questionnaire.allowedAccountTypes
+            .map(id => {
+                const found = accountTypes.find(a => a._id === id);
+                return found ? found.name_en : id;
+            })
+            .join(", ");
+    };
+
     return (
         <div className="space-y-6">
             <div className="bg-white p-4 rounded shadow">
@@ -40,6 +55,9 @@ export default function PopUpQuestionnaireDetail() {
                 </h2>
                 <p>Total Points: {questionnaire.totalPoints}</p>
                 <p>Total Questions: {questionnaire.questions.length}</p>
+                <p>
+                    <b>Allowed Account Types:</b> {getAccountTypeNames()}
+                </p>
             </div>
             <div className="bg-white p-4 rounded shadow">
                 <h3 className="text-lg font-semibold mb-3">Questions</h3>

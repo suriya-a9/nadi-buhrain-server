@@ -13,7 +13,10 @@ export default function PopUpQuestionnaire() {
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [statusLoading, setStatusLoading] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(false); const [accountTypes, setAccountTypes] = useState([]);
+    useEffect(() => {
+        api.get("/account-type/").then(res => setAccountTypes(res.data.data));
+    }, []);
 
     const [form, setForm] = useState({
         title: "",
@@ -268,6 +271,25 @@ export default function PopUpQuestionnaire() {
                 title={editData ? "Edit Popup" : "Add Popup"}
             >
                 <form onSubmit={saveQuestionnaire} className="space-y-4">
+                    <div>
+                        <label className="block mb-1 font-medium">Account Types</label>
+                        <select
+                            value={form.allowedAccountTypes?.[0] || ""}
+                            onChange={e => setForm({ ...form, allowedAccountTypes: [e.target.value] })}
+                            className="w-full border p-2 rounded"
+                            required
+                        >
+                            <option value="">Select Account Type</option>
+                            {accountTypes.map(type => (
+                                <option key={type._id} value={type._id}>
+                                    {type.name_en}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="text-xs text-gray-500 mt-1">
+                            Hold Ctrl (Windows) or Cmd (Mac) to select multiple.
+                        </div>
+                    </div>
                     <div>
                         <label className="font-medium">Title</label>
                         <input

@@ -6,11 +6,12 @@ const PointsHistory = require("../points/pointsHistory.model");
 
 exports.addPopUp = async (req, res, next) => {
     try {
-        const { title, totalPoints, questions } = req.body;
+        const { title, totalPoints, questions, allowedAccountTypes } = req.body;
         const popUpQuestionnaire = await PopUpQuestionnaire.create({
             title,
             totalPoints,
-            questions
+            questions,
+            allowedAccountTypes
         })
         await UserLog.create({
             userId: req.user.id,
@@ -31,7 +32,7 @@ exports.addPopUp = async (req, res, next) => {
 
 exports.editPopup = async (req, res, next) => {
     try {
-        const { id, ...updateField } = req.body;
+        const { id, allowedAccountTypes, ...updateField } = req.body;
         const userId = req.user.id;
         if (!userId) {
             return res.status(403).json({
@@ -41,7 +42,7 @@ exports.editPopup = async (req, res, next) => {
         }
         const questionnaire = await PopUpQuestionnaire.findByIdAndUpdate(
             id,
-            updateField,
+            { updateField, allowedAccountTypes },
             { new: true }
         )
         await UserLog.create({
@@ -325,6 +326,11 @@ exports.listForClient = async (req, res, next) => {
             });
         }
 
+        const user = await UserAccount.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
         const answered = await PopUpQuestionnaireResult.find(
             { userId },
             { questionnaireId: 1, _id: 0 }
@@ -334,9 +340,12 @@ exports.listForClient = async (req, res, next) => {
 
         const listData = await PopUpQuestionnaire.find({
             status: true,
-            _id: { $nin: answeredIds }
+            _id: { $nin: answeredIds },
+            $or: [
+                { allowedAccountTypes: { $size: 0 } }, // for popups open to all
+                { allowedAccountTypes: user.accountTypeId }
+            ]
         }).sort({ createdAt: -1 });
-
 
         if (listData.length === 0) {
             return res.status(400).json({

@@ -16,6 +16,10 @@ const popUpQuestionnaireSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    allowedAccountTypes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account"
+    }],
     createdAt: {
         type: Date,
         default: Date.now
