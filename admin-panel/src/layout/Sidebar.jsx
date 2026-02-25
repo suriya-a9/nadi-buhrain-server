@@ -50,30 +50,32 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
 
             <aside
                 className={`
-        fixed left-0 top-0 h-full bg-white shadow-lg z-40 w-64 
-        transform transition-transform duration-300 overflow-y-scroll
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-    `}
+                    fixed left-0 top-0 h-full bg-white shadow-lg z-40 w-64 
+                    transform transition-transform duration-300 overflow-y-scroll
+                    ${isOpen ? "translate-x-0" : "-translate-x-full"}
+                `}
             >
                 <div className="p-4 flex items-center gap-3">
                     <img src="/assets/admin-panel-logo.png" className="w-[175px]" />
                     {/* <h2 className="text-[25px] font-bold text-textGreen">Nadi Bahrain</h2> */}
-                    <button
-                        onClick={toggleSidebar}
-                        className="ml-auto bg-gray-100 hover:bg-gray-200 p-2 rounded lg:block"
-                        style={{ position: "static" }}
-                        title="Toggle Sidebar"
-                    >
-                        <svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
+                    {isOpen && (
+                        <button
+                            onClick={toggleSidebar}
+                            className="ml-auto bg-gray-100 hover:bg-gray-200 p-2 rounded lg:block"
+                            style={{ position: "static" }}
+                            title="Toggle Sidebar"
                         >
-                            <path d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+                            <svg
+                                className="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
                 <div className="px-4 pb-2 relative">
                     <input

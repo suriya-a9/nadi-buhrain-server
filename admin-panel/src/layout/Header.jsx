@@ -6,7 +6,7 @@ import { MdDone } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import api from "../services/api";
 
-export default function Header({ toggleSidebar }) {
+export default function Header({ toggleSidebar, isSidebarOpen }) {
     const { logout, name, role, permissions: userPermissions } = useAuth();
     const [openMenu, setOpenMenu] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -22,12 +22,12 @@ export default function Header({ toggleSidebar }) {
     useEffect(() => {
         loadNotifications();
         if (!socketRef.current) {
-            // socketRef.current = io(import.meta.env.VITE_API_URL);
-            socketRef.current = io(import.meta.env.VITE_API_URL, {
-                path: "/socket.io",
-                transports: ["polling"],
-                withCredentials: true,
-            });
+            socketRef.current = io(import.meta.env.VITE_API_URL);
+            // socketRef.current = io(import.meta.env.VITE_API_URL, {
+            //     path: "/socket.io",
+            //     transports: ["polling"],
+            //     withCredentials: true,
+            // });
 
             socketRef.current.on('notification', (data) => {
                 setNotifications((prev) => [data, ...prev]);
@@ -87,20 +87,22 @@ export default function Header({ toggleSidebar }) {
 
     return (
         <header className="bg-[#F3F3F3] shadow h-16 flex items-center px-4 justify-between">
-            <button
-                onClick={toggleSidebar}
-                className="lg:hidden p-2 rounded hover:bg-gray-100"
-            >
-                <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
+            {!isSidebarOpen && (
+                <button
+                    onClick={toggleSidebar}
+                    className="p-2 rounded hover:bg-gray-100"
                 >
-                    <path d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+                    <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            )}
 
             <h1 className="text-xl font-semibold"> </h1>
 
