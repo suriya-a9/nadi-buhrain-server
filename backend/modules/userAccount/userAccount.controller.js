@@ -620,7 +620,7 @@ exports.signInWithOtp = async (req, res, next) => {
 }
 
 exports.updateBasicInfoAndAddress = async (req, res, next) => {
-    let { userId, basicInfo, address, idProofUrl } = req.body;
+    let { userId, basicInfo, address, idProofUrl, accountTypeId } = req.body;
     try {
         if (typeof basicInfo === "string") basicInfo = JSON.parse(basicInfo);
         if (typeof address === "string") address = JSON.parse(address);
@@ -677,6 +677,15 @@ exports.updateBasicInfoAndAddress = async (req, res, next) => {
                 { new: true }
             );
             updatedFields.push("idProofUrl");
+        }
+
+        if (accountTypeId) {
+            await UserAccount.findByIdAndUpdate(
+                userId,
+                { accountTypeId },
+                { new: true }
+            );
+            updatedFields.push("accountTypeId");
         }
 
         if (updatedFields.length > 0) {

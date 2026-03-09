@@ -12,6 +12,7 @@ export default function UserDetails() {
     const [addresses, setAddresses] = useState([]);
     const [familyMembers, setFamilyMembers] = useState([]);
     const [owner, setOwner] = useState(null);
+    const [accountTypes, setAccountTypes] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const { register, handleSubmit, reset } = useForm();
     const [blocks, setBlocks] = useState([]);
@@ -65,6 +66,15 @@ export default function UserDetails() {
         }
     }, [selectedBlock, blocks]);
 
+    useEffect(() => {
+        fetch(`${API_BASE}/api/account-type/`)
+            .then(res => res.json())
+            .then(data => {
+                console.log("Account types:", data.data);
+                setAccountTypes(data.data || []);
+            });
+    }, []);
+
     const startEdit = () => {
         if (!user) return;
         const address = (addresses && addresses[0]) || {};
@@ -73,6 +83,7 @@ export default function UserDetails() {
         setSelectedBlock(blockId);
         setSelectedRoad(roadId);
         reset({
+            accountTypeId: user.accountTypeId?._id || "",
             fullName: user.basicInfo?.fullName || "",
             email: user.basicInfo?.email || "",
             mobileNumber: user.basicInfo?.mobileNumber || "",
@@ -90,6 +101,7 @@ export default function UserDetails() {
         try {
             await api.post("/user-account/profile-update", {
                 userId: user._id,
+                accountTypeId: data.accountTypeId,
                 basicInfo: {
                     fullName: data.fullName,
                     email: data.email,
@@ -146,6 +158,17 @@ export default function UserDetails() {
                     onSubmit={handleSubmit(onEditSubmit)}
                     className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"
                 >
+                    <div>
+                        <label className="block text-xs mb-1">Account Type</label>
+                        <select {...register("accountTypeId")} defaultValue={user?.accountTypeId?._id || ""}>
+                            <option value="">Select Account Type</option>
+                            {accountTypes.map(type => (
+                                <option key={type._id} value={type._id}>
+                                    {type.name_en}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div>
                         <label className="block text-xs mb-1">Full Name</label>
                         <input {...register("fullName")} className="border p-2 rounded w-full" />
