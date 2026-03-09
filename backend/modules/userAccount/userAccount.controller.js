@@ -1007,3 +1007,78 @@ exports.notificationStatusSet = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.addAdditionalFamilyMembers = async (req, res, next) => {
+    const {
+        userId,
+        familyCount,
+        password,
+        fullName,
+        relation,
+        mobile,
+        email,
+        gender,
+        address,
+        accountTypeId
+    } = req.body;
+    try {
+        const existingUser = await UserAccount.findOne({
+            $or: [
+                { "basicInfo.mobileNumber": mobile },
+                { "basicInfo.email": email }
+            ]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ message: "Family member already exists as user" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const familyMember = await FamilyMember.create({
+            userId,
+            fullName,
+            relation,
+            mobile,
+            email,
+            password: hashedPassword,
+            gender
+        });
+
+        const familyUser = await UserAccount.create({
+            accountTypeId: accountTypeId || null,
+            isFamilyMember: true,
+            familyOwnerId: userId,
+            familyMemberRef: familyMember._id,
+            basicInfo: {
+                fullName,
+                mobileNumber: mobile,
+                email,
+                gender,
+                password: hashedPassword
+            },
+            status: "completed",
+            singnUpCompleted: true,
+        });
+
+        const addressDoc = await Address.create({
+            userId: familyUser._id,
+            ...address
+        });
+
+        familyMember.addressId = addressDoc._id;
+        await familyMember.save();
+
+        const owner = await UserAccount.findById(userId);
+        if (familyCount) owner.familyCount = familyCount;
+        owner.familyMembersAdded += 1;
+        await owner.save();
+
+        res.status(201).json({
+            message: 'Family member added as user',
+            data: familyUser
+        });
+    } catch (err) {
+        next(err);
+    }
+};

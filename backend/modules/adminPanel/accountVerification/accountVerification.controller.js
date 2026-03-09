@@ -35,6 +35,17 @@ exports.verifyAccount = async (req, res, next) => {
         if (status === "verified") {
             updateFields.accountStatus = true;
         }
+        const pointsDoc = await Points.findOne({ accountType: user.accountTypeId });
+        if (pointsDoc && (!user.points || user.points === 0)) {
+            updateFields.points = pointsDoc.points;
+            await PointsHistory.create({
+                userId: user._id,
+                history: "Signup points",
+                points: pointsDoc.points,
+                time: new Date(),
+                status: "credit"
+            });
+        }
         const result = await UserAccount.findByIdAndUpdate(
             userId,
             updateFields,

@@ -49,4 +49,6 @@ router.post("/notification-status", auth, controller.notificationStatus);
 
 router.post("/status", auth, controller.notificationStatusSet);
 
+router.post("/add-additional-members", auth, controller.addAdditionalFamilyMembers);
+
 module.exports = router;
