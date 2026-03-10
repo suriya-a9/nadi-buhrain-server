@@ -11,6 +11,7 @@ export default function UserChatList() {
     const { id } = useAuth();
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [unreadCounts, setUnreadCounts] = useState({});
     const [chatClient, setChatClient] = useState(null);
     const [channel, setChannel] = useState(null);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -24,7 +25,36 @@ export default function UserChatList() {
             setUsers(res.data.data.filter(u => u._id !== id));
         });
     }, [id]);
+    useEffect(() => {
+        if (!chatClient || !id) return;
 
+        async function loadUnreadCounts() {
+            const filters = {
+                type: "messaging",
+                members: { $in: [id] }
+            };
+
+            const channels = await chatClient.queryChannels(filters);
+
+            const counts = {};
+
+            channels.forEach(ch => {
+                const members = Object.keys(ch.state.members).filter(m => m !== id);
+                const otherUser = members[0];
+                counts[otherUser] = ch.countUnread();
+            });
+
+            setUnreadCounts(counts);
+        }
+
+        loadUnreadCounts();
+
+        chatClient.on("message.new", loadUnreadCounts);
+
+        return () => {
+            chatClient.off("message.new", loadUnreadCounts);
+        };
+    }, [chatClient, id]);
     useEffect(() => {
         if (!id) return;
         async function initStream() {
@@ -55,6 +85,7 @@ export default function UserChatList() {
                 members: [id, selectedUser._id]
             });
             await channel.watch();
+            await channel.markRead();
             setChannel(channel);
         }
         setupChannel();
@@ -128,6 +159,12 @@ export default function UserChatList() {
                                         <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
                                             {user.basicInfo?.fullName?.charAt(0).toUpperCase()}
                                         </div>
+
+                                        {unreadCounts[user._id] > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                                {unreadCounts[user._id]}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-sm font-medium text-gray-800 truncate">

@@ -12,6 +12,7 @@ export default function TechnicianChatList() {
     const { id } = useAuth();
     const [technicians, setTechnicians] = useState([]);
     const [selectedTechnician, setSelectedTechnician] = useState(null);
+    const [unreadCounts, setUnreadCounts] = useState({});
     const [chatClient, setChatClient] = useState(null);
     const [channel, setChannel] = useState(null);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -25,13 +26,42 @@ export default function TechnicianChatList() {
             setTechnicians(res.data.data.filter(t => t._id !== id));
         });
     }, [id]);
+    useEffect(() => {
+        if (!chatClient || !id) return;
 
+        async function loadUnreadCounts() {
+            const filters = {
+                type: "messaging",
+                members: { $in: [id] }
+            };
+
+            const channels = await chatClient.queryChannels(filters);
+
+            const counts = {};
+
+            channels.forEach(ch => {
+                const members = Object.keys(ch.state.members).filter(m => m !== id);
+                const otherUser = members[0];
+                counts[otherUser] = ch.countUnread();
+            });
+
+            setUnreadCounts(counts);
+        }
+
+        loadUnreadCounts();
+
+        chatClient.on("message.new", loadUnreadCounts);
+
+        return () => {
+            chatClient.off("message.new", loadUnreadCounts);
+        };
+    }, [chatClient, id]);
     useEffect(() => {
         if (!id) return;
         async function initStream() {
             const res = await api.post("/stream-chat/token", {
                 userId: id,
-                name: "", 
+                name: "",
             });
             const { token } = res.data;
             const client = StreamChat.getInstance(STREAM_API_KEY);
@@ -54,6 +84,7 @@ export default function TechnicianChatList() {
                 members: [id, selectedTechnician._id]
             });
             await channel.watch();
+            await channel.markRead();
             setChannel(channel);
         }
         setupChannel();
@@ -143,6 +174,11 @@ export default function TechnicianChatList() {
                                         <div className="h-10 w-10 rounded-full bg-bgGreen/20 flex items-center justify-center font-semibold text-bgGreen">
                                             {tech.firstName?.charAt(0).toUpperCase()}
                                         </div>
+                                        {unreadCounts[tech._id] > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                                {unreadCounts[tech._id]}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-sm font-medium text-gray-800 truncate">
