@@ -12,6 +12,7 @@ export default function PopUpQuestionnaire() {
     const [questionnaires, setQuestionnaires] = useState([]);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [statusLoading, setStatusLoading] = useState(false); const [accountTypes, setAccountTypes] = useState([]);
     useEffect(() => {
@@ -21,7 +22,8 @@ export default function PopUpQuestionnaire() {
     const [form, setForm] = useState({
         title: "",
         totalPoints: "",
-        questions: []
+        questions: [],
+        targetUserId: ""
     });
 
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -50,7 +52,8 @@ export default function PopUpQuestionnaire() {
         setForm({
             title: "",
             totalPoints: "",
-            questions: []
+            questions: [],
+            targetUserId: "",
         });
         setOpenCanvas(true);
     };
@@ -60,15 +63,26 @@ export default function PopUpQuestionnaire() {
         setForm({
             title: item.title,
             totalPoints: item.totalPoints,
-            questions: item.questions
+            questions: item.questions,
+            targetUserId: item.targetUserId || "",
         });
         setOpenCanvas(true);
     };
-
+    useEffect(() => {
+        api.get("/account-verify/all-user-list")
+            .then(res => setUsers(res.data.data))
+            .catch(() => setUsers([]));
+    }, []);
     const saveQuestionnaire = async (e) => {
         e.preventDefault();
         try {
             const payload = { ...form };
+            // Only send one field
+            if (form.targetUserId) {
+                payload.allowedAccountTypes = [];
+            } else {
+                payload.targetUserId = "";
+            }
             if (editData) payload.id = editData._id;
 
             await api.post(
@@ -277,7 +291,7 @@ export default function PopUpQuestionnaire() {
                             value={form.allowedAccountTypes?.[0] || ""}
                             onChange={e => setForm({ ...form, allowedAccountTypes: [e.target.value] })}
                             className="w-full border p-2 rounded"
-                            required
+
                         >
                             <option value="">Select Account Type</option>
                             {accountTypes.map(type => (
@@ -286,9 +300,23 @@ export default function PopUpQuestionnaire() {
                                 </option>
                             ))}
                         </select>
-                        <div className="text-xs text-gray-500 mt-1">
-                            Hold Ctrl (Windows) or Cmd (Mac) to select multiple.
-                        </div>
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Target User</label>
+                        <select
+                            value={form.targetUserId || ""}
+                            onChange={e => setForm({ ...form, targetUserId: e.target.value, allowedAccountTypes: [] })}
+                            className="w-full border p-2 rounded"
+                            disabled={form.allowedAccountTypes && form.allowedAccountTypes.length > 0}
+                            required={!form.allowedAccountTypes || form.allowedAccountTypes.length === 0}
+                        >
+                            <option value="">Select User</option>
+                            {users.map(user => (
+                                <option key={user._id} value={user._id}>
+                                    {user.basicInfo.fullName} ({user.basicInfo.email})
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="font-medium">Title</label>

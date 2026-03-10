@@ -55,9 +55,17 @@ export default function PopUpQuestionnaireDetail() {
                 </h2>
                 <p>Total Points: {questionnaire.totalPoints}</p>
                 <p>Total Questions: {questionnaire.questions.length}</p>
-                <p>
-                    <b>Allowed Account Types:</b> {getAccountTypeNames()}
-                </p>
+                {questionnaire.targetUserId ? (
+                    <p>
+                        <b>Target User:</b>{" "}
+                        {questionnaire.targetUserId.basicInfo.fullName} (
+                        {questionnaire.targetUserId.basicInfo.email})
+                    </p>
+                ) : (
+                    <p>
+                        <b>Allowed Account Types:</b> {getAccountTypeNames()}
+                    </p>
+                )}
             </div>
             <div className="bg-white p-4 rounded shadow">
                 <h3 className="text-lg font-semibold mb-3">Questions</h3>
