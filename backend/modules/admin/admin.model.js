@@ -18,6 +18,19 @@ const adminSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role"
     },
+    mobileNumber: {
+        type: Number,
+        required: true
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female'],
+        required: true
+    },
+    status: {
+        type: Boolean,
+        default: true
+    },
     resetPasswordToken: String,
     resetPasswordExpires: Date
 }, { timestamps: true });

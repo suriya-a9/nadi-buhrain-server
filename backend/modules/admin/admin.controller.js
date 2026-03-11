@@ -8,7 +8,7 @@ const resetPasswordTemplate = require("../../template/resetPassword.template");
 const sendMail = require("../../utils/mailer");
 
 exports.adminRegister = async (req, res, next) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, mobileNumber, gender } = req.body;
     try {
         const existingAdmin = await Admin.findOne({ email });
         if (existingAdmin) {
@@ -26,7 +26,9 @@ exports.adminRegister = async (req, res, next) => {
             name,
             email,
             password: hashedPassword,
-            role
+            role,
+            gender,
+            mobileNumber
         });
 
         res.status(201).json({
@@ -107,9 +109,9 @@ exports.listAdminUsers = async (req, res, next) => {
 exports.updateAdmin = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, role, password } = req.body;
+        const { name, role, password, gender, mobileNumber } = req.body;
 
-        const updateData = { name, role };
+        const updateData = { name, role, gender, mobileNumber };
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -250,3 +252,27 @@ exports.detail = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.setAccountStatus = async (req, res, next) => {
+    const { id, status } = req.body;
+    try {
+        const account = await Admin.findByIdAndUpdate(id, { status: status }, { new: true });
+        if (!account) {
+            return res.status(404).json({ message: "account not found" });
+        }
+        await UserLog.create({
+            userId: req.user.id,
+            log: `Admin - ${account.name} Status Updated`,
+            status: "Updated",
+            role: "admin",
+            logo: "/assets/user-login-logo.webp",
+            time: new Date()
+        });
+        res.status(200).json({
+            message: "account status updated",
+            data: account
+        });
+    } catch (err) {
+        next(err);
+    }
+};

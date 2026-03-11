@@ -19,6 +19,8 @@ export default function AdminUser() {
         email: "",
         password: "",
         role: "",
+        mobileNumber: "",
+        gender: ""
     });
     const [loading, setLoading] = useState(false);
 
@@ -63,6 +65,8 @@ export default function AdminUser() {
             email: admin.email,
             password: "",
             role: admin.role?._id || admin.role,
+            mobileNumber: admin.mobileNumber,
+            gender: admin.gender
         });
         setOpenCanvas(true);
     };
@@ -80,6 +84,8 @@ export default function AdminUser() {
                         name: form.name,
                         role: form.role,
                         ...(form.password ? { password: form.password } : {}),
+                        mobileNumber: form.mobileNumber,
+                        gender: form.gender,
                     },
                     {
                         headers: { Authorization: `Bearer ${token}` },
@@ -96,7 +102,7 @@ export default function AdminUser() {
             }
 
             setOpenCanvas(false);
-            setForm({ name: "", email: "", password: "", role: "" });
+            setForm({ name: "", email: "", password: "", role: "", mobileNumber: "", gender: "" });
             setEditData(null);
             fetchAdmins();
 
@@ -120,6 +126,20 @@ export default function AdminUser() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const toggleAdminStatus = async (item) => {
+        try {
+            await api.post(
+                "/admin/status-change",
+                { id: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            fetchAdmins()
+            toast.success("Admin status updated");
+        } catch (err) {
+            toast.error("Failed to update admin status");
+        }
+    };
 
     return (
         <div>
@@ -189,20 +209,30 @@ export default function AdminUser() {
                                 key: "role",
                                 render: (role) => role?.name || "",
                             },
+                            { title: "Mobile Number", key: "mobileNumber" },
+                            { title: "Gender", key: "gender" },
                             {
-                                title: "Date & Time",
-                                key: "updatedAt",
-                                render: (_, row) => formatDateTime(row.updatedAt)
+                                title: "Joining Date",
+                                key: "createdAt",
+                                render: (_, row) => formatDateTime(row.createdAt)
                             },
                         ]}
                         data={paginatedAdmins}
                         actions={(row) => (
-                            <button
-                                onClick={() => openEdit(row)}
-                                className="bg-yellow-500 text-white px-3 py-1 rounded"
-                            >
-                                Edit
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEdit(row)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => toggleAdminStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
+                                </button>
+                            </div>
                         )}
                     />
 
@@ -256,6 +286,29 @@ export default function AdminUser() {
                                     {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
                                 </option>
                             ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Mobile Number</label>
+                        <input
+                            type="number"
+                            value={form.mobileNumber}
+                            onChange={e => setForm({ ...form, mobileNumber: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Gender</label>
+                        <select
+                            value={form.gender}
+                            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                            className="w-full border p-2 rounded"
+                            required
+                        >
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="s">Female</option>
                         </select>
                     </div>
                     {!editData && (

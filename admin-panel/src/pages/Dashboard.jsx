@@ -109,7 +109,6 @@ export default function Dashboard() {
             </div>
         );
     };
-
     const statusCounts = getStatusCounts();
     const chartData = [
         { name: "Pending", value: statusCounts.Pending },
@@ -117,6 +116,7 @@ export default function Dashboard() {
         { name: "Completed", value: statusCounts.Completed },
         { name: "Progress", value: statusCounts.Progress },
     ];
+    const maxValue = Math.max(...chartData.map(d => d.value), 5);
 
     return (
         <div className="p-4">
@@ -188,11 +188,13 @@ export default function Dashboard() {
                             <BarChart data={chartData}>
                                 <CartesianGrid vertical={false} stroke="#e0e0e0" />
                                 <XAxis dataKey="name" />
+                                <YAxis
+                                    domain={[0, maxValue]}
+                                    tickCount={Math.ceil(maxValue / 5) + 1}
+                                    ticks={Array.from({ length: Math.ceil(maxValue / 5) + 1 }, (_, i) => i * 5)}
+                                />
                                 <Tooltip />
-                                <Bar
-                                    dataKey="value"
-                                    barSize={45}
-                                >
+                                <Bar dataKey="value" barSize={45}>
                                     {chartData.map((entry, index) => {
                                         const colors = [
                                             "#74BFAB",

@@ -10,6 +10,9 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
     const { logout, name, role, permissions: userPermissions } = useAuth();
     const [openMenu, setOpenMenu] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [notificationToRemove, setNotificationToRemove] = useState(null);
+    const [showClearAllModal, setShowClearAllModal] = useState(false);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const socketRef = useRef(null);
     const loadNotifications = async () => {
@@ -123,7 +126,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                         <div className="flex justify-between items-center px-4 py-2">
                             <h3 className="font-semibold">Notifications</h3>
                             <button
-                                onClick={clearAll}
+                                onClick={() => setShowClearAllModal(true)}
                                 className="text-xs text-red-500 hover:underline"
                             >
                                 Clear All
@@ -152,7 +155,10 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                                             </button>
                                         )}
                                         <button
-                                            onClick={() => removeNotification(n._id)}
+                                            onClick={() => {
+                                                setNotificationToRemove(n._id);
+                                                setShowRemoveModal(true);
+                                            }}
                                             className="ml-2 text-red-500 hover:text-red-700"
                                             title="Remove notification"
                                         >
@@ -210,6 +216,57 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                     )}
                 </div>
             </div>
+            {showRemoveModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+                    <div className="bg-white rounded shadow p-6 w-80">
+                        <h2 className="text-lg font-semibold mb-4">Confirm Removal</h2>
+                        <p className="mb-6">Are you sure you want to remove this notification?</p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                className="px-4 py-2 bg-gray-200 rounded"
+                                onClick={() => setShowRemoveModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded"
+                                onClick={async () => {
+                                    await removeNotification(notificationToRemove);
+                                    setShowRemoveModal(false);
+                                    setNotificationToRemove(null);
+                                }}
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showClearAllModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+                    <div className="bg-white rounded shadow p-6 w-80">
+                        <h2 className="text-lg font-semibold mb-4">Confirm Clear All</h2>
+                        <p className="mb-6">Are you sure you want to clear all notifications?</p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                className="px-4 py-2 bg-gray-200 rounded"
+                                onClick={() => setShowClearAllModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded"
+                                onClick={async () => {
+                                    await clearAll();
+                                    setShowClearAllModal(false);
+                                }}
+                            >
+                                Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 }

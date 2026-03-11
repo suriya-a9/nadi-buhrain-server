@@ -77,3 +77,27 @@ exports.deleteAccountType = async (req, res, next) => {
     next(err);
   }
 }
+
+exports.setAccountStatus = async (req, res, next) => {
+  const { id, status } = req.body;
+  try {
+    const account = await Account.findByIdAndUpdate(id, { status: status }, { new: true });
+    if (!account) {
+      return res.status(404).json({ message: "account not found" });
+    }
+    await UserLog.create({
+      userId: req.user.id,
+      log: `Account type - ${account.name_en} Status Updated`,
+      status: "Updated",
+      role: "admin",
+      logo: "/assets/account-type.webp",
+      time: new Date()
+    });
+    res.status(200).json({
+      message: "account status updated",
+      data: account
+    });
+  } catch (err) {
+    next(err);
+  }
+};

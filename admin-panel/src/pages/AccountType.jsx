@@ -90,6 +90,20 @@ export default function AccountType() {
         currentPage * ITEMS_PER_PAGE
     );
 
+    const toggleAccountStatus = async (item) => {
+        try {
+            await api.post(
+                "/account-type/set-status",
+                { id: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Account status updated");
+            loadAccountList();
+        } catch (err) {
+            toast.error("Failed to update account status");
+        }
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
@@ -127,6 +141,12 @@ export default function AccountType() {
                             className="bg-red-600 text-white px-3 py-1 rounded"
                         >
                             Delete
+                        </button>
+                        <button
+                            onClick={() => toggleAccountStatus(row)}
+                            className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                        >
+                            {row.status ? "Disable" : "Enable"}
                         </button>
                     </div>
                 )}
