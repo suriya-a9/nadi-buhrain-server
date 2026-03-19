@@ -3,7 +3,9 @@ import api from "../services/api";
 import { StreamChat } from "stream-chat";
 import { Chat, Channel, MessageList, MessageInput } from "stream-chat-react";
 import "stream-chat-react/css/v2/index.css";
+
 import { useAuth } from "../context/AuthContext";
+import CustomMessage from "../components/Message";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -202,7 +204,7 @@ export default function AdminChatList() {
                                 <Channel channel={channel}>
                                     <div className="flex flex-col h-full min-h-0">
                                         <div className="flex-1 overflow-y-auto px-6 py-4 hide-scrollbar min-h-0">
-                                            <MessageList />
+                                            <MessageList Message={CustomMessage} />
                                         </div>
                                         <div className="border-t px-6 py-4 bg-gray-50">
                                             <MessageInput />
