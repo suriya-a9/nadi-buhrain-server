@@ -10,6 +10,8 @@ import { formatDateTime } from "../utils/dateUtils";
 export default function PopUpQuestionnaire() {
     const navigate = useNavigate();
     const [questionnaires, setQuestionnaires] = useState([]);
+    const [userSearch, setUserSearch] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
     const [openCanvas, setOpenCanvas] = useState(false);
     const [editData, setEditData] = useState(null);
     const [users, setUsers] = useState([]);
@@ -25,7 +27,13 @@ export default function PopUpQuestionnaire() {
         questions: [],
         targetUserId: ""
     });
-
+    const filteredUsers = users.filter(user => {
+        const search = userSearch.toLowerCase();
+        return (
+            user.basicInfo.fullName.toLowerCase().includes(search) ||
+            user.basicInfo.email.toLowerCase().includes(search)
+        );
+    });
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const token = localStorage.getItem("token");
@@ -77,7 +85,6 @@ export default function PopUpQuestionnaire() {
         e.preventDefault();
         try {
             const payload = { ...form };
-            // Only send one field
             if (form.targetUserId) {
                 payload.allowedAccountTypes = [];
             } else {
@@ -301,22 +308,63 @@ export default function PopUpQuestionnaire() {
                             ))}
                         </select>
                     </div>
-                    <div>
+                    <div className="relative">
                         <label className="block mb-1 font-medium">Target User</label>
-                        <select
-                            value={form.targetUserId || ""}
-                            onChange={e => setForm({ ...form, targetUserId: e.target.value, allowedAccountTypes: [] })}
+
+                        <input
+                            type="text"
+                            placeholder="Search & select user..."
+                            value={
+                                form.targetUserId
+                                    ? users.find(u => u._id === form.targetUserId)?.basicInfo.fullName || ""
+                                    : userSearch
+                            }
+                            onChange={(e) => {
+                                setUserSearch(e.target.value);
+                                setShowDropdown(true);
+                                setForm({ ...form, targetUserId: "" });
+                            }}
+                            onFocus={() => setShowDropdown(true)}
                             className="w-full border p-2 rounded"
-                            disabled={form.allowedAccountTypes && form.allowedAccountTypes.length > 0}
-                            required={!form.allowedAccountTypes || form.allowedAccountTypes.length === 0}
-                        >
-                            <option value="">Select User</option>
-                            {users.map(user => (
-                                <option key={user._id} value={user._id}>
-                                    {user.basicInfo.fullName} ({user.basicInfo.email})
-                                </option>
-                            ))}
-                        </select>
+                            disabled={form.allowedAccountTypes?.length > 0}
+                        />
+
+                        {showDropdown && (
+                            <div className="absolute z-10 bg-white border w-full max-h-48 overflow-y-auto rounded shadow">
+                                <div
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => {
+                                        setForm({ ...form, targetUserId: "", allowedAccountTypes: [] });
+                                        setUserSearch("");
+                                        setShowDropdown(false);
+                                    }}
+                                >
+                                    All Users
+                                </div>
+
+                                {filteredUsers.length > 0 ? (
+                                    filteredUsers.map(user => (
+                                        <div
+                                            key={user._id}
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => {
+                                                setForm({
+                                                    ...form,
+                                                    targetUserId: user._id,
+                                                    allowedAccountTypes: []
+                                                });
+                                                setUserSearch("");
+                                                setShowDropdown(false);
+                                            }}
+                                        >
+                                            {user.basicInfo.fullName} ({user.basicInfo.email})
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="p-2 text-gray-500">No users found</div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="font-medium">Title</label>
