@@ -21,7 +21,7 @@ import { FaWarehouse, FaClipboardUser } from "react-icons/fa6";
 import { RiAdvertisementLine } from "react-icons/ri";
 import { SlBadge } from "react-icons/sl";
 import { GiRoad } from "react-icons/gi";
-import { FiInfo } from "react-icons/fi";
+import { FiInfo, FiGift } from "react-icons/fi";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const { permissions } = useAuth();
@@ -318,6 +318,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                             {filterBySearch("PopUp") && (
                                 <NavLink to="/popup" className={linkClasses}>
                                     <TbBellQuestion size={20} /> &nbsp;&nbsp;&nbsp;PopUp
+                                </NavLink>
+                            )}
+                            {filterBySearch("Gifts") && (
+                                <NavLink to="/gifts" className={linkClasses}>
+                                    <FiGift size={20} /> &nbsp;&nbsp;&nbsp;Gifts
                                 </NavLink>
                             )}
                             {filterBySearch("Deleted Account") && (

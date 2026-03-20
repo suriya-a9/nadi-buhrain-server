@@ -60,6 +60,7 @@ import Enquiry from "./pages/Enquiry";
 import SparePartsUsage from "./pages/SparePartsUsage";
 import TechnicianChatList from "./pages/TechnicianChatList";
 import { StreamProvider } from "./context/StreamChatContext";
+import Gift from "./pages/Gift";
 
 export default function App() {
   return (
@@ -609,7 +610,18 @@ export default function App() {
                   </PrivateRoute>
                 }
               />
-
+              <Route
+                path="/gifts"
+                element={
+                  <PrivateRoute>
+                    <PermissionRoute permission="Settings">
+                      <DashboardLayout>
+                        <Gift />
+                      </DashboardLayout>
+                    </PermissionRoute>
+                  </PrivateRoute>
+                }
+              />
               <Route
                 path="/deleted-account"
                 element={

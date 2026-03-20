@@ -57,6 +57,7 @@ const deletedAccountsRouter = require("./modules/adminPanel/deletedAccounts/dele
 const enquiryRouter = require("./modules/adminPanel/helpAndSupport/helpAndSupportEnquiry.routes.js");
 const SparePartsUsageRouter = require("./modules/adminPanel/spareParts/sparePartsUsage.routes.js");
 const streamChatRouter = require("./modules/chat/streamChat.routes.js");
+const giftRouter = require("./modules/adminPanel/gift/gift.routes.js");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -136,6 +137,7 @@ app.use("/api/deleted-accounts", deletedAccountsRouter);
 app.use("/api/enquiry", enquiryRouter);
 app.use("/api/spare-parts-usage", SparePartsUsageRouter);
 app.use('/api/stream-chat', streamChatRouter);
+app.use('/api/gift', giftRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
