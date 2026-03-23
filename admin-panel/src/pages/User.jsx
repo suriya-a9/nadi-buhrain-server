@@ -15,6 +15,7 @@ export default function User() {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState("");
     const [accountTypeFilter, setAccountTypeFilter] = useState("");
+    const [familyHeadFilter, setFamilyHeadFilter] = useState(false);
     const [search, setSearch] = useState("");
     const [blocks, setBlocks] = useState([]);
     const [roads, setRoads] = useState([]);
@@ -90,6 +91,13 @@ export default function User() {
         (
             accountTypeFilter === "" ||
             String(s.accountTypeId?.name || "").toLowerCase() === accountTypeFilter.toLowerCase()
+        ) &&
+        (
+            !familyHeadFilter ||
+            (
+                s.accountTypeId?.name === "Family Account" &&
+                s.familyOwnerId === null
+            )
         )
     );
 
@@ -137,6 +145,15 @@ export default function User() {
                     Users
                 </h2>
                 <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+                    <button
+                        onClick={() => setFamilyHeadFilter(prev => !prev)}
+                        className={`px-4 py-1 rounded-full text-sm ${familyHeadFilter
+                                ? "bg-bgGreen text-white"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
+                    >
+                        Family Heads
+                    </button>
                     <select
                         value={accountTypeFilter}
                         onChange={e => setAccountTypeFilter(e.target.value)}
