@@ -80,7 +80,8 @@ exports.listGift = async (req, res, next) => {
         const result = unreadGifts.map(gd => ({
             title: gd.giftId?.title,
             caption: gd.giftId?.caption,
-            points: gd.pointsAssigned
+            points: gd.pointsAssigned,
+            read: gd.read
         }));
 
         res.status(200).json({

@@ -11,6 +11,7 @@ const PointsHistory = require("../../adminPanel/points/pointsHistory.model");
 const sendPushNotification = require("../../../utils/sendPush");
 const UserNotification = require("../../adminPanel/notification/userNotification.model");
 const UserApproval = require("../../technician/userApproval.model");
+const Admin = require("../../admin/admin.model");
 
 exports.createRequest = async (req, res, next) => {
     const { serviceId, issuesId, feedback, scheduleService, scheduleServiceTime, immediateAssistance, otherIssue } = req.body;
@@ -377,3 +378,23 @@ exports.approveWork = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.markAsCompleted = async (req, res, next) => {
+    const { serviceId } = req.body;
+    try {
+        const admin = await Admin.findById(req.user.id);
+        const service = await UserService.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                message: "Service request not found"
+            })
+        }
+        service.serviceStatus = "completed";
+        service.statusTimestamps.completed = new Date();
+        service.completedBy = admin.name;
+        await service.save();
+    } catch (err) {
+        next(err)
+    }
+}

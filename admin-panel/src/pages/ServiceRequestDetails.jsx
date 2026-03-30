@@ -208,6 +208,17 @@ export default function ServiceRequestDetails() {
         XLSX.writeFile(wb, `service-request-${request?.serviceRequestID || "details"}.xlsx`);
     }
 
+    const markAsCompleted = async () => {
+        try {
+            await api.post("/user-service/mark-as-completed", {
+                serviceId: request._id,
+            });
+            window.location.reload(true);
+        } catch (err) {
+            console.error("Mark as complete failed", err);
+        }
+    }
+
     useEffect(() => {
         function handleClickOutside(event) {
             if (
@@ -544,6 +555,16 @@ export default function ServiceRequestDetails() {
                                                     {status === "accepted" && time && request.acceptedBy && (
                                                         <span className="ml-2 text-xs text-gray-700 font-semibold">
                                                             Accepted By: {request.acceptedBy}
+                                                        </span>
+                                                    )}
+                                                    {status === "paymentInProgress" && time && request.acceptedBy && request.serviceStatus === "paymentInProgress" && (
+                                                        <button className="ml-2 text-xs text-gray-700 font-semibold" onClick={markAsCompleted}>
+                                                            Mark as complete
+                                                        </button>
+                                                    )}
+                                                    {status === "completed" && time && request.completedBy && (
+                                                        <span className="ml-2 text-xs text-gray-700 font-semibold">
+                                                            Mark as completed by: {request.completedBy}
                                                         </span>
                                                     )}
                                                 </span>

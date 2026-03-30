@@ -49,6 +49,9 @@ const userServiceSchema = new mongoose.Schema({
     acceptedBy: {
         type: String
     },
+    completedBy: {
+        type: String
+    },
     serviceStatus: {
         type: String,
         enum: [
