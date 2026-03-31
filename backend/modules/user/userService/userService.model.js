@@ -34,6 +34,10 @@ const userServiceSchema = new mongoose.Schema({
     feedback: {
         type: String
     },
+    completionFeedback: {
+        type: String,
+        default: null
+    },
     scheduleService: {
         type: Date,
         default: null

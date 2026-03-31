@@ -10,6 +10,7 @@ const rateLimit = require("express-rate-limit");
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+const path = require('path');
 
 const cron = require('node-cron');
 const TechnicianUserService = require('./modules/adminPanel/userService/technicianUserService.model');
@@ -67,6 +68,11 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/assets', express.static('assets'));
+
+const resetPage = (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
+app.get('/user/reset-password/:token', resetPage);
+app.get('/reset-password/:token', resetPage);
+app.get('/technician/reset-password/:token', resetPage);
 
 // app.use(cors());
 app.use(cors({

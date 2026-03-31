@@ -399,29 +399,40 @@ exports.markAsCompleted = async (req, res, next) => {
     }
 }
 
-exports.addUserComment = async (req, res, next) => {
-    const { serviceId, userComment } = req.body;
+exports.submitFeedback = async (req, res, next) => {
+    const { serviceId, completionFeedback } = req.body;
     try {
-        const service = await UserService.findById(serviceId);
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({ message: "User id needed" });
+        }
+        if (!serviceId || !completionFeedback) {
+            return res.status(400).json({ message: "serviceId and completionFeedback are required" });
+        }
+
+        const service = await UserService.findOne({ _id: serviceId, userId: userId });
         if (!service) {
-            return res.status(404).json({
-                success: false,
-                message: "Service not found"
-            })
+            return res.status(404).json({ message: "Service request not found for this user" });
         }
+
         if (service.serviceStatus !== "completed") {
-            return res.status(400).json({
-                success: false,
-                message: "Service not completed yet"
-            })
+            return res.status(400).json({ message: "Feedback can only be submitted for completed services" });
         }
-        service.userComment = userComment;
+
+        if (service.isFeedbackSubmitted) {
+            return res.status(400).json({ message: "Feedback has already been submitted for this service" });
+        }
+
+        service.completionFeedback = completionFeedback;
+        service.isFeedbackSubmitted = true;
         await service.save();
+
         res.status(200).json({
             success: true,
-            message: "Comment updated"
-        })
+            message: "Feedback submitted successfully"
+        });
+
     } catch (err) {
-        next(err)
+        next(err);
     }
 }

@@ -1,6 +1,7 @@
 const Gift = require("./gift.model");
 const UserAccount = require("../../userAccount/userAccount.model");
 const GiftDistribution = require("./giftDistribution.model");
+const PointsHistory = require("../points/pointsHistory.model");
 
 exports.add = async (req, res, next) => {
     try {
@@ -44,6 +45,15 @@ exports.add = async (req, res, next) => {
             read: false
         }));
         await GiftDistribution.insertMany(distributionRecords);
+
+        const pointsHistoryRecords = usersToUpdate.map(userId => ({
+            userId,
+            history: `Gift: ${gift.title}`,
+            points: totalPoints,
+            time: new Date(),
+            status: "credit"
+        }));
+        await PointsHistory.insertMany(pointsHistoryRecords);
 
         res.status(201).json({
             success: true,

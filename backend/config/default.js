@@ -7,7 +7,7 @@ const config = {
     jwt: process.env.JWT_SECRET,
     mail_user: process.env.EMAIL_USER,
     mail_pass: process.env.EMAIL_PASS,
-    frontend: process.env.FRONTEND_URL,
+    frontend: (process.env.FRONTEND_URL || '').replace(/\/$/, ''),
     firebase: process.env.FIREBASE_SERVICE_ACCOUNT
 }
 module.exports = config;
