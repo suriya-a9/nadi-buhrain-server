@@ -84,6 +84,10 @@ const userServiceSchema = new mongoose.Schema({
     payment: {
         type: Number,
         default: "0"
+    },
+    userComment: {
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 

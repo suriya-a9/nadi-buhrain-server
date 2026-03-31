@@ -398,3 +398,30 @@ exports.markAsCompleted = async (req, res, next) => {
         next(err)
     }
 }
+
+exports.addUserComment = async (req, res, next) => {
+    const { serviceId, userComment } = req.body;
+    try {
+        const service = await UserService.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                message: "Service not found"
+            })
+        }
+        if (service.serviceStatus !== "completed") {
+            return res.status(400).json({
+                success: false,
+                message: "Service not completed yet"
+            })
+        }
+        service.userComment = userComment;
+        await service.save();
+        res.status(200).json({
+            success: true,
+            message: "Comment updated"
+        })
+    } catch (err) {
+        next(err)
+    }
+}

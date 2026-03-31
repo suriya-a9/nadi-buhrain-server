@@ -14,6 +14,7 @@ const UserLog = require('../userLogs/userLogs.model');
 const crypto = require("crypto");
 const sendMail = require("../../utils/mailer");
 const userResetPasswordTemplate = require("../../template/userResetPasswordTemplate");
+const memberAccountCreationTemplate = require("../../template/memberAccountCreationTemplate");
 const Points = require("../adminPanel/points/points.model");
 const PointsHistory = require("../adminPanel/points/pointsHistory.model");
 const accountRegisterTemplate = require("../../template/accountRegisterTemplate");
@@ -1032,7 +1033,8 @@ exports.addAdditionalFamilyMembers = async (req, res, next) => {
         if (existingUser) {
             return res.status(400).json({ message: "Family member already exists as user" });
         }
-
+        const familyHead = await UserAccount.findById(userId);
+        const familyMemeberHead = familyHead.basicInfo.fullName;
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const familyMember = await FamilyMember.create({
@@ -1073,6 +1075,20 @@ exports.addAdditionalFamilyMembers = async (req, res, next) => {
         if (familyCount) owner.familyCount = familyCount;
         owner.familyMembersAdded += 1;
         await owner.save();
+
+        try {
+            await sendMail({
+                to: familyMember.email,
+                subject: "Account Register",
+                html: memberAccountCreationTemplate({
+                    name: familyMember.fullName,
+                    email: familyMember.email,
+                    familyHead: familyMemeberHead
+                })
+            });
+        } catch (mailErr) {
+            console.error("Failed to send verification email:", mailErr);
+        }
 
         res.status(201).json({
             message: 'Family member added as user',
