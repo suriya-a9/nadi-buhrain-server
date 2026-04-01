@@ -212,7 +212,7 @@ export default function NotVerifiedUser() {
                                 >
                                     Verify
                                 </button>
-                                <button
+                                {row.accountVerification === "not verified" ? <button
                                     onClick={() => {
                                         setSelectedUser({ user: row, type: 'user' });
                                         setDetailsOpen(true);
@@ -221,7 +221,9 @@ export default function NotVerifiedUser() {
                                     className="px-2 py-1 bg-red-500 text-white rounded text-sm"
                                 >
                                     Reject
-                                </button>
+                                </button> :
+                                    ""}
+
                             </div>
                         )}
                     />

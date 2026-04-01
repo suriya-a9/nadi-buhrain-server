@@ -465,42 +465,36 @@ exports.pointsHistory = async (req, res, next) => {
 
 exports.listFamilyMembersWithPoints = async (req, res, next) => {
     try {
-        let userId = req.user.id;
+        const userId = req.user.id;
         if (!userId) {
             return res.status(400).json({ message: "User id required" });
         }
 
         const currentUser = await UserAccount.findById(userId);
 
-        let ownerDoc = null;
+        let result = [];
 
-        if (currentUser && currentUser.isFamilyMember && currentUser.familyOwnerId) {
-            ownerDoc = await UserAccount.findById(currentUser.familyOwnerId)
-                .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points accountTypeId familyMemberRef");
-            userId = currentUser.familyOwnerId;
+        if (currentUser.isFamilyMember && currentUser.familyOwnerId) {
+            const owner = await UserAccount.findById(currentUser.familyOwnerId)
+                .select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points familyMemberRef");
+            if (owner) result.push(owner.toObject());
         }
 
-        const familyMembers = await UserAccount.find({
-            familyOwnerId: userId,
-            isFamilyMember: true,
-            _id: { $ne: currentUser._id }
+        const children = await UserAccount.find({
+            familyOwnerId: currentUser._id,
+            isFamilyMember: true
         }).select("basicInfo.fullName basicInfo.mobileNumber basicInfo.email basicInfo.image points familyMemberRef");
 
-        let allMembers = familyMembers.map(fm => fm.toObject());
-        if (ownerDoc) {
-            allMembers.unshift(ownerDoc.toObject());
-        }
+        result = result.concat(children.map(c => c.toObject()));
 
-        const familyMemberRefs = allMembers.map(fm => fm.familyMemberRef).filter(Boolean);
-        const relations = await FamilyMember.find({ _id: { $in: familyMemberRefs } })
-            .select("relation");
-
+        const familyMemberRefs = result.map(fm => fm.familyMemberRef).filter(Boolean);
+        const relations = await FamilyMember.find({ _id: { $in: familyMemberRefs } }).select("relation");
         const relationMap = {};
         relations.forEach(r => {
             relationMap[r._id.toString()] = r.relation;
         });
 
-        const data = allMembers.map(fm => ({
+        const data = result.map(fm => ({
             ...fm,
             relation: relationMap[fm.familyMemberRef?.toString()] || null
         }));

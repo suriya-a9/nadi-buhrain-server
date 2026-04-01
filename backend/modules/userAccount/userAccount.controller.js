@@ -297,6 +297,8 @@ exports.termsAndConditionVerify = async (req, res, next) => {
 exports.completeSignUp = async (req, res, next) => {
     const { userId, isVerfied } = req.body;
     try {
+        const individualAccount = await Account.findOne({ type: "IA" });
+        const individualAccountPoints = await Points.findOne({ accountType: individualAccount._id });
         const user = await UserAccount.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -332,7 +334,7 @@ exports.completeSignUp = async (req, res, next) => {
             const existing = await UserAccount.findOne({ "basicInfo.mobileNumber": member.mobile });
             if (existing) continue;
             const newFamilyUser = await UserAccount.create({
-                accountTypeId: user.accountTypeId,
+                accountTypeId: individualAccount._id,
                 basicInfo: {
                     fullName: member.fullName,
                     mobileNumber: member.mobile,
@@ -350,12 +352,12 @@ exports.completeSignUp = async (req, res, next) => {
                 familyMemberRef: member._id
             });
             if (pointsDoc) {
-                newFamilyUser.points = pointsDoc.points;
+                newFamilyUser.points = individualAccountPoints.points;
                 await newFamilyUser.save();
                 await PointsHistory.create({
                     userId: newFamilyUser._id,
                     history: `Signup points`,
-                    points: pointsDoc.points,
+                    points: individualAccountPoints.points,
                     time: new Date(),
                     status: "credit"
                 });

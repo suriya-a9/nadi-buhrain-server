@@ -110,7 +110,7 @@ exports.verificaionAccountList = async (req, res, next) => {
         const users = await UserAccount.find({
             status: "completed",
             singnUpCompleted: true,
-            accountVerification: "not verified"
+            accountVerification: { $in: ["not verified", "rejected"] }
         })
             .populate('accountTypeId')
             .lean();
