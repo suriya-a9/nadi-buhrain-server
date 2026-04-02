@@ -7,7 +7,7 @@ function getValue(obj, key) {
 }
 
 
-export default function Table({ columns = [], data = [], actions }) {
+export default function Table({ columns = [], data = [], actions, getRowClassName }) {
   return (
     <div className="bg-white rounded shadow overflow-hidden">
       <div className="overflow-x-auto">
@@ -42,7 +42,7 @@ export default function Table({ columns = [], data = [], actions }) {
               data.map((row, idx) => (
                 <tr
                   key={row._id}
-                  className="border-b hover:bg-gray-50 transition"
+                  className={`border-b transition ${getRowClassName ? getRowClassName(row) : ''}`}
                 >
                   {columns.map((col) => (
                     <td

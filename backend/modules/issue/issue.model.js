@@ -11,6 +11,10 @@ const issueSchema = new mongoose.Schema({
     },
     issue_ar: {
         type: String
+    },
+    status: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true });
 

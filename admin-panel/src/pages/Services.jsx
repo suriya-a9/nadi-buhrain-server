@@ -87,6 +87,16 @@ export default function Services() {
             toast.error(err.response?.data?.message);
         }
     };
+
+    const toggleServiceStatus = async (item) => {
+        try {
+            await api.post("/service/status-toggle", { serviceId: item._id, status: !item.status });
+            toast.success("Service status updated");
+            loadServices();
+        } catch (err) {
+            toast.error("Failed to update service status");
+        }
+    };
     const filteredServices = services.filter(s =>
         (s.name_en || "").toLowerCase().includes(search.toLowerCase()) ||
         (s.name_ar || "").toLowerCase().includes(search.toLowerCase())
@@ -155,6 +165,11 @@ export default function Services() {
                             { title: "Name (Ar)", key: "name_ar" },
                             { title: "Points", key: "points" },
                             {
+                                title: "Status",
+                                key: "status",
+                                render: (value) => value ? "Enabled" : "Disabled"
+                            },
+                            {
                                 title: "Image",
                                 key: "serviceImage",
                                 render: (value) =>
@@ -188,9 +203,9 @@ export default function Services() {
                         ]}
                         data={paginatedServices}
                         actions={(row) => (
-                            <div>
+                            <div className="flex gap-2">
                                 <button
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
                                     onClick={() => editService(row)}
                                 >
                                     Edit
@@ -201,6 +216,13 @@ export default function Services() {
                                     onClick={() => deleteService(row._id)}
                                 >
                                     Delete
+                                </button>
+
+                                <button
+                                    onClick={() => toggleServiceStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

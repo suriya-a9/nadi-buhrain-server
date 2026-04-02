@@ -228,6 +228,7 @@ export default function User() {
                             },
                         ]}
                         data={paginatedUsers}
+                        getRowClassName={(row) => row.accountStatus ? 'bg-green-100' : 'bg-red-100'}
                         actions={(row) => (
                             <div className="flex gap-2">
                                 <button

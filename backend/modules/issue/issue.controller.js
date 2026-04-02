@@ -29,7 +29,7 @@ exports.addIssue = async (req, res, next) => {
 exports.listIssue = async (req, res, next) => {
     try {
         const lang = req.query.lang || "en";
-        const issueList = await Issue.find().populate('serviceId');
+        const issueList = await Issue.find({ status: true }).populate('serviceId');
         const data = issueList.map(item => {
             const obj = item.toObject();
             obj.issue = lang === "ar" ? obj.issue_ar : obj.issue_en;
@@ -106,6 +106,35 @@ exports.deleteIssue = async (req, res, next) => {
         });
         res.status(200).json({
             message: 'deleted successfully'
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.statusToggle = async (req, res, next) => {
+    const { issueId, status } = req.body;
+    try {
+        const issue = await Issue.findById(issueId);
+        if (!issue) {
+            return res.status(404).json({
+                success: false,
+                message: "issue not found"
+            })
+        }
+        issue.status = status;
+        await issue.save();
+        await UserLog.create({
+            userId: req.user.id,
+            log: `updated ${issue.issue_en} issue status`,
+            status: "Updated",
+            role: "admin",
+            logo: "/assets/verification.webp",
+            time: new Date()
+        });
+        res.status(200).json({
+            success: true,
+            message: "issue status updated"
         })
     } catch (err) {
         next(err)

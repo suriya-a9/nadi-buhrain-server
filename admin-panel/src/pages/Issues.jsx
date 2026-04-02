@@ -110,6 +110,16 @@ export default function Issues() {
         currentPage * itemsPerPage
     );
 
+    const toggleIssueStatus = async (item) => {
+        try {
+            await api.post("/issue/status-toggle", { issueId: item._id, status: !item.status });
+            toast.success("Issue status updated");
+            loadIssues();
+        } catch (err) {
+            toast.error("Failed to update issue status");
+        }
+    };
+
     return (
         <div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
@@ -164,6 +174,11 @@ export default function Issues() {
                             { title: "Issue (EN)", key: "issue_en" },
                             { title: "Issue (AR)", key: "issue_ar" },
                             {
+                                title: "Status",
+                                key: "status",
+                                render: (value) => value ? "Enabled" : "Disabled"
+                            },
+                            {
                                 title: "Date & Time",
                                 key: "updatedAt",
                                 render: (_, row) => formatDateTime(row.updatedAt)
@@ -183,6 +198,12 @@ export default function Issues() {
                                     className="bg-red-600 text-white px-3 py-1 rounded"
                                 >
                                     Delete
+                                </button>
+                                <button
+                                    onClick={() => toggleIssueStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

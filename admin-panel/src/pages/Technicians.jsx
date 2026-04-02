@@ -236,6 +236,7 @@ export default function Technicians() {
                             },
                         ]}
                         data={paginatedTechnicians}
+                        getRowClassName={(row) => row.status ? 'bg-green-100' : 'bg-red-100'}
                         actions={(row) => (
                             <div className="flex gap-2">
                                 <button
