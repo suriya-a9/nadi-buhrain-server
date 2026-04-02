@@ -55,12 +55,17 @@ export default function PopUpQuestionnaireDetail() {
                 </h2>
                 <p>Total Points: {questionnaire.totalPoints}</p>
                 <p>Total Questions: {questionnaire.questions.length}</p>
-                {questionnaire.targetUserId ? (
-                    <p>
-                        <b>Target User:</b>{" "}
-                        {questionnaire.targetUserId.basicInfo.fullName} (
-                        {questionnaire.targetUserId.basicInfo.email})
-                    </p>
+                {questionnaire.targetUserId && questionnaire.targetUserId.length > 0 ? (
+                    <div>
+                        <b>Target Users:</b>
+                        <ul className="ml-5 list-disc">
+                            {questionnaire.targetUserId.map((u) => (
+                                <li key={u._id}>
+                                    {u.basicInfo?.fullName || "Unknown"} ({u.basicInfo?.email || "-"})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 ) : (
                     <p>
                         <b>Allowed Account Types:</b> {getAccountTypeNames()}

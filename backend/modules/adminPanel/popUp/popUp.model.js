@@ -1,0 +1,34 @@
+const mongoose = require("mongoose");
+
+const popUpQuestionSchema = new mongoose.Schema({
+    question: String,
+    options: [String],
+    correctAnswer: Number,
+    type: { type: String, enum: ["choose", "input"], default: "choose" },
+    inputAnswer: String
+});
+
+const popUpQuestionnaireSchema = new mongoose.Schema({
+    title: String,
+    totalPoints: Number,
+    questions: [popUpQuestionSchema],
+    status: {
+        type: Boolean,
+        default: false
+    },
+    allowedAccountTypes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account"
+    }],
+    targetUserId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserAccount",
+        default: null
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = mongoose.model("PopUpQuestionnaire", popUpQuestionnaireSchema);

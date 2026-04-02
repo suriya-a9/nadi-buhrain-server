@@ -52,6 +52,13 @@ exports.adminLogin = async (req, res, next) => {
         if (!admin) {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
+
+        if(admin.status !== true){
+            return res.status(403).json({
+                success: false,
+                message: "Account is disabled"
+            })
+        }
         const permissions = admin.role?.permissions || [];
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch) {

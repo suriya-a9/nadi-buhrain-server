@@ -23,7 +23,7 @@ export default function Roles() {
     const token = localStorage.getItem("token");
     const loadRoles = async () => {
         setLoading(true);
-        const res = await api.get("/role/");
+        const res = await api.get("/role/admin-list");
         setRolesList(res.data.data);
         setLoading(false);
     };
@@ -89,6 +89,20 @@ export default function Roles() {
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
+
+    const toggleRoleStatus = async (item) => {
+        try {
+            await api.post(
+                "/role/status-toggle",
+                { roleId: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Role status updated");
+            loadRoles();
+        } catch (err) {
+            toast.error("Failed to update role status");
+        }
+    };
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
@@ -135,6 +149,12 @@ export default function Roles() {
                                     className="bg-red-600 text-white px-3 py-1 rounded"
                                 >
                                     Delete
+                                </button>
+                                <button
+                                    onClick={() => toggleRoleStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

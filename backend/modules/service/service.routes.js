@@ -1,5 +1,5 @@
 const express = require('express');
-const { createService, deleteService, listService, updateService, listServiceForAdmin } = require('./service.controller');
+const { createService, deleteService, listService, updateService, listServiceForAdmin, statusToggle } = require('./service.controller');
 const upload = require('../../middleware/fileUpload');
 const auth = require('../../middleware/authMiddleware');
 
@@ -18,5 +18,6 @@ router.post('/edit', auth, upload.fields([
 router.post('/delete', auth, deleteService);
 router.get('/', listService);
 router.get('/list', listServiceForAdmin);
+router.post('/status-toggle', auth, statusToggle);
 
 module.exports = router;

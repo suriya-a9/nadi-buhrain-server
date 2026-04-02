@@ -72,7 +72,7 @@ export default function PopUpQuestionnaire() {
             title: item.title,
             totalPoints: item.totalPoints,
             questions: item.questions,
-            targetUserId: item.targetUserId || "",
+            targetUserId: item.targetUserId || [],
         });
         setOpenCanvas(true);
     };
@@ -85,10 +85,10 @@ export default function PopUpQuestionnaire() {
         e.preventDefault();
         try {
             const payload = { ...form };
-            if (form.targetUserId) {
+            if (form.targetUserId.length > 0) {
                 payload.allowedAccountTypes = [];
             } else {
-                payload.targetUserId = "";
+                payload.targetUserId = [];
             }
             if (editData) payload.id = editData._id;
 
@@ -328,7 +328,33 @@ export default function PopUpQuestionnaire() {
                             className="w-full border p-2 rounded"
                             disabled={form.allowedAccountTypes?.length > 0}
                         />
-
+                        {form.targetUserId.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {form.targetUserId.map(id => {
+                                    const u = users.find(user => user._id === id);
+                                    return (
+                                        <span
+                                            key={id}
+                                            className="bg-gray-200 px-2 py-1 rounded flex items-center gap-2"
+                                        >
+                                            {u?.basicInfo.fullName}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setForm({
+                                                        ...form,
+                                                        targetUserId: form.targetUserId.filter(uid => uid !== id)
+                                                    })
+                                                }
+                                                className="text-red-500"
+                                            >
+                                                ✕
+                                            </button>
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                        )}
                         {showDropdown && (
                             <div className="absolute z-10 bg-white border w-full max-h-48 overflow-y-auto rounded shadow">
                                 <div
@@ -348,11 +374,18 @@ export default function PopUpQuestionnaire() {
                                             key={user._id}
                                             className="p-2 hover:bg-gray-100 cursor-pointer"
                                             onClick={() => {
+                                                let updatedList = [...form.targetUserId];
+
+                                                if (!updatedList.includes(user._id)) {
+                                                    updatedList.push(user._id);
+                                                }
+
                                                 setForm({
                                                     ...form,
-                                                    targetUserId: user._id,
+                                                    targetUserId: updatedList,
                                                     allowedAccountTypes: []
                                                 });
+
                                                 setUserSearch("");
                                                 setShowDropdown(false);
                                             }}

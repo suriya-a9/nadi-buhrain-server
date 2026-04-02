@@ -25,7 +25,7 @@ export default function RoleManager() {
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        api.get("/role/").then(res => setRoles(res.data.data));
+        api.get("/role/admin-list").then(res => setRoles(res.data.data));
     }, []);
 
     const handleRoleSelect = (role) => {

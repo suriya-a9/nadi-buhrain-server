@@ -9,6 +9,10 @@ const roleSchema = new mongoose.Schema({
     permissions: {
         type: [String],
         default: ["dashboard"]
+    },
+    status: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true });
 

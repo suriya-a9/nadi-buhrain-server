@@ -32,10 +32,22 @@ exports.addRole = async (req, res, next) => {
 
 exports.listRoles = async (req, res, next) => {
     try {
-        const roleList = await Role.find();
+        const roleList = await Role.find({ status: true });
         res.status(200).json({
             success: true,
             data: roleList
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.adminRoleList = async (req, res, next) => {
+    try {
+        const listData = await Role.find();
+        res.status(200).json({
+            success: true,
+            data: listData
         })
     } catch (err) {
         next(err)
@@ -96,6 +108,36 @@ exports.deleteRole = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: "role deleted",
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.statusToggle = async (req, res, next) => {
+    const { roleId, status } = req.body;
+    try {
+        const role = await Role.findById(roleId);
+        if (!role) {
+            return res.status(404).json({
+                success: false,
+                message: "role not found"
+            })
+        }
+
+        role.status = status;
+        await role.save();
+        await UserLog.create({
+            userId: req.user.id,
+            log: `${role.name} role status updated`,
+            status: "Updated",
+            role: "admin",
+            logo: "/assets/role.webp",
+            time: new Date()
+        })
+        res.status(200).json({
+            success: true,
+            message: "Role status updated"
         })
     } catch (err) {
         next(err)

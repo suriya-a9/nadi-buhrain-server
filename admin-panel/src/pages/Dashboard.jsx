@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUsers } from "react-icons/fa";
 import { MdVerifiedUser } from "react-icons/md";
 import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
@@ -135,24 +135,29 @@ export default function Dashboard() {
             )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[35px] h-full">
-                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
-                        <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[20px]">Total<br />Technician</span>
-                            <span className="bg-[#6c8fcf] text-white p-2 rounded-[10px] ml-auto">
-                                <FaUsers size={22} />
-                            </span>
+                    <Link to="/technicians">
+                        <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold text-[20px]">Total<br />Technician</span>
+                                <span className="bg-[#6c8fcf] text-white p-2 rounded-[10px] ml-auto">
+                                    <FaUsers size={22} />
+                                </span>
+                            </div>
+                            {renderAvatars(dashboardData.technicians, "technician")}
                         </div>
-                        {renderAvatars(dashboardData.technicians, "technician")}
-                    </div>
-                    <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
-                        <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[20px]">Verified<br /> Users</span>
-                            <span className="bg-[#4ad991] text-white p-2 rounded-[10px] ml-auto">
-                                <MdVerifiedUser size={22} />
-                            </span>
+                    </Link>
+                    <Link to="/users">
+                        <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold text-[20px]">Verified<br /> Users</span>
+                                <span className="bg-[#4ad991] text-white p-2 rounded-[10px] ml-auto">
+                                    <MdVerifiedUser size={22} />
+                                </span>
+                            </div>
+                            {renderAvatars(dashboardData.users, "user")}
                         </div>
-                        {renderAvatars(dashboardData.users, "user")}
-                    </div>
+                    </Link>
+                    <Link to="/service-requests">
                     <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Total Requests</span>
@@ -164,6 +169,8 @@ export default function Dashboard() {
                             {dashboardData.serviceRequests.length}
                         </div>
                     </div>
+                    </Link>
+                    <Link to="/requested-points">
                     <div className="p-4 sm:p-6 bg-white rounded-[25px] shadow flex flex-col justify-between h-auto sm:h-[215px]">
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-[20px]">Total Points Request</span>
@@ -175,6 +182,7 @@ export default function Dashboard() {
                             {dashboardData.points.length}
                         </div>
                     </div>
+                    </Link>
                 </div>
                 <div className="bg-white rounded-[25px] shadow p-6 flex flex-col justify-between h-full min-h-[304px]">
                     <div className="flex justify-between items-center mb-4">
