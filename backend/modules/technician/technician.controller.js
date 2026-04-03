@@ -460,6 +460,9 @@ exports.updateServiceStatus = async (req, res, next) => {
         if (mediaFiles.length > 0) {
             updateFields["assignments.$[elem].media"] = mediaFiles;
         }
+        if (voiceFile) {
+            updateFields["assignments.$[elem].voice"] = voiceFile;
+        }
 
         const updatedTechUserService = await TechnicianUserService.findOneAndUpdate(
             { userServiceId },
@@ -496,7 +499,7 @@ exports.updateServiceStatus = async (req, res, next) => {
             time: now
         });
         res.status(200).json({
-            message: "Service completed, notes and media saved",
+            message: "Service completed, notes, media and voice saved",
             techUserService: updatedTechUserService
         });
     } catch (err) {

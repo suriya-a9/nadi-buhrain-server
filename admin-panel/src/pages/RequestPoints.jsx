@@ -12,6 +12,7 @@ export default function RequestPoints() {
     const token = localStorage.getItem("token");
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState("");
     useEffect(() => {
         loadRequests();
         loadQuestionnaires();
@@ -52,29 +53,48 @@ export default function RequestPoints() {
             toast.error(err.response?.data?.message || "Failed to update action");
         }
     };
-    const totalPages = Math.ceil(requests.length / itemsPerPage);
-    const paginatedRequests = requests.slice(
+    const filteredRequests = requests.filter((r) =>
+        statusFilter === "" || String(r.status || "").toLowerCase() === statusFilter.toLowerCase()
+    );
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+    const paginatedRequests = filteredRequests.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
     return (
         <div>
-            <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen mb-4">
-                Requests
-            </h2>
-            <select
-                value={itemsPerPage}
-                onChange={e => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                }}
-                className="border p-2 rounded w-28"
-            >
-                <option value={10}>Show 10</option>
-                <option value={50}>Show 50</option>
-                <option value={100}>Show 100</option>
-            </select>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+                <h2 className="text-[20px] sm:text-[25px] font-bold text-textGreen">
+                    Requests
+                </h2>
+                <select
+                    value={statusFilter}
+                    onChange={e => {
+                        setStatusFilter(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                    className="border p-2 rounded"
+                >
+                    <option value="">All Status</option>
+                    <option value="requested">Requested</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="sent questionnaire">Send Questionnaire</option>
+                </select>
+                <select
+                    value={itemsPerPage}
+                    onChange={e => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                    }}
+                    className="border p-2 rounded w-28"
+                >
+                    <option value={10}>Show 10</option>
+                    <option value={50}>Show 50</option>
+                    <option value={100}>Show 100</option>
+                </select>
+            </div>
             {loading ? (
                 <div className="flex justify-center items-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-textGreen"></div>

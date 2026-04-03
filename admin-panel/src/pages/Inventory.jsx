@@ -207,7 +207,7 @@ export default function Inventory() {
                         <option value={50}>Show 50</option>
                         <option value={100}>Show 100</option>
                     </select>
-                    <select
+                    {/* <select
                         value={selectedService}
                         onChange={e => setSelectedService(e.target.value)}
                         className="border p-2 rounded w-48"
@@ -218,7 +218,7 @@ export default function Inventory() {
                                 {service.name_en}
                             </option>
                         ))}
-                    </select>
+                    </select> */}
                     <button
                         onClick={openCreate}
                         className="bg-bgGreen text-white px-4 py-2 rounded w-full sm:w-auto"

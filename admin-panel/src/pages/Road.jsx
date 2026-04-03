@@ -25,7 +25,7 @@ export default function Road() {
     const loadRoadList = async () => {
         try {
             setLoading(true);
-            const res = await api.get("/road/");
+            const res = await api.get("/road/admin-list");
             setRoadList(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -92,7 +92,19 @@ export default function Road() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
+    const toggleRoadStatus = async (item) => {
+        try {
+            await api.post(
+                "/road/status-toggle",
+                { roadId: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Road status updated");
+            loadRoadList();
+        } catch (err) {
+            toast.error("Failed to update road status");
+        }
+    };
     return (
         <div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
@@ -163,6 +175,12 @@ export default function Road() {
                                     className="bg-red-600 text-white px-3 py-1 rounded"
                                 >
                                     Delete
+                                </button>
+                                <button
+                                    onClick={() => toggleRoadStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

@@ -17,6 +17,7 @@ const technicianAssignmentSchema = new mongoose.Schema({
     reason: String,
     notes: String,
     media: [String],
+    voice: String,
     workStartedAt: Date,
     userApproval: { type: Boolean, default: false },
     workDuration: { type: Number, default: 0 },

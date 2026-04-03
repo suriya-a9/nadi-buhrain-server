@@ -38,7 +38,7 @@ export default function Block() {
     };
 
     const loadBlockList = async () => {
-        const res = await api.get("/block/");
+        const res = await api.get("/block/admin-list");
         setBlockList(res.data.data);
     };
 
@@ -121,7 +121,19 @@ export default function Block() {
             .filter(Boolean)
             .join(", ");
     };
-
+    const toggleBlockStatus = async (item) => {
+        try {
+            await api.post(
+                "/block/status-toggle",
+                { blockId: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Block status updated");
+            loadBlockList();
+        } catch (err) {
+            toast.error("Failed to update block status");
+        }
+    };
     return (
         <div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
@@ -197,6 +209,12 @@ export default function Block() {
                                     className="bg-red-600 text-white px-3 py-1 rounded"
                                 >
                                     Delete
+                                </button>
+                                <button
+                                    onClick={() => toggleBlockStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

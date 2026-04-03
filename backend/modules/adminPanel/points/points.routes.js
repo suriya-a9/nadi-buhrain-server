@@ -1,5 +1,5 @@
 const express = require('express');
-const { addPoints, listPoints, updatePoints, transferPointsWithFamily, requestPointsToFamily, requestList, requestToAdmin, listAdminRequest, handleAdminRequestAction, pointsHistory, listFamilyMembersWithPoints, requestedList, peopleList, requestWithOutMobileNumber, listClientPointAdminRequest } = require('./points.controller');
+const { addPoints, listPoints, updatePoints, transferPointsWithFamily, requestPointsToFamily, requestList, requestToAdmin, listAdminRequest, handleAdminRequestAction, pointsHistory, listFamilyMembersWithPoints, requestedList, peopleList, requestWithOutMobileNumber, listClientPointAdminRequest, deletePoints } = require('./points.controller');
 const auth = require('../../../middleware/authMiddleware');
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.get('/family-members', auth, listFamilyMembersWithPoints);
 router.post('/requested-list', auth, requestedList);
 router.post('/people-list', auth, peopleList);
 router.post('/request-with-id', auth, requestWithOutMobileNumber);
-router.post('/listadmin', auth, listClientPointAdminRequest)
+router.post('/listadmin', auth, listClientPointAdminRequest);
+router.post('/delete', auth, deletePoints);
 
 module.exports = router;

@@ -640,3 +640,31 @@ exports.requestWithOutMobileNumber = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.deletePoints = async (req, res, next) => {
+    const { pointsId } = req.body;
+    try {
+        const points = await Points.findById(pointsId);
+        if (!points) {
+            return res.status(404).json({
+                success: false,
+                message: "points not found"
+            })
+        }
+        await Points.findByIdAndDelete(pointsId);
+        await UserLog.create({
+            userId: req.user.id,
+            log: `${points.points} Points updated`,
+            status: "Updated",
+            role: "admin",
+            logo: "/assets/badge.webp",
+            time: new Date()
+        });
+        res.status(200).json({
+            success: true,
+            message: "Deleted successfully"
+        });
+    } catch (err) {
+        next(err)
+    }
+}

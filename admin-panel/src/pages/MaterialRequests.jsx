@@ -138,6 +138,7 @@ export default function MaterialRequests() {
                             },
                         ]}
                         data={paginatedRequests}
+                        getRowClassName={(row) => row.status === "rejected" ? 'bg-red-100' : row.status === "requested" ? 'bg-green-100' : ''}
                         actions={(row) => (
                             <div className="flex gap-2">
                                 {row.status !== "processed" && (

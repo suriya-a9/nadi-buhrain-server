@@ -9,7 +9,11 @@ const blockSchema = new mongoose.Schema(
     roads: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Road"
-    }]
+    }],
+    status: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );

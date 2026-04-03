@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../services/api";
 import Offcanvas from "../components/Offcanvas";
 import Table from "../components/Table";
+import toast from "react-hot-toast";
 import { formatDateTime } from "../utils/dateUtils";
 
 export default function Points() {
@@ -47,31 +48,69 @@ export default function Points() {
     };
     const savePoints = async (e) => {
         e.preventDefault();
-        if (editData) {
-            await api.post("/points/update", {
-                id: editData._id,
-                points: form.points,
-                accountType: form.accountType
-            });
-        } else {
-            await api.post("/points/add", form);
+
+        if (!form.accountType) {
+            toast.error("Please select account type");
+            return;
         }
-        setOpenCanvas(false);
-        loadPoints();
+
+        try {
+            if (editData) {
+                await api.post("/points/update", {
+                    id: editData._id,
+                    points: form.points,
+                    accountType: form.accountType
+                });
+                toast.success("Points updated successfully");
+            } else {
+                await api.post("/points/add", form);
+                toast.success("Points assigned successfully");
+            }
+            setOpenCanvas(false);
+            loadPoints();
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to assign points");
+        }
     };
     const deletePoints = async (id) => {
-        await api.post("/points/delete", { id });
-        loadPoints();
+        try {
+            const res = await api.post(
+                "/points/delete",
+                { pointsId: id },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            toast.success(res.data.message);
+            loadPoints();
+
+        } catch (err) {
+            toast.error(
+                err.response?.data?.message || "Something went wrong"
+            );
+        }
     };
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-[25px] font-bold mb-6 text-textGreen">Points List</h2>
+                <button
+                    onClick={openCreate}
+                    className="bg-bgGreen text-white px-4 py-2 rounded"
+                >
+                    Assign points to new Account type
+                </button>
             </div>
             <Table
                 columns={[
                     { title: "Points", key: "points" },
-                    { title: "Account type", key: "accountType.name" },
+                    {
+                        title: "Account type",
+                        key: "accountType.name_en",
+                        render: (_, row) => {
+                            const t = row.accountType || {};
+                            return t.name_en || t.name_ar || t.type || "-";
+                        }
+                    },
                     {
                         title: "Date & Time",
                         key: "updatedAt",
@@ -124,7 +163,7 @@ export default function Points() {
                             <option value="">Select Account Type</option>
                             {accountTypes.map((type) => (
                                 <option key={type._id} value={type._id}>
-                                    {type.name}
+                                    {type.name_en || type.name_ar || type.type || "Unnamed"}
                                 </option>
                             ))}
                         </select>

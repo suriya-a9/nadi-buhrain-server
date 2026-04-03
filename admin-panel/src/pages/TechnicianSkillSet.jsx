@@ -24,7 +24,7 @@ export default function TechnicianSkills() {
     const loadTechnicianSkill = async () => {
         try {
             setLoading(true);
-            const res = await api.get("/technical");
+            const res = await api.get("/technical/admin-list");
             setTechnicianSkill(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -89,6 +89,19 @@ export default function TechnicianSkills() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+    const toggleSkillStatus = async (item) => {
+        try {
+            await api.post(
+                "/technical/status-toggle",
+                { skillId: item._id, status: !item.status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Skill status updated");
+            loadTechnicianSkill();
+        } catch (err) {
+            toast.error("Failed to update skill status");
+        }
+    };
     return (
         <div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
@@ -159,6 +172,12 @@ export default function TechnicianSkills() {
                                     className="bg-red-600 text-white px-3 py-1 rounded"
                                 >
                                     Delete
+                                </button>
+                                <button
+                                    onClick={() => toggleSkillStatus(row)}
+                                    className={`px-3 py-1 rounded text-white ${row.status ? "bg-red-600" : "bg-green-600"}`}
+                                >
+                                    {row.status ? "Disable" : "Enable"}
                                 </button>
                             </div>
                         )}

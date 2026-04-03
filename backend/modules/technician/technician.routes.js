@@ -10,7 +10,10 @@ router.post('/list', auth, servicesList);
 router.post('/inventory', auth, inventory);
 router.post('/start-work', auth, startWork);
 router.post('/hold-work', auth, onHoldService);
-router.post('/update-service', auth, upload.array('media', 10), updateServiceStatus);
+router.post('/update-service', auth, upload.fields([
+    { name: 'media', maxCount: 10 },
+    { name: 'voice', maxCount: 1 }
+]), updateServiceStatus);
 router.post('/update-payment', auth, paymentRaise);
 router.post("/notifications", auth, listNotification);
 router.post('/timer', auth, getServiceTimer);
